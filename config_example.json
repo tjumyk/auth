@@ -4,7 +4,8 @@
     "port": 8777
   },
   "htpasswd": {
-    "path": "test_htpass.txt"
+    "path": "test_htpass.txt",
+    "scheme": "apr_md5_crypt"
   },
   "admin": {
     "name": "admin",

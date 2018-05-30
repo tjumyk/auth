@@ -10,7 +10,7 @@ app = Flask(__name__)
 with open('config.json') as _f:
     config = json.load(_f)
 
-ht = HtpasswdFile(config['htpasswd']['path'], default_scheme='portable')
+ht = HtpasswdFile(config['htpasswd']['path'], default_scheme=config['htpasswd']['scheme'])
 ht_lock = Lock()
 
 reset_keys = {}
