@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="app" ng-cloak ng-controller="RootController">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Password Management</title>
+    <link rel="shortcut icon" href="static/image/logo-64.png" type="image/png">
+
+    <link rel="stylesheet" href="static/css/semantic.min.css">
+    <link rel="stylesheet" href="static/css/app.css">
+
+    <script src="static/js/jquery.min.js"></script>
+    <script src="static/js/semantic.min.js"></script>
+
+    <script src="static/js/app.js"></script>
+</head>
+<body>
+<div class="vertical-center">
+    <div class="inner">
+        <div class="ui container">
+            <div class="ui centered grid">
+                <div class="six wide column">
+                    <div class="ui center aligned header">
+                        <img src="static/image/logo.svg" alt="logo">
+                        Add Reset Request
+                    </div>
+                    <div class="ui segment">
+                        <form class="ui form" enctype="multipart/form-data" method="post" action="">
+                            <div class="field">
+                                <label for="username">Admin Name</label>
+                                <input type="text" name="admin_name" id="admin_name" required>
+                            </div>
+                            <div class="field">
+                                <label for="password">Admin Password</label>
+                                <input type="password" name="admin_password" id="admin_password" required>
+                            </div>
+                            <div class="field">
+                                <label for="username">User Name</label>
+                                <input type="text" name="username" id="username" required>
+                            </div>
+                            <button class="ui button" type="submit">Submit</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

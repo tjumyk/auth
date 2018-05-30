@@ -1,0 +1,32 @@
+html,
+body,
+.vertical-center {
+  width: 100%;
+  height: 100%;
+}
+.app-header {
+  padding-top: 2rem;
+  padding-bottom: 1rem;
+}
+.app-footer {
+  text-align: center;
+  padding: 1em;
+}
+.vertical-center {
+  display: table;
+}
+.vertical-center > .inner {
+  display: table-cell;
+  vertical-align: middle;
+}
+.table-responsive {
+  overflow-x: auto;
+  width: 100%;
+}
+.centered-text {
+  text-align: center;
+}
+.muted-text {
+  opacity: .45!important;
+}
+/*# sourceMappingURL=app.css.map */
