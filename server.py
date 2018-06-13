@@ -60,7 +60,7 @@ def add_reset_form():
         reset_keys[new_key] = {
             "username": new_username
         }
-        return redirect('reset?key=%s' % new_key)
+        return redirect('%sreset?key=%s' % (config['site']['base_url'], new_key))
 
 
 if __name__ == '__main__':
