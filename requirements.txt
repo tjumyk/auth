@@ -1,2 +1,4 @@
 flask
+flask-sqlalchemy
+psycopg2-binary
 passlib[bcrypt]
