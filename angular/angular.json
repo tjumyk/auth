@@ -36,7 +36,9 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
-            "outputPath": "dist/auth",
+            "baseHref": "/",
+            "deployUrl": "static/",
+            "outputPath": "../static",
             "index": "src/index.html",
             "main": "src/main.ts",
             "polyfills": "src/polyfills.ts",
