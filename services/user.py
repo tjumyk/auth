@@ -92,7 +92,7 @@ class UserService:
             error = 'wrong password'
 
         from .login_record import LoginRecordService
-        LoginRecordService.add(user.id, ip, user_agent, error is None, error)
+        LoginRecordService.add(user.id, ip, user_agent.string, error is None, error)
         db.session.commit()  # force commit, a little bit ugly
 
         if error is not None:
