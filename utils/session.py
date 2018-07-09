@@ -19,7 +19,7 @@ def set_current_user(user, remember):
 
 def clear_current_user():
     if _g_key_user in g:
-        del g[_g_key_user]
+        g.pop(_g_key_user)
     if _session_key_user_id in session:
         del session[_session_key_user_id]
 
