@@ -39,7 +39,7 @@ def get_current_user():
     if user is None:  # user deleted?
         clear_current_user()  # avoid next db query
     else:
-        g[_g_key_user] = user
+        setattr(g, _g_key_user, user)
     return user
 
 
