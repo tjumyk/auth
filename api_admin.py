@@ -2,6 +2,7 @@ from flask import Blueprint, current_app as app, request, jsonify
 
 from models import db
 from services.group import GroupService, GroupServiceError
+from services.oauth import OAuthServiceError, OAuthService
 from services.user import UserService, UserServiceError
 from utils.mail import send_email
 from utils.session import requires_admin
@@ -156,4 +157,76 @@ def admin_group_user(gid, uid):
             db.session.commit()
             return "", 204
     except (UserServiceError, GroupServiceError) as e:
+        return jsonify(msg=e.msg, detail=e.detail), 400
+
+
+@admin.route('/clients', methods=['GET', 'POST'])
+@requires_admin
+def oauth_clients():
+    try:
+        if request.method == 'GET':
+            return jsonify([c.to_dict() for c in OAuthService.get_all_clients()])
+        else:  # POST
+            _json = request.json
+            name = _json.get('name')
+            redirect_url = _json.get('redirect_url')
+            home_url = _json.get('home_url')
+            description = _json.get('description')
+
+            client = OAuthService.add_client(name, redirect_url, home_url, description)
+            db.session.commit()
+            return jsonify(client.to_dict()), 201
+    except OAuthServiceError as e:
+        return jsonify(msg=e.msg, detail=e.detail), 400
+
+
+@admin.route('/clients/<int:cid>', methods=['GET', 'DELETE', 'PUT'])
+@requires_admin
+def oauth_client(cid):
+    try:
+        client = OAuthService.get_client(cid)
+        if client is None:
+            return jsonify(msg='client not found'), 404
+
+        if request.method == 'GET':
+            return jsonify(client.to_dict())
+        elif request.method == 'DELETE':
+            db.session.delete(client)
+            db.session.commit()
+            return "", 204
+        else:  # PUT
+            files = request.files
+            params = request.form or request.json
+
+            # handle upload
+            icon_file = files.get('icon')
+            if icon_file:
+                if not icon_file.filename:
+                    return jsonify(msg='icon file cannot be empty'), 400
+                url = handle_upload(icon_file, 'icon')
+                params['icon'] = url  # save url in profile
+
+            old_profile = OAuthService.update_client_profile(client, **params)
+            if icon_file:
+                old_icon = old_profile.get('icon')
+                handle_post_upload(old_icon, 'icon')
+
+            db.session.commit()
+            return "", 204
+    except (OAuthServiceError, UploadError) as e:
+        return jsonify(msg=e.msg, detail=e.detail), 400
+
+
+@admin.route('/clients/<int:cid>/regenerate-secret')
+@requires_admin
+def oauth_client_regenerate_secret(cid):
+    try:
+        client = OAuthService.get_client(cid)
+        if client is None:
+            return jsonify('client not found'), 404
+
+        OAuthService.regenerate_client_secret(client)
+        db.session.commit()
+        return jsonify(secret=client.secret)
+    except OAuthServiceError as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
