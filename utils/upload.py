@@ -28,7 +28,14 @@ def handle_upload(file, _type):
     if ext.lower() not in upload_config['accept_ext']:
         raise UploadError('invalid file extension')
 
-    save_file = "%s.%s" % (str(uuid4()), ext)
+    save_file = None
+    for _ in range(5):
+        _file = "%s.%s" % (str(uuid4()), ext)
+        if not os.path.lexists(_file):
+            save_file = _file
+            break
+    if save_file is None:
+        raise UploadError('file name space almost exhausted')
     upload_root = cfg['root_folder']
     sub_folder = _type
     save_folder = os.path.join(upload_root, sub_folder)
