@@ -94,6 +94,18 @@ def account_reset_password():
         return jsonify(msg=e.msg, detail=e.detail), 400
 
 
+@account.route('/status', methods=['GET'])
+def account_get_status():
+    try:
+        user = get_current_user()
+    except UserServiceError as e:
+        return jsonify(msg=e.msg, detail=e.detail), 500
+
+    if user is None:
+        return "", 204
+    return jsonify(user.to_dict())
+
+
 @account.route('/me', methods=['GET', 'PUT'])
 @requires_login
 def account_me():
