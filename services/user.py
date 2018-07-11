@@ -126,6 +126,33 @@ class UserService:
         return user
 
     @staticmethod
+    def init_admin(name, password, email):
+        if name is None:
+            raise UserServiceError('name is required')
+        if password is None:
+            raise UserServiceError('password is required')
+        if email is None:
+            raise UserServiceError('email is required')
+
+        if not UserService.name_pattern.match(name):
+            raise UserServiceError('invalid name format')
+        if not UserService.email_pattern.match(email):
+            raise UserServiceError('invalid email format')
+        if len(email) > UserService.email_max_length:
+            raise UserServiceError('email too long')
+        if not UserService.password_pattern.match(password):
+            raise UserServiceError('invalid password format')
+        if User.query.filter_by(name=name).count():
+            raise UserServiceError('duplicate name')
+        if User.query.filter_by(email=email).count():
+            raise UserServiceError('duplicate email')
+
+        password_hash = pbkdf2_sha256.hash(password)
+        user = User(name=name, password=password_hash, email=email, is_email_confirmed=True)
+        db.session.add(user)
+        return user
+
+    @staticmethod
     def reconfirm_email(user):
         if user is None:
             raise UserServiceError('user is required')
