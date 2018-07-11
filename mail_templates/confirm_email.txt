@@ -3,4 +3,4 @@ Hi {user.name}!
 
 Welcome to join {site[name]}, please use the following link to confirm your email.
 
-{site[root_url]}{site[base_url]}account/confirm_email?uid={user.id}&token={user.email_confirm_token}
+{site[root_url]}{site[base_url]}account/confirm-email?uid={user.id}&token={user.email_confirm_token}
