@@ -25,7 +25,8 @@ def handle_upload(file, _type):
     _, ext = os.path.splitext(name)
     if ext:
         ext = ext[1:]  # remove dot
-    if ext.lower() not in upload_config['accept_ext']:
+        ext = ext.lower()  # normalize to lower case
+    if ext not in upload_config['accept_ext']:
         raise UploadError('invalid file extension')
 
     save_file = None
