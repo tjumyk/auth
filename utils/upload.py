@@ -54,13 +54,14 @@ def handle_upload(file, _type):
 
 
 def handle_post_upload(old_url, _type):
-    parts = old_url.split('/', 1)
-    if parts[0] != 'upload':
+    parts = old_url.split('/')
+    if len(parts) != 3:
+        return
+    root, sub_folder, file = parts
+    if root != 'upload' or sub_folder != _type:
         return
 
-    old_file = parts[-1]
     upload_root = app.config['UPLOAD']['root_folder']
-    sub_folder = _type
-    old_path = os.path.join(upload_root, sub_folder, old_file)
+    old_path = os.path.join(upload_root, sub_folder, file)
     if os.path.isfile(old_path):
         os.unlink(old_path)
