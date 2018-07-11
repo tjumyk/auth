@@ -210,7 +210,7 @@ class UserService:
                 if value is not None:
                     if not UserService.nickname_pattern.match(value):
                         raise UserServiceError('invalid nickname format')
-                    if User.query.filter_by(nickname=value).count():
+                    if value != user.nickname and User.query.filter_by(nickname=value).count():
                         raise UserServiceError('duplicate nickname')
             setattr(user, key, value)
         return old_values
