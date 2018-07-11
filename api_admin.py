@@ -59,11 +59,10 @@ def admin_user(uid):
                 url = handle_upload(avatar_file, 'avatar', image_check=True, image_check_squared=True)
                 params['avatar'] = url  # save url in params
 
-            # treat the rest as the normal profile fields
-            if params:
-                old_profile = UserService.update_profile(user, **params)
-                if avatar_file:
-                    old_avatar = old_profile.get('avatar')
+            old_profile = UserService.update_profile(user, **params)
+            if avatar_file:
+                old_avatar = old_profile.get('avatar')
+                if old_avatar:
                     handle_post_upload(old_avatar, 'avatar')
 
             db.session.commit()
