@@ -132,7 +132,7 @@ def account_me():
                     handle_post_upload(old_avatar, 'avatar')
 
             db.session.commit()
-            return jsonify(params)
+            return jsonify(user.to_dict())
     except (UserServiceError, UploadError) as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
 

@@ -70,7 +70,7 @@ def admin_user(uid):
                     handle_post_upload(old_avatar, 'avatar')
 
             db.session.commit()
-            return jsonify(params)
+            return jsonify(user.to_dict())
     except (UserServiceError, UploadError) as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
 
@@ -213,7 +213,7 @@ def oauth_client(cid):
                     handle_post_upload(old_icon, 'icon')
 
             db.session.commit()
-            return jsonify(params)
+            return jsonify(client.to_dict())
     except (OAuthServiceError, UploadError) as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
 
