@@ -29,7 +29,8 @@ class User(db.Model):
     is_active = db.Column(db.Boolean, nullable=False, default=True)
     is_email_confirmed = db.Column(db.Boolean, nullable=False, default=False)
 
-    groups = db.relationship('Group', secondary=user_groups, backref=db.backref('users'))
+    login_records = db.relationship('LoginRecord', backref=db.backref('user'), cascade="all, delete-orphan")
+    client_users = db.relationship('OAuthClientUser', backref=db.backref('user'), cascade="all, delete-orphan")
 
     def to_dict(self, with_groups=True, with_group_ids=False):
         _dict = dict(id=self.id, name=self.name, email=self.email, nickname=self.nickname, avatar=self.avatar,
@@ -52,6 +53,8 @@ class Group(db.Model):
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     modified_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
 
+    users = db.relationship('User', secondary=user_groups, backref=db.backref('groups'))
+
     def to_dict(self, with_users=False, with_user_ids=False):
         _dict = dict(id=self.id, name=self.name, description=self.description)
         if with_users:
@@ -72,8 +75,6 @@ class LoginRecord(db.Model):
     user_agent = db.Column(db.String(128))
     success = db.Column(db.Boolean, nullable=False)
     reason = db.Column(db.String(32))
-
-    user = db.relationship('User', backref=db.backref('login_records'))
 
     def to_dict(self, with_user=False):
         _dict = dict(id=self.id, user_id=self.user_id, time=self.time, ip=self.ip, user_agent=self.user_agent,
@@ -101,6 +102,8 @@ class OAuthClient(db.Model):
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     modified_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
 
+    users = db.relationship('OAuthClientUser', backref=db.backref('client'), cascade="all, delete-orphan")
+
     def to_dict(self):
         _dict = dict(id=self.id, name=self.name, secret=self.secret, redirect_url=self.redirect_url,
                      home_url=self.home_url, description=self.description, icon=self.icon)
@@ -122,9 +125,6 @@ class OAuthClientUser(db.Model):
 
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     modified_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
-
-    client = db.relationship('OAuthClient', backref=db.backref('users'))
-    user = db.relationship('User', backref=db.backref('client_users'))
 
     def to_dict(self):
         return dict(client_id=self.client_id, user_id=self.user_id)
