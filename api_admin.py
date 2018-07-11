@@ -2,6 +2,7 @@ from flask import Blueprint, current_app as app, request, jsonify
 
 from models import db
 from services.group import GroupService, GroupServiceError
+from services.login_record import LoginRecordService
 from services.oauth import OAuthServiceError, OAuthService
 from services.user import UserService, UserServiceError
 from utils.mail import send_email
@@ -107,6 +108,19 @@ def admin_user_reconfirm_email(uid):
 
         send_email(user.name, user.email, 'confirm_email', user=user, site=app.config['SITE'])
         return "", 204
+    except UserServiceError as e:
+        return jsonify(msg=e.msg, detail=e.detail), 400
+
+
+@admin.route('/users/<int:uid>/login-records')
+@requires_admin
+def admin_user_login_records(uid):
+    try:
+        user = UserService.get(uid)
+        if user is None:
+            return jsonify(msg='user not found'), 404
+
+        return jsonify([r.to_dict() for r in LoginRecordService.get_for_user(user)])
     except UserServiceError as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
 
