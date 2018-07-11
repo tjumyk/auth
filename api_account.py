@@ -123,7 +123,7 @@ def account_me():
                 if not avatar_file.filename:
                     return jsonify(msg='avatar file cannot be empty'), 400
                 url = handle_upload(avatar_file, 'avatar')
-                params['avatar'] = url  # save url in profile
+                params['avatar'] = url  # save url in params
 
             old_profile = UserService.update_profile(user, **params)
             if avatar_file:
@@ -131,7 +131,7 @@ def account_me():
                 handle_post_upload(old_avatar, 'avatar')
 
             db.session.commit()
-            return "", 204
+            return jsonify(params)
     except (UserServiceError, UploadError) as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
 

@@ -60,7 +60,7 @@ def admin_user(uid):
                 if not avatar_file.filename:
                     return jsonify(msg='avatar file cannot be empty'), 400
                 url = handle_upload(avatar_file, 'avatar')
-                params['avatar'] = url  # save url in profile
+                params['avatar'] = url  # save url in params
 
             # treat the rest as the normal profile fields
             if params:
@@ -70,7 +70,7 @@ def admin_user(uid):
                     handle_post_upload(old_avatar, 'avatar')
 
             db.session.commit()
-            return "", 204
+            return jsonify(params)
     except (UserServiceError, UploadError) as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
 
@@ -128,7 +128,7 @@ def admin_group(gid):
             _json = request.json
             GroupService.update_profile(group, **_json)
             db.session.commit()
-            return "", 204
+            return jsonify(_json)
     except GroupServiceError as e:
         return jsonify(msg=e.msg, detail=e.detail), 500
 
@@ -204,7 +204,7 @@ def oauth_client(cid):
                 if not icon_file.filename:
                     return jsonify(msg='icon file cannot be empty'), 400
                 url = handle_upload(icon_file, 'icon')
-                params['icon'] = url  # save url in profile
+                params['icon'] = url  # save url in params
 
             old_profile = OAuthService.update_client_profile(client, **params)
             if icon_file:
@@ -212,7 +212,7 @@ def oauth_client(cid):
                 handle_post_upload(old_icon, 'icon')
 
             db.session.commit()
-            return "", 204
+            return jsonify(params)
     except (OAuthServiceError, UploadError) as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
 
