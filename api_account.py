@@ -115,7 +115,7 @@ def account_me():
             return jsonify(user.to_dict())
         else:
             files = request.files
-            params = request.form or request.json
+            params = request.form or request.json or {}
 
             # handle upload
             avatar_file = files.get('avatar')
@@ -128,7 +128,8 @@ def account_me():
             old_profile = UserService.update_profile(user, **params)
             if avatar_file:
                 old_avatar = old_profile.get('avatar')
-                handle_post_upload(old_avatar, 'avatar')
+                if old_avatar:
+                    handle_post_upload(old_avatar, 'avatar')
 
             db.session.commit()
             return jsonify(params)

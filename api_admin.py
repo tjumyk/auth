@@ -125,10 +125,10 @@ def admin_group(gid):
             db.session.commit()
             return "", 204
         else:  # PUT
-            _json = request.json
-            GroupService.update_profile(group, **_json)
+            params = request.json or {}
+            GroupService.update_profile(group, **params)
             db.session.commit()
-            return jsonify(_json)
+            return jsonify(params)
     except GroupServiceError as e:
         return jsonify(msg=e.msg, detail=e.detail), 500
 
@@ -196,7 +196,7 @@ def oauth_client(cid):
             return "", 204
         else:  # PUT
             files = request.files
-            params = request.form or request.json
+            params = request.form or request.json or {}
 
             # handle upload
             icon_file = files.get('icon')
@@ -209,7 +209,8 @@ def oauth_client(cid):
             old_profile = OAuthService.update_client_profile(client, **params)
             if icon_file:
                 old_icon = old_profile.get('icon')
-                handle_post_upload(old_icon, 'icon')
+                if old_icon:
+                    handle_post_upload(old_icon, 'icon')
 
             db.session.commit()
             return jsonify(params)
