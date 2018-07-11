@@ -23,6 +23,8 @@ app.register_blueprint(open_account, url_prefix='/api/open/account')
 
 @app.route('/')
 @app.route('/account/<path:path>')
+@app.route('/oauth/<path:path>')
+@app.route('/settings/<path:path>')
 @app.route('/admin/<path:path>')
 def get_index_page(path=''):
     return app.send_static_file('index.html')
