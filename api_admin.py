@@ -218,7 +218,7 @@ def oauth_client(cid):
         return jsonify(msg=e.msg, detail=e.detail), 400
 
 
-@admin.route('/clients/<int:cid>/regenerate-secret')
+@admin.route('/clients/<int:cid>/regenerate-secret', methods=['POST'])
 @requires_admin
 def oauth_client_regenerate_secret(cid):
     try:
@@ -228,6 +228,6 @@ def oauth_client_regenerate_secret(cid):
 
         OAuthService.regenerate_client_secret(client)
         db.session.commit()
-        return jsonify(secret=client.secret)
+        return jsonify(client.to_dict())
     except OAuthServiceError as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
