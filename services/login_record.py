@@ -1,3 +1,5 @@
+from sqlalchemy import desc
+
 from error import BasicError
 from models import db, LoginRecord
 
@@ -16,7 +18,7 @@ class LoginRecordService:
         if user is None:
             raise LoginRecordServiceError('user is required')
 
-        return LoginRecord.query.with_parent(user).all()
+        return LoginRecord.query.with_parent(user).order_by(desc(LoginRecord.id)).all()
 
     @staticmethod
     def add(user_id, ip, user_agent, success, reason):
