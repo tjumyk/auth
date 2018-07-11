@@ -18,6 +18,7 @@ class UserService:
     nickname_pattern = re.compile('^[ \w\-]{3,16}$')
     password_pattern = re.compile('^.{8,20}$')
     email_pattern = re.compile('^.+@\w+(\.\w+)*$')
+    email_max_length = 64
     email_confirm_token_valid = timedelta(days=7)
     password_reset_token_valid = timedelta(minutes=5)
 
@@ -110,6 +111,8 @@ class UserService:
             raise UserServiceError('invalid name format')
         if not UserService.email_pattern.match(email):
             raise UserServiceError('invalid email format')
+        if len(email) > UserService.email_max_length:
+            raise UserServiceError('email too long')
         if User.query.filter_by(name=name).count():
             raise UserServiceError('duplicate name')
         if User.query.filter_by(email=email).count():
