@@ -48,7 +48,7 @@ def admin_user(uid):
             return "", 204
         else:  # PUT
             files = request.files
-            params = request.form or request.json
+            params = request.form or request.json or {}
 
             # allow updating additional fields for admin only
             if 'is_active' in params:
