@@ -50,10 +50,6 @@ def admin_user(uid):
             files = request.files
             params = request.form or request.json or {}
 
-            # allow updating additional fields for admin only
-            if 'is_active' in params:
-                user.is_active = params.pop('is_active')
-
             # handle upload
             avatar_file = files.get('avatar')
             if avatar_file:
@@ -71,6 +67,29 @@ def admin_user(uid):
 
             db.session.commit()
             return jsonify(user.to_dict())
+    except (UserServiceError, UploadError) as e:
+        return jsonify(msg=e.msg, detail=e.detail), 400
+
+
+@admin.route('/users/<int:uid>/active', methods=['POST', 'DELETE'])
+@requires_admin
+def admin_user_set_active(uid):
+    try:
+        user = UserService.get(uid)
+        if user is None:
+            return jsonify(msg='user not found'), 404
+
+        if request.method == 'POST':
+            if user.is_active:
+                return jsonify(msg='user already active'), 400
+            user.is_active = True
+        else:  # DELETE
+            if not user.is_active:
+                return jsonify(msg='user already inactive'), 400
+            user.is_active = False
+
+        db.session.commit()
+        return "", 204
     except (UserServiceError, UploadError) as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
 
@@ -133,7 +152,7 @@ def admin_group(gid):
         return jsonify(msg=e.msg, detail=e.detail), 500
 
 
-@admin.route('/groups/<int:gid>/users/<int:uid>', methods=['PUT', 'DELETE'])
+@admin.route('/groups/<int:gid>/users/<int:uid>', methods=['POST', 'DELETE'])
 @requires_admin
 def admin_group_user(gid, uid):
     try:
