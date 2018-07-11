@@ -5,6 +5,8 @@ from api_admin import admin
 from api_oauth import oauth
 from api_open_account import open_account
 from models import db
+from services.group import GroupService
+from services.user import UserService
 from utils import upload
 
 app = Flask(__name__)
@@ -39,6 +41,11 @@ def page_not_found(error):
 @app.cli.command()
 def init_db():
     db.create_all()
+    admin_config = app.config['ADMIN']
+    admin_user = UserService.init_admin(**admin_config)
+    admin_group = GroupService.add('admin', 'System Administrators')
+    admin_user.groups.append(admin_group)
+    db.session.commit()
 
 
 if __name__ == '__main__':
