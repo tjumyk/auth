@@ -54,14 +54,14 @@ class GroupService:
 
         if any(key not in GroupService.profile_fields for key in kwargs):
             raise GroupServiceError('unexpected profile field')
-        old_values = {field: group[field] for field in kwargs}
+        old_values = {field: getattr(group, field) for field in kwargs}
 
         for key, value in kwargs.items():
             if key == 'description':
                 if value is not None:
                     if len(value) > GroupService.description_max_length:
                         raise GroupServiceError('description too long')
-            group[key] = value
+            setattr(group, key, value)
         return old_values
 
     @staticmethod

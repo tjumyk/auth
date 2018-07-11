@@ -203,7 +203,7 @@ class UserService:
 
         if any(key not in UserService.profile_fields for key in kwargs):
             raise UserServiceError('unexpected profile field')
-        old_values = {field: user[field] for field in kwargs}
+        old_values = {field: getattr(user, field) for field in kwargs}
 
         for key, value in kwargs.items():
             if key == 'nickname':
@@ -212,7 +212,7 @@ class UserService:
                         raise UserServiceError('invalid nickname format')
                     if User.query.filter_by(nickname=value).count():
                         raise UserServiceError('duplicate nickname')
-            user[key] = value
+            setattr(user, key, value)
         return old_values
 
     @staticmethod

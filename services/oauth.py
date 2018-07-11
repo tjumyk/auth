@@ -62,7 +62,7 @@ class OAuthService:
 
         if any(key not in OAuthService.client_profile_fields for key in kwargs):
             raise OAuthServiceError('unexpected profile field')
-        old_values = {field: client[field] for field in kwargs}
+        old_values = {field: getattr(client, field) for field in kwargs}
 
         for key, value in kwargs.items():
             if key == 'redirect_url':
@@ -76,7 +76,7 @@ class OAuthService:
             elif key == 'description':
                 if value and len(value) > OAuthService.client_description_max_length:
                     raise OAuthServiceError('description too long')
-            client[key] = value
+            setattr(client, key, value)
         return old_values
 
     @staticmethod
