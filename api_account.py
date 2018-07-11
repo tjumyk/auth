@@ -122,7 +122,7 @@ def account_me():
             if avatar_file:
                 if not avatar_file.filename:
                     return jsonify(msg='avatar file cannot be empty'), 400
-                url = handle_upload(avatar_file, 'avatar')
+                url = handle_upload(avatar_file, 'avatar', image_check=True, image_check_squared=True)
                 params['avatar'] = url  # save url in params
 
             old_profile = UserService.update_profile(user, **params)

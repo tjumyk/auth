@@ -59,7 +59,7 @@ def admin_user(uid):
             if avatar_file:
                 if not avatar_file.filename:
                     return jsonify(msg='avatar file cannot be empty'), 400
-                url = handle_upload(avatar_file, 'avatar')
+                url = handle_upload(avatar_file, 'avatar', image_check=True, image_check_squared=True)
                 params['avatar'] = url  # save url in params
 
             # treat the rest as the normal profile fields
@@ -203,7 +203,7 @@ def oauth_client(cid):
             if icon_file:
                 if not icon_file.filename:
                     return jsonify(msg='icon file cannot be empty'), 400
-                url = handle_upload(icon_file, 'icon')
+                url = handle_upload(icon_file, 'icon', image_check=True, image_check_squared=True)
                 params['icon'] = url  # save url in params
 
             old_profile = OAuthService.update_client_profile(client, **params)
