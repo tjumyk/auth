@@ -94,6 +94,21 @@ def account_reset_password():
         return jsonify(msg=e.msg, detail=e.detail), 400
 
 
+@account.route('/request-reconfirm-email', methods=['POST'])
+def account_reconfirm_email():
+    try:
+        _json = request.json
+        name_or_email = _json.get('name_or_email')
+
+        user = UserService.request_reconfirm_email(name_or_email)
+        db.session.commit()
+
+        send_email(user.name, user.email, 'confirm_email', user=user, site=app.config['SITE'])
+        return "", 204
+    except UserServiceError as e:
+        return jsonify(msg=e.msg, detail=e.detail), 400
+
+
 @account.route('/whoami', methods=['GET'])
 def account_who_am_i():
     """
