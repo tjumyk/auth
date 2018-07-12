@@ -46,7 +46,7 @@ def account_confirm_email():
 
         if request.method == 'GET':
             UserService.confirm_email(user, token, None, check_only=True)
-            return "", 204
+            return jsonify(user.to_dict())
         else:  # POST
             new_password = request.json.get('new_password')
             UserService.confirm_email(user, token, new_password)
@@ -84,7 +84,7 @@ def account_reset_password():
 
         if request.method == 'GET':
             UserService.reset_password(user, token, None, check_only=True)
-            return "", 204
+            return jsonify(user.to_dict())
         else:  # POST
             new_password = request.json.get('new_password')
             UserService.reset_password(user, token, new_password)
