@@ -154,11 +154,37 @@ class UserService:
         return user
 
     @staticmethod
+    def request_reconfirm_email(name_or_email):
+        if name_or_email is None:
+            raise UserServiceError('name or email is required')
+
+        if '@' in name_or_email:
+            user = User.query.filter_by(email=name_or_email).first()
+        else:
+            user = User.query.filter_by(name=name_or_email).first()
+        if user is None:
+            raise UserServiceError('user not found')
+        if not user.is_active:
+            raise UserServiceError('inactive user')
+        if user.email is None:
+            raise UserServiceError('no email')
+        if user.is_email_confirmed:
+            raise UserServiceError('email already confirmed')
+
+        user.is_email_confirmed = False
+        user.email_confirm_token = token_urlsafe()
+        user.email_confirm_token_expire_at = datetime.utcnow() + UserService.email_confirm_token_valid
+        user.email_confirmed_at = None
+        return user
+
+    @staticmethod
     def reconfirm_email(user):
         if user is None:
             raise UserServiceError('user is required')
         if not user.is_active:
             raise UserServiceError('inactive user')
+        if user.is_email_confirmed:
+            raise UserServiceError('email already confirmed')
 
         user.is_email_confirmed = False
         user.email_confirm_token = token_urlsafe()
