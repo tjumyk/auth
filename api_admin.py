@@ -179,7 +179,7 @@ def admin_group_users(gid):
         return jsonify(msg=e.msg, detail=e.detail), 400
 
 
-@admin.route('/groups/<int:gid>/users/<int:uid>', methods=['POST', 'DELETE'])
+@admin.route('/groups/<int:gid>/users/<int:uid>', methods=['PUT', 'DELETE'])
 @requires_admin
 def admin_group_user(gid, uid):
     try:
