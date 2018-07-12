@@ -30,7 +30,7 @@ def admin_user_list():
             send_email(name, email, 'confirm_email', user=user, site=app.config['SITE'])
             return jsonify(user.to_dict(with_advanced_fields=True)), 201
     except (UserServiceError, GroupServiceError) as e:
-        return jsonify(msg=e.msg, detail=e.detail), 500
+        return jsonify(msg=e.msg, detail=e.detail), 400
 
 
 @admin.route('/users/<int:uid>', methods=['GET', 'DELETE', 'PUT'])
@@ -139,7 +139,7 @@ def admin_group_list():
             db.session.commit()
             return jsonify(group.to_dict(with_advanced_fields=True)), 201
     except GroupServiceError as e:
-        return jsonify(msg=e.msg, detail=e.detail), 500
+        return jsonify(msg=e.msg, detail=e.detail), 400
 
 
 @admin.route('/groups/<int:gid>', methods=['GET', 'DELETE', 'PUT'])
@@ -162,7 +162,7 @@ def admin_group(gid):
             db.session.commit()
             return jsonify(group.to_dict(with_advanced_fields=True))
     except GroupServiceError as e:
-        return jsonify(msg=e.msg, detail=e.detail), 500
+        return jsonify(msg=e.msg, detail=e.detail), 400
 
 
 @admin.route('/groups/<int:gid>/users/<int:uid>', methods=['POST', 'DELETE'])
