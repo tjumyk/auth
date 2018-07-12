@@ -160,7 +160,7 @@ def admin_group(gid):
             params = request.json or {}
             GroupService.update_profile(group, **params)
             db.session.commit()
-            return jsonify(params)
+            return jsonify(group.to_dict(with_advanced_fields=True))
     except GroupServiceError as e:
         return jsonify(msg=e.msg, detail=e.detail), 500
 
