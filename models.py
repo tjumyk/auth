@@ -32,13 +32,20 @@ class User(db.Model):
     login_records = db.relationship('LoginRecord', backref=db.backref('user'), cascade="all, delete-orphan")
     client_users = db.relationship('OAuthClientUser', backref=db.backref('user'), cascade="all, delete-orphan")
 
-    def to_dict(self, with_groups=True, with_group_ids=False):
+    def to_dict(self, with_groups=True, with_group_ids=False, with_advanced_fields=False):
         _dict = dict(id=self.id, name=self.name, email=self.email, nickname=self.nickname, avatar=self.avatar,
                      is_active=self.is_active)
         if with_groups:
             _dict['groups'] = [group.to_dict() for group in self.groups]
         elif with_group_ids:
             _dict['group_ids'] = [group.id for group in self.groups]
+
+        if with_advanced_fields:
+            _dict['created_at'] = self.created_at
+            _dict['modified_at'] = self.modified_at
+            _dict['email_confirmed_at'] = self.email_confirmed_at
+            _dict['is_email_confirmed'] = self.is_email_confirmed
+
         return _dict
 
     def __repr__(self):
@@ -55,12 +62,17 @@ class Group(db.Model):
 
     users = db.relationship('User', secondary=user_groups, backref=db.backref('groups'))
 
-    def to_dict(self, with_users=False, with_user_ids=False):
+    def to_dict(self, with_users=False, with_user_ids=False, with_advanced_fields=False):
         _dict = dict(id=self.id, name=self.name, description=self.description)
         if with_users:
             _dict['users'] = [user.to_dict(with_groups=False) for user in self.users]
         elif with_user_ids:
             _dict['users'] = [user.id for user in self.users]
+
+        if with_advanced_fields:
+            _dict['created_at'] = self.created_at
+            _dict['modified_at'] = self.modified_at
+
         return _dict
 
     def __repr__(self):
@@ -104,9 +116,14 @@ class OAuthClient(db.Model):
 
     users = db.relationship('OAuthClientUser', backref=db.backref('client'), cascade="all, delete-orphan")
 
-    def to_dict(self):
+    def to_dict(self, with_advanced_fields=False):
         _dict = dict(id=self.id, name=self.name, secret=self.secret, redirect_url=self.redirect_url,
                      home_url=self.home_url, description=self.description, icon=self.icon)
+
+        if with_advanced_fields:
+            _dict['created_at'] = self.created_at
+            _dict['modified_at'] = self.modified_at
+
         return _dict
 
     def __repr__(self):
@@ -126,8 +143,14 @@ class OAuthClientUser(db.Model):
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     modified_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
 
-    def to_dict(self):
-        return dict(client_id=self.client_id, user_id=self.user_id)
+    def to_dict(self, with_advanced_fields=False):
+        _dict = dict(client_id=self.client_id, user_id=self.user_id)
+
+        if with_advanced_fields:
+            _dict['created_at'] = self.created_at
+            _dict['modified_at'] = self.modified_at
+
+        return _dict
 
     def __repr__(self):
         return '<OAuthClientUser %r,%r>' % (self.client_id, self.user_id)

@@ -17,8 +17,8 @@ admin = Blueprint('admin', __name__)
 def admin_user_list():
     try:
         if request.method == 'GET':
-            users = [u.to_dict(with_groups=False, with_group_ids=True) for u in UserService.get_all()]
-            groups = [g.to_dict() for g in GroupService.get_all()]
+            users = [u.to_dict(with_groups=False, with_group_ids=True, with_advanced_fields=True) for u in UserService.get_all()]
+            groups = [g.to_dict(with_advanced_fields=True) for g in GroupService.get_all()]
             return jsonify(users=users, groups=groups)
         else:  # POST
             _json = request.json
@@ -28,7 +28,7 @@ def admin_user_list():
             db.session.commit()
 
             send_email(name, email, 'invitation', user=user, site=app.config['SITE'])
-            return jsonify(user.to_dict()), 201
+            return jsonify(user.to_dict(with_advanced_fields=True)), 201
     except (UserServiceError, GroupServiceError) as e:
         return jsonify(msg=e.msg, detail=e.detail), 500
 
@@ -42,7 +42,7 @@ def admin_user(uid):
             return jsonify(msg='user not found'), 404
 
         if request.method == 'GET':
-            return jsonify(user.to_dict())
+            return jsonify(user.to_dict(with_advanced_fields=True))
         elif request.method == 'DELETE':
             db.session.delete(user)
             db.session.commit()
@@ -66,7 +66,7 @@ def admin_user(uid):
                     handle_post_upload(old_avatar, 'avatar')
 
             db.session.commit()
-            return jsonify(user.to_dict())
+            return jsonify(user.to_dict(with_advanced_fields=True))
     except (UserServiceError, UploadError) as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
 
@@ -129,7 +129,7 @@ def admin_user_login_records(uid):
 def admin_group_list():
     try:
         if request.method == 'GET':
-            groups = [g.to_dict() for g in GroupService.get_all()]
+            groups = [g.to_dict(with_advanced_fields=True) for g in GroupService.get_all()]
             return jsonify(groups)
         else:  # POST
             _json = request.json
@@ -137,7 +137,7 @@ def admin_group_list():
             description = _json.get('description')
             group = GroupService.add(name, description)
             db.session.commit()
-            return jsonify(group.to_dict()), 201
+            return jsonify(group.to_dict(with_advanced_fields=True)), 201
     except GroupServiceError as e:
         return jsonify(msg=e.msg, detail=e.detail), 500
 
@@ -151,7 +151,7 @@ def admin_group(gid):
             return jsonify(msg='group not found'), 404
 
         if request.method == 'GET':
-            return jsonify(group.to_dict())
+            return jsonify(group.to_dict(with_advanced_fields=True))
         elif request.method == 'DELETE':
             db.session.delete(group)
             db.session.commit()
@@ -197,7 +197,7 @@ def admin_group_user(gid, uid):
 def oauth_clients():
     try:
         if request.method == 'GET':
-            return jsonify([c.to_dict() for c in OAuthService.get_all_clients()])
+            return jsonify([c.to_dict(with_advanced_fields=True) for c in OAuthService.get_all_clients()])
         else:  # POST
             _json = request.json
             name = _json.get('name')
@@ -207,7 +207,7 @@ def oauth_clients():
 
             client = OAuthService.add_client(name, redirect_url, home_url, description)
             db.session.commit()
-            return jsonify(client.to_dict()), 201
+            return jsonify(client.to_dict(with_advanced_fields=True)), 201
     except OAuthServiceError as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
 
@@ -221,7 +221,7 @@ def oauth_client(cid):
             return jsonify(msg='client not found'), 404
 
         if request.method == 'GET':
-            return jsonify(client.to_dict())
+            return jsonify(client.to_dict(with_advanced_fields=True))
         elif request.method == 'DELETE':
             db.session.delete(client)
             db.session.commit()
@@ -245,7 +245,7 @@ def oauth_client(cid):
                     handle_post_upload(old_icon, 'icon')
 
             db.session.commit()
-            return jsonify(client.to_dict())
+            return jsonify(client.to_dict(with_advanced_fields=True))
     except (OAuthServiceError, UploadError) as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
 
@@ -260,6 +260,6 @@ def oauth_client_regenerate_secret(cid):
 
         OAuthService.regenerate_client_secret(client)
         db.session.commit()
-        return jsonify(client.to_dict())
+        return jsonify(client.to_dict(with_advanced_fields=True))
     except OAuthServiceError as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
