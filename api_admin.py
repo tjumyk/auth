@@ -27,7 +27,7 @@ def admin_user_list():
             user = UserService.invite(name, email)
             db.session.commit()
 
-            send_email(name, email, 'invitation', user=user, site=app.config['SITE'])
+            send_email(name, email, 'confirm_email', user=user, site=app.config['SITE'])
             return jsonify(user.to_dict(with_advanced_fields=True)), 201
     except (UserServiceError, GroupServiceError) as e:
         return jsonify(msg=e.msg, detail=e.detail), 500
