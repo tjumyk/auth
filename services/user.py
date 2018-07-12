@@ -19,8 +19,8 @@ class UserService:
     password_pattern = re.compile('^.{8,20}$')
     email_pattern = re.compile('^.+@\w+(\.\w+)*$')
     email_max_length = 64
-    email_confirm_token_valid = timedelta(days=7)
-    password_reset_token_valid = timedelta(minutes=5)
+    email_confirm_token_valid = timedelta(days=30)
+    password_reset_token_valid = timedelta(minutes=15)
 
     profile_fields = {
         'nickname',
