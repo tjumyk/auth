@@ -72,7 +72,7 @@ def admin_user(uid):
         return jsonify(msg=e.msg, detail=e.detail), 400
 
 
-@admin.route('/users/<int:uid>/active', methods=['POST', 'DELETE'])
+@admin.route('/users/<int:uid>/active', methods=['PUT', 'DELETE'])
 @requires_admin
 def admin_user_set_active(uid):
     try:
@@ -80,7 +80,7 @@ def admin_user_set_active(uid):
         if user is None:
             return jsonify(msg='user not found'), 404
 
-        if request.method == 'POST':
+        if request.method == 'PUT':
             if user.is_active:
                 return jsonify(msg='user already active'), 400
             user.is_active = True
