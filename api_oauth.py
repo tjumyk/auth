@@ -3,7 +3,6 @@ from flask import Blueprint, request, jsonify
 from models import db
 from services.oauth import OAuthService, OAuthServiceError
 from utils.session import requires_admin, requires_login, get_current_user
-from utils.upload import handle_upload, handle_post_upload, UploadError
 from utils.url import url_append_param
 
 oauth = Blueprint('oauth', __name__)

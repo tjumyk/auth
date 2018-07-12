@@ -17,7 +17,8 @@ admin = Blueprint('admin', __name__)
 def admin_user_list():
     try:
         if request.method == 'GET':
-            users = [u.to_dict(with_groups=False, with_group_ids=True, with_advanced_fields=True) for u in UserService.get_all()]
+            users = [u.to_dict(with_groups=False, with_group_ids=True, with_advanced_fields=True)
+                     for u in UserService.get_all()]
             groups = [g.to_dict(with_advanced_fields=True) for g in GroupService.get_all()]
             return jsonify(users=users, groups=groups)
         else:  # POST
