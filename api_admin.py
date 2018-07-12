@@ -17,10 +17,23 @@ admin = Blueprint('admin', __name__)
 def admin_user_list():
     try:
         if request.method == 'GET':
-            users = [u.to_dict(with_groups=False, with_group_ids=True, with_advanced_fields=True)
-                     for u in UserService.get_all()]
-            groups = [g.to_dict(with_advanced_fields=True) for g in GroupService.get_all()]
-            return jsonify(users=users, groups=groups)
+            args = request.args
+            if 'name' in args:  # search by name
+                limit = args.get('limit')
+                if limit is not None:
+                    try:
+                        limit = int(limit)
+                    except ValueError:
+                        return jsonify(msg='limit must be an integer'), 400
+                    _users = UserService.search_by_name(args['name'], limit)
+                else:
+                    _users = UserService.search_by_name(args['name'])  # use default limit
+                return jsonify([user.to_dict(with_advanced_fields=True) for user in _users])
+            else:  # get all
+                users = [u.to_dict(with_groups=False, with_group_ids=True, with_advanced_fields=True)
+                         for u in UserService.get_all()]
+                groups = [g.to_dict(with_advanced_fields=True) for g in GroupService.get_all()]
+                return jsonify(users=users, groups=groups)
         else:  # POST
             _json = request.json
             name = _json.get('name')
