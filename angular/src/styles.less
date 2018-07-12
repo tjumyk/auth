@@ -1,1 +1,35 @@
-/* You can add global styles to this file, and also import other style files */
+[hidden] { display: none !important;}
+
+.field .errors{
+  display: none;
+}
+.field.error .errors{
+  display: block;
+  &>label{
+    display: block;
+  }
+}
+
+.center.aligned.message{
+  text-align: center;
+}
+
+.text{
+  &.brand{
+    font-family: Sommet, 'Helvetica Neue', Arial, Helvetica, sans-serif;
+  }
+  &.muted{
+    color: rgba(0, 0, 0, 0.45);
+  }
+  &.error{
+    color: #db2828;
+  }
+  &.success{
+    color: #21ba45;
+  }
+}
+
+.table-responsive{
+  overflow-x: auto;
+  width: 100%;
+}
