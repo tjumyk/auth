@@ -94,14 +94,19 @@ def account_reset_password():
         return jsonify(msg=e.msg, detail=e.detail), 400
 
 
-@account.route('/status', methods=['GET'])
-def account_get_status():
+@account.route('/whoami', methods=['GET'])
+def account_who_am_i():
+    """
+    A more API-friendly version of 'account_me()'
+    """
     try:
         user = get_current_user()
     except UserServiceError as e:
         return jsonify(msg=e.msg, detail=e.detail), 500
 
     if user is None:
+        return "", 204
+    if not user.is_active:  # do not acknowledge inactive user as '@requires_login' do
         return "", 204
     return jsonify(user.to_dict())
 
