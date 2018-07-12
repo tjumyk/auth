@@ -68,7 +68,14 @@ class UserService:
             raise UserServiceError('name is required')
         if len(name) == 0:
             raise UserServiceError('name must not be empty')
-        return User.query.filter(or_(User.name.contains(name), User.nickname.contains(name))).limit(limit)
+
+        _filter = or_(User.name.contains(name), User.nickname.contains(name))
+        if limit is None:
+            return User.query.filter(_filter).all()
+        else:
+            if type(limit) is not int:
+                raise UserServiceError('limit must be an integer')
+            return User.query.filter(_filter).limit(limit)
 
     @staticmethod
     def login(name_or_email, password, ip, user_agent):
