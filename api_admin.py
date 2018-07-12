@@ -204,13 +204,13 @@ def admin_group_user(gid, uid):
             return jsonify(msg='user not found'), 404
 
         if request.method == 'PUT':
-            if group in user.roles:
+            if group in user.groups:
                 return jsonify(msg='user already in the group'), 400
             user.groups.append(group)
             db.session.commit()
             return "", 204
         else:  # DELETE
-            if group not in user.roles:
+            if group not in user.groups:
                 return jsonify(msg='user not in the group'), 400
             user.groups.remove(group)
             db.session.commit()
