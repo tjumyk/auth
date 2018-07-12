@@ -148,7 +148,8 @@ class UserService:
             raise UserServiceError('duplicate email')
 
         password_hash = pbkdf2_sha256.hash(password)
-        user = User(name=name, password=password_hash, email=email, is_email_confirmed=True)
+        user = User(name=name, password=password_hash, email=email,
+                    is_email_confirmed=True, email_confirmed_at=datetime.utcnow())
         db.session.add(user)
         return user
 
