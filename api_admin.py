@@ -166,6 +166,19 @@ def admin_group(gid):
         return jsonify(msg=e.msg, detail=e.detail), 400
 
 
+@admin.route('/groups/<int:gid>/users', methods=['GET'])
+@requires_admin
+def admin_group_users(gid):
+    try:
+        group = GroupService.get(gid)
+        if group is None:
+            return jsonify(msg='group not found'), 404
+        return jsonify([user.to_dict(with_groups=False, with_advanced_fields=True)
+                        for user in group.users])
+    except GroupServiceError as e:
+        return jsonify(msg=e.msg, detail=e.detail), 400
+
+
 @admin.route('/groups/<int:gid>/users/<int:uid>', methods=['POST', 'DELETE'])
 @requires_admin
 def admin_group_user(gid, uid):
