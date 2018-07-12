@@ -49,7 +49,7 @@ def account_confirm_email():
             return "", 204
         else:  # POST
             new_password = request.json.get('new_password')
-            UserService.confirm_email(uid, token, new_password)
+            UserService.confirm_email(user, token, new_password)
             db.session.commit()
             return "", 204
     except UserServiceError as e:
