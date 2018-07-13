@@ -1,17 +1,35 @@
 {
-  "server": {
-    "host": "0.0.0.0",
-    "port": 8777
+  "SECRET_KEY": "vfcvkoscmkrxdjwydbf",
+  "SQLALCHEMY_DATABASE_URI": "sqlite:///test.db",
+  "SQLALCHEMY_TRACK_MODIFICATIONS": false,
+  "MAX_CONTENT_LENGTH": 262144,
+
+  "MAIL": {
+    "display_name": "IdM@UNSWKG",
+    "from": "example@unsw.edu.au",
+    "mock_folder": "mailbox"
   },
-  "htpasswd": {
-    "path": "test_htpass.txt",
-    "scheme": "apr_md5_crypt"
-  },
-  "admin": {
-    "name": "admin",
-    "password": "PaSsWoRd!!"
-  },
-  "site": {
+  "SITE": {
+    "name": "UNSWKG",
+    "root_url": "http://localhost:8077",
     "base_url": "/"
+  },
+  "ADMIN": {
+    "name": "admin",
+    "password": "PASSword",
+    "email": "example@gmail.com"
+  },
+  "UPLOAD": {
+    "root_folder": "upload",
+    "avatar": {
+      "accept": ["image/png", "image/jpg", "image/jpeg", "image/gif"],
+      "accept_ext": ["png", "jpg", "jpeg", "gif"],
+      "size_limit": 262144
+    },
+    "icon": {
+      "accept": ["image/png", "image/jpg", "image/jpeg", "image/gif"],
+      "accept_ext": ["png", "jpg", "jpeg", "gif"],
+      "size_limit": 262144
+    }
   }
 }
