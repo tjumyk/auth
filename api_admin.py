@@ -293,6 +293,19 @@ def oauth_client_regenerate_secret(cid):
 
         OAuthService.regenerate_client_secret(client)
         db.session.commit()
-        return jsonify(client.to_dict(with_advanced_fields=True))
+        return "", 204
+    except OAuthServiceError as e:
+        return jsonify(msg=e.msg, detail=e.detail), 400
+
+
+@admin.route('/clients/<int:cid>/authorizations', methods=['GET'])
+@requires_admin
+def oauth_client_authorizations(cid):
+    try:
+        client = OAuthService.get_client(cid)
+        if client is None:
+            return jsonify(msg='client not found'), 404
+
+        return jsonify([auth.to_dict() for auth in client.authorizations])
     except OAuthServiceError as e:
         return jsonify(msg=e.msg, detail=e.detail), 400

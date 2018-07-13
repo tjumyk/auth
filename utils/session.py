@@ -7,7 +7,7 @@ from services.user import UserService, UserServiceError
 
 _session_key_user_id = 'user_id'
 _g_key_user = 'user'
-_g_key_oauth_client_user = 'oauth_client_user'
+_g_key_oauth_authorization = 'oauth_authorization'
 _admin_group_name = 'admin'
 
 
@@ -43,16 +43,16 @@ def get_current_user():
     return user
 
 
-def get_current_oauth_client_user():
-    client_user = g.get(_g_key_oauth_client_user)
-    if client_user is not None:
-        return client_user
+def get_current_oauth_authorization():
+    auth = g.get(_g_key_oauth_authorization)
+    if auth is not None:
+        return auth
     access_token = request.args.get('oauth_token')
     if access_token is None:
         return None
-    client_user = OAuthService.verify_access_token(access_token)
-    g[_g_key_oauth_client_user] = client_user
-    return client_user
+    auth = OAuthService.verify_access_token(access_token)
+    setattr(g, _g_key_oauth_authorization, auth)
+    return auth
 
 
 def requires_login(f):
@@ -117,10 +117,12 @@ def requires_oauth(f):
     @wraps(f)
     def wrapped(*args, **kwargs):
         try:
-            client_user = get_current_oauth_client_user()
+            auth = get_current_oauth_authorization()
 
-            if client_user is None:
+            if auth is None:
                 return jsonify(msg='oauth access token required'), 400
+            if not auth.user.is_active:
+                return jsonify(msg='inactive user'), 403
         except OAuthServiceError as e:
             return jsonify(msg=e.msg, detail=e.detail), 403
         return f(*args, **kwargs)

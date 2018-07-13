@@ -3,8 +3,8 @@ from flask import Flask, request, jsonify
 from api_account import account
 from api_admin import admin
 from api_oauth import oauth
-from api_open_account import open_account
 from models import db
+from page_oauth import oauth_pages
 from services.group import GroupService
 from services.user import UserService
 from utils import upload
@@ -18,14 +18,14 @@ upload.init_app(app)
 app.register_blueprint(account, url_prefix='/api/account')
 app.register_blueprint(admin, url_prefix='/api/admin')
 app.register_blueprint(oauth, url_prefix='/api/oauth')
-app.register_blueprint(open_account, url_prefix='/api/open/account')
+app.register_blueprint(oauth_pages, url_prefix='/oauth')
 
 
 @app.route('/')
 @app.route('/account/<path:path>')
-@app.route('/oauth/<path:path>')
 @app.route('/settings/<path:path>')
 @app.route('/admin/<path:path>')
+@app.route('/oauth/<path:path>')
 def get_index_page(path=''):
     return app.send_static_file('index.html')
 

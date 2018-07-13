@@ -101,8 +101,6 @@ class LoginRecord(db.Model):
 
 
 class OAuthClient(db.Model):
-    __tablename__ = 'oauth_client'
-
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(16), unique=True, nullable=False)
     secret = db.Column(db.String(128), nullable=False)
@@ -133,30 +131,25 @@ class OAuthClient(db.Model):
 
 
 class OAuthAuthorization(db.Model):
-    __tablename__ = 'oauth_client_user'
-
-    client_id = db.Column(db.Integer, db.ForeignKey('oauth_client.id'), primary_key=True)
+    client_id = db.Column(db.Integer, db.ForeignKey('o_auth_client.id'), primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
 
-    authorize_token = db.Column(db.String(64))
+    authorize_token = db.Column(db.String(64), unique=True)
     authorize_token_expire_at = db.Column(db.DateTime)
     access_token = db.Column(db.String(64), unique=True)
 
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     modified_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
 
-    def to_dict(self, with_client=False, with_user=True, with_advanced_fields=False):
-        _dict = dict(client_id=self.client_id, user_id=self.user_id)
+    def to_dict(self, with_client=False, with_user=True):
+        _dict = dict(client_id=self.client_id, user_id=self.user_id,
+                     created_at=self.created_at, modified_at=self.modified_at)
 
         if with_client:
             _dict['client'] = self.client.to_dict()
 
         if with_user:
             _dict['user'] = self.user.to_dict()
-
-        if with_advanced_fields:
-            _dict['created_at'] = self.created_at
-            _dict['modified_at'] = self.modified_at
 
         return _dict
 

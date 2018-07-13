@@ -14,6 +14,7 @@ class OAuthService:
     client_name_pattern = re.compile('^[\w]{3,16}$')
     client_url_max_length = 128
     client_description_max_length = 256
+    token_generation_retry = 5
 
     client_profile_fields = {
         'redirect_url',
@@ -87,7 +88,26 @@ class OAuthService:
         client.secret = token_urlsafe()
 
     @staticmethod
-    def connect(client, user, redirect_url):
+    def pre_check_client(client, redirect_url):
+        if client is None:
+            raise OAuthServiceError('client is required')
+        if redirect_url is None:
+            raise OAuthServiceError('redirect_url is required')
+
+        if client.redirect_url != redirect_url:
+            raise OAuthServiceError('redirect_url mismatch')
+
+    @staticmethod
+    def has_access_token(client, user):
+        if client is None:
+            raise OAuthServiceError('client is required')
+        if user is None:
+            raise OAuthServiceError('user is required')
+
+        return OAuthAuthorization.query.filter_by(client_id=client.id, user_id=user.id).count() > 0
+
+    @staticmethod
+    def start_authorization(client, user, redirect_url):
         if client is None:
             raise OAuthServiceError('client is required')
         if user is None:
@@ -95,10 +115,17 @@ class OAuthService:
         if redirect_url is None:
             raise OAuthServiceError('redirect_url is required')
 
-        if client.redirect_url != redirect_url:
-            raise OAuthServiceError('redirect_url mismatch')
+        OAuthService.pre_check_client(client, redirect_url)
 
-        authorize_token = token_urlsafe()
+        authorize_token = None
+        for _ in range(OAuthService.token_generation_retry):  # repeat in case token collision
+            token = token_urlsafe()
+            if OAuthAuthorization.query.filter_by(authorize_token=token).count() == 0:
+                authorize_token = token
+                break
+        if authorize_token is None:
+            raise OAuthServiceError('token space almost exhausted')
+
         expire = datetime.utcnow() + timedelta(minutes=1)
 
         auth = OAuthAuthorization.query.filter_by(client_id=client.id, user_id=user.id).first()
@@ -112,33 +139,29 @@ class OAuthService:
         return authorize_token
 
     @staticmethod
-    def get_access_token(client, user, client_secret, redirect_url, authorize_token):
+    def get_access_token(client, client_secret, redirect_url, authorize_token):
         if client is None:
             raise OAuthServiceError('client is required')
-        if user is None:
-            raise OAuthServiceError('user is required')
         if client_secret is None:
-            raise OAuthServiceError('client_secret is required')
+            raise OAuthServiceError('client secret is required')
         if redirect_url is None:
             raise OAuthServiceError('redirect_url is required')
         if authorize_token is None:
-            raise OAuthServiceError('authorize_token is required')
+            raise OAuthServiceError('authorization token is required')
 
-        if client.authorize_token_expire_at < datetime.utcnow():
-            raise OAuthServiceError('authorize_token expired')
-        if client.redirect_url != redirect_url:
-            raise OAuthServiceError('redirect_url mismatch')
+        OAuthService.pre_check_client(client, redirect_url)
+
         if client.secret != client_secret:
             raise OAuthServiceError('wrong client secret')
 
-        auth = OAuthAuthorization.query.filter_by(client_id=client.id, user_id=user.id).first()
+        auth = OAuthAuthorization.query.filter_by(client_id=client.id, authorize_token=authorize_token).first()
         if auth is None:
-            raise OAuthServiceError('authorize not started')
-        if auth.authorize_token != authorize_token:
-            raise OAuthServiceError('wrong authorize_token')
+            raise OAuthServiceError('invalid authorization token')
+        if auth.authorize_token_expire_at < datetime.utcnow():
+            raise OAuthServiceError('authorization token expired')
 
         access_token = None
-        for _ in range(5):  # repeat 5 times in case token collision
+        for _ in range(OAuthService.token_generation_retry):  # repeat in case token collision
             token = token_urlsafe()
             if OAuthAuthorization.query.filter_by(access_token=token).count() == 0:
                 access_token = token
