@@ -1,6 +1,6 @@
 export class BasicError {
   msg: string;
-  detail: string;
+  detail?: string;
 }
 
 export class User {
@@ -11,7 +11,8 @@ export class User {
   avatar: string;
   is_active: boolean;
 
-  groups: Group[];
+  groups?: Group[];
+  group_ids?: number[];
 }
 
 export class UserAdvanced extends User {
@@ -25,6 +26,9 @@ export class Group {
   id: number;
   name: string;
   description: string;
+
+  users?: User[];
+  user_ids?: number[];
 }
 
 export class GroupAdvanced extends Group {
@@ -46,8 +50,6 @@ export class LoginRecord {
 export class OAuthClient {
   id: number;
   name: string;
-  secret: string;
-  redirect_url: string;
   home_url: string;
   description: string;
   icon: string;
@@ -56,14 +58,16 @@ export class OAuthClient {
 export class OAuthClientAdvanced extends OAuthClient {
   created_at: string;
   modified_at: string;
+  secret: string;
+  redirect_url: string;
 }
 
-export class OAuthClientUser {
-  client: OAuthClient;
-  user: User;
-}
-
-export class OAuthClientUserAdvanced extends OAuthClientUser {
+export class OAuthAuthorization {
+  client_id: number;
+  user_id: number;
   created_at: string;
   modified_at: string;
+
+  client?: OAuthClient;
+  user?: User;
 }

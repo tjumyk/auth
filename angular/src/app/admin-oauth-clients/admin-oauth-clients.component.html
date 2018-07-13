@@ -1,0 +1,35 @@
+<div class="ui error message" *ngIf="error">
+  <i class="close icon" (click)="error=undefined"></i>
+  <div class="header"><i class="times circle icon"></i> {{error.msg}}</div>
+  <p>{{error.detail}}</p>
+</div>
+
+<div class="ui centered active large inline text loader" *ngIf="loading_client_list">Loading client list...</div>
+
+<div *ngIf="!loading_client_list">
+  <p>
+    <a class="ui small button primary" routerLink="new"><i class="icon plus"></i> New Client</a>
+  </p>
+
+  <div class="table-responsive">
+    <table class="ui unstackable celled compact table">
+      <thead><tr><th>ID</th><th>Name</th><th>Home URL</th><th>Description</th><th class="collapsing">Ops</th></tr></thead>
+      <tbody>
+      <tr *ngFor="let client of client_list; index as i" #row>
+        <td>{{client.id}}</td>
+        <td>{{client.name}}</td>
+        <td><a target="_blank" [href]="client.home_url">{{client.home_url}}</a></td>
+        <td>{{client.description}}</td>
+
+        <td class="collapsing">
+          <div class="ui small buttons">
+            <div class="ui icon button" routerLink="c/{{client.id}}"><i class="edit icon"></i></div>
+            <div class="ui icon red button" #btn (click)="deleteClient(client, i, btn)" ><i class="trash icon"></i></div>
+          </div>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>

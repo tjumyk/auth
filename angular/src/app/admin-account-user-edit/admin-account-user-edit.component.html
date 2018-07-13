@@ -1,0 +1,172 @@
+<div class="ui error message" *ngIf="error">
+  <i class="close icon" (click)="error=undefined"></i>
+  <div class="header"><i class="times circle icon"></i> {{error.msg}}</div>
+  <p>{{error.detail}}</p>
+</div>
+
+<div class="ui stackable two column grid">
+  <div class="column">
+    <div class="ui large centered active inline text loader" *ngIf="loading_user">Loading user profile...</div>
+
+    <div *ngIf="!loading_user && user">
+      <div class="ui segments">
+        <div class="ui segment">
+          <div class="ui header">
+            <i class="user icon" *ngIf="!user.avatar"></i>
+            <img [src]="user.avatar" *ngIf="user.avatar" class="ui avatar image">
+            {{user.name}}
+          </div>
+        </div>
+        <div class="ui segment">
+          <div class="ui relaxed horizontal list">
+            <div class="item">
+              <div class="header">ID</div>
+              {{user.id}}
+            </div>
+            <div class="item">
+              <div class="header">Name</div>
+              {{user.name}}
+            </div>
+            <div class="item">
+              <div class="header">E-mail</div>
+              {{user.email}}
+              <i class="icon green check circle" *ngIf="user.is_email_confirmed" title="Confirmed"></i>
+              <i class="icon yellow question circle" *ngIf="!user.is_email_confirmed" title="Not yet confirmed"></i>
+            </div>
+            <div class="item">
+              <div class="header">Status</div>
+              <span *ngIf="user.is_active" class="text success">Active</span>
+              <span *ngIf="!user.is_active" class="text error">Inactive</span>
+            </div>
+            <div class="item">
+              <div class="header">Groups</div>
+              <div class="ui small labels">
+                <a class="ui basic label" *ngFor="let group of user.groups" routerLink="../../../groups/g/{{group.id}}">{{group.name}}</a>
+              </div>
+              <span *ngIf="user.groups.length==0" class="text muted">(None)</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="ui segment">
+          <div class="ui list">
+            <div class="item">
+              <div class="header">Created At</div>
+              {{user.created_at | date:'medium'}}
+            </div>
+            <div class="item">
+              <div class="header">Modified At</div>
+              {{user.modified_at | date:'medium'}}
+            </div>
+            <div class="item">
+              <div class="header">E-mail Confirmed At</div>
+              <span *ngIf="user.email_confirmed_at">{{user.email_confirmed_at | date:'medium'}}</span>
+              <span class="text muted" *ngIf="!user.email_confirmed_at">(Not yet confirmed)</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="ui segment">
+          <div class="ui success message" *ngIf="admin_operation_success">
+            <i class="close icon" (click)="admin_operation_success=undefined"></i>
+            <div class="header"><i class="check circle icon"></i> {{admin_operation_success.msg}}</div>
+            {{admin_operation_success.detail}}
+          </div>
+
+          <p *ngIf="!user.is_email_confirmed">
+            <a class="ui button" [ngClass]="{'loading disabled': requesting_reconfirm_email}" (click)="reconfirmEmail()">Reconfirm E-mail</a>
+          </p>
+          <p>
+            <a class="ui red button" [hidden]="!user.is_active" [ngClass]="{'loading disabled': setting_active}" (click)="setActive(false)">
+              <i class="dont icon"></i> Set as Inactive
+            </a>
+            <a class="ui green button" [hidden]="user.is_active" [ngClass]="{'loading disabled': setting_active}"  (click)="setActive(true)">
+              <i class="redo icon"></i> Set as Active
+            </a>
+            <a class="ui red button" (click)="deleteUser()" [ngClass]="{'loading disabled': deleting}"><i class="trash icon"></i>Delete User</a>
+          </p>
+        </div>
+
+        <div class="ui segment">
+          <div class="ui success message" *ngIf="update_profile_success">
+            <i class="close icon" (click)="update_profile_success=undefined"></i>
+            <div class="header"><i class="check circle icon"></i> Profile updated successfully</div>
+          </div>
+          <div class="ui error message" *ngIf="update_profile_error">
+            <i class="close icon" (click)="update_profile_error=undefined"></i>
+            <div class="header"><i class="times circle icon"></i> {{update_profile_error.msg}}</div>
+            <p>{{update_profile_error.detail}}</p>
+          </div>
+          <form #f="ngForm" class="ui form" (ngSubmit)="updateProfile(f)" [ngClass]="{'loading': updating_profile}">
+            <div class="field" [ngClass]="{'error': nickname_model.invalid && (f.submitted || nickname_model.dirty || nickname_model.touched)}">
+              <label>Nickname</label>
+              <input type="text" placeholder="alphanumeric, space or dash, 3-16 characters"
+                     minlength="3" maxlength="16" pattern="^[ \w\-]{3,16}$"
+                     [(ngModel)]="form.nickname" name="nickname" #nickname_model="ngModel">
+              <div *ngIf="nickname_model.errors" class="errors">
+                <label *ngIf="nickname_model.errors.minlength"><i class="times icon"></i>At least 3 characters</label>
+                <label *ngIf="nickname_model.errors.maxlength"><i class="times icon"></i>At most 16 characters</label>
+                <label *ngIf="nickname_model.errors.pattern"><i class="times icon"></i>Invalid format</label>
+              </div>
+            </div>
+            <button class="ui primary fluid submit button" type="submit">Update Profile</button>
+          </form>
+        </div>
+
+        <div class="ui segment">
+          <div class="ui success message" *ngIf="update_avatar_success">
+            <i class="close icon" (click)="update_avatar_success=undefined"></i>
+            <div class="header"><i class="check circle icon"></i> Avatar updated successfully</div>
+          </div>
+          <div class="ui error message" *ngIf="update_avatar_error">
+            <i class="close icon" (click)="update_avatar_error=undefined"></i>
+            <div class="header"><i class="times circle icon"></i> {{update_avatar_error.msg}}</div>
+            <p>{{update_avatar_error.detail}}</p>
+          </div>
+          <div class="ui center aligned grid">
+            <div class="column">
+              <form class="ui form" [ngClass]="{'loading': updating_avatar}">
+                <div class="field">
+                  <label>Avatar</label>
+                  <input type="file" hidden name="avatar" #avatar_input [accept]="avatar_validator.filter.accept.join(',')" (change)="uploadAvatar(avatar_input)">
+                  <img class="ui small centered image" [src]="user.avatar" *ngIf="user.avatar">
+                  <div class="text muted" *ngIf="!user.avatar">(No avatar)</div>
+                </div>
+                <button class="ui primary button" type="button" (click)="avatar_input.click()">Upload Avatar</button>
+                <p>Max size: {{avatar_validator.filter.size_limit/1024 | number}}KB, squared image only</p>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="column">
+    <div class="ui large centered active inline text loader" *ngIf="loading_login_records">Loading user login records...</div>
+
+    <div *ngIf="!loading_login_records && login_records">
+      <div class="ui top attached segment">
+        <div class="ui header">
+          <i class="sign in icon"></i>
+          Sign In Records
+        </div>
+      </div>
+      <table class="ui table celled compact unstackable bottom attached">
+        <thead><tr><th>ID</th><th>Time</th><th>IP</th><th>Result</th></tr></thead>
+        <tbody>
+        <tr *ngFor="let record of login_records" [ngClass]="{'error': !record.success}">
+          <td>{{record.id}}</td>
+          <td>{{record.time | date:'short'}}</td>
+          <td>{{record.ip}}</td>
+          <td>
+            <span *ngIf="record.success">Success</span>
+            <span *ngIf="!record.success">{{record.reason}}</span>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

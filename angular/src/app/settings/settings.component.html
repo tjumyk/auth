@@ -1,0 +1,23 @@
+<div class="ui centered stackable grid">
+  <div class="three wide column">
+    <div class="ui vertical pointing fluid menu">
+      <a routerLink="profile" routerLinkActive="active" class="item">Profile</a>
+      <a routerLink="password" routerLinkActive="active" class="item">Password</a>
+    </div>
+
+    <div class="ui vertical fluid buttons">
+      <button class="ui violet button" routerLink="/admin" *ngIf="is_admin">
+        <i class="icon cogs"></i>
+        Management
+      </button>
+      <button class="ui teal button" routerLink="/account/logout">
+        <i class="icon sign out"></i>
+        Sign Out
+      </button>
+    </div>
+  </div>
+
+  <div class="eight wide column">
+    <router-outlet></router-outlet>
+  </div>
+</div>

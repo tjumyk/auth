@@ -1,0 +1,52 @@
+<div class="ui error message" *ngIf="error">
+  <i class="close icon" (click)="error=undefined"></i>
+  <div class="header"><i class="times circle icon"></i> {{error.msg}}</div>
+  <p>{{error.detail}}</p>
+</div>
+
+<div class="ui padded raised segment" *ngIf="verifying">
+  <div class="ui large centered text inline loader active">Verifying token...</div>
+</div>
+
+<div *ngIf="!verifying && user">
+  <form class="ui large form" #f="ngForm" (ngSubmit)="start_reset(f)" [ngClass]="{'loading': requesting}">
+    <div class="ui raised segment">
+      <div class="field">
+        <label>Username</label>
+        {{user.name}}
+      </div>
+      <div class="field">
+        <label>E-mail</label>
+        {{user.email}}
+      </div>
+      <div class="field" [ngClass]="{'error': (f.submitted || new_pass_model.touched || new_pass_model.dirty) && new_pass_model.invalid}">
+        <label>New password</label>
+        <input type="password" name="new_password" placeholder="8-20 characters"
+               required minlength="8" maxlength="20"
+               [(ngModel)]="form.new_password" #new_pass_model="ngModel">
+        <div class="errors" *ngIf="new_pass_model.errors">
+          <label *ngIf="new_pass_model.errors.required"><i class="times icon"></i> New password is required</label>
+          <label *ngIf="new_pass_model.errors.minlength"><i class="times icon"></i> At least 8 characters</label>
+          <label *ngIf="new_pass_model.errors.maxlength"><i class="times icon"></i> At most 20 characters</label>
+        </div>
+      </div>
+      <div class="field" [ngClass]="{'error': (f.submitted || repeat_new_pass_model.touched || repeat_new_pass_model.dirty) && repeat_new_pass_model.invalid}">
+        <label>Repeat new password</label>
+        <input type="password" name="repeat_new_password" placeholder="repeat the new password"
+               required minlength="8" maxlength="20" appSameAs="{{form.new_password}}"
+               [(ngModel)]="form.repeat_new_password" #repeat_new_pass_model="ngModel">
+        <div class="errors" *ngIf="repeat_new_pass_model.errors">
+          <label *ngIf="repeat_new_pass_model.errors.required"><i class="times icon"></i> Please repeat the new password</label>
+          <label *ngIf="repeat_new_pass_model.errors.minlength"><i class="times icon"></i> At least 8 characters</label>
+          <label *ngIf="repeat_new_pass_model.errors.maxlength"><i class="times icon"></i> At most 20 characters</label>
+          <label *ngIf="repeat_new_pass_model.errors.sameAs"><i class="times icon"></i> Two new passwords do not match</label>
+        </div>
+      </div>
+      <button class="ui fluid large primary submit button" type="submit">Finish</button>
+    </div>
+  </form>
+</div>
+
+<div class="ui center aligned message">
+  Token expired? <a routerLink="../request-reconfirm-email">Reconfirm E-mail</a>
+</div>

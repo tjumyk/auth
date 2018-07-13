@@ -1,0 +1,34 @@
+<div class="ui centered stackable grid">
+  <div class="three wide column">
+    <div class="ui vertical fluid large menu">
+      <div class="item">
+        Account
+        <div class="menu">
+          <a routerLink="account/users" routerLinkActive="active" class="item">Users</a>
+          <a routerLink="account/groups" routerLinkActive="active" class="item">Groups</a>
+        </div>
+      </div>
+      <div class="item">
+        OAuth
+        <div class="menu">
+          <a routerLink="oauth/clients" routerLinkActive="active" class="item">Clients</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="ui vertical fluid buttons">
+      <button class="ui button" routerLink="/settings">
+        <i class="icon user"></i>
+        My Settings
+      </button>
+      <button class="ui teal button" routerLink="/account/logout">
+        <i class="icon sign out"></i>
+        Sign Out
+      </button>
+    </div>
+  </div>
+
+  <div class="thirteen wide column">
+    <router-outlet></router-outlet>
+  </div>
+</div>

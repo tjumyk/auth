@@ -1,0 +1,49 @@
+<div class="ui error message" *ngIf="error">
+  <i class="close icon" (click)="error=undefined"></i>
+  <div class="header"><i class="times circle icon"></i> {{error.msg}}</div>
+  <p>{{error.detail}}</p>
+</div>
+
+<div class="ui two column stackable grid">
+  <div class="column">
+    <div class="ui segments">
+
+      <div class="ui segment">
+        <div class="ui header">
+          <i class="icon users add"></i>
+          Add New Group
+        </div>
+      </div>
+
+      <div class="ui segment">
+        <form #f="ngForm" class="ui form" (ngSubmit)="newGroup(f)" [ngClass]="{'loading': requesting}">
+          <div class="field"
+               [ngClass]="{'error': (f.submitted || name_model.touched || name_model.dirty) && name_model.invalid}">
+            <label>Name</label>
+            <input type="text" name="name" placeholder="alphanumeric, 3-16 characters"
+                   required minlength="3" maxlength="16" pattern="^[\w]{3,16}$"
+                   [(ngModel)]="form.name" #name_model="ngModel">
+            <div class="errors" *ngIf="name_model.errors">
+              <label *ngIf="name_model.errors.required"><i class="times icon"></i> Name is required</label>
+              <label *ngIf="name_model.errors.minlength"><i class="times icon"></i> At least 3 characters</label>
+              <label *ngIf="name_model.errors.maxlength"><i class="times icon"></i> At most 16 characters</label>
+              <label *ngIf="name_model.errors.pattern"><i class="times icon"></i> Invalid format</label>
+            </div>
+          </div>
+          <div class="field"
+               [ngClass]="{'error': (f.submitted || desc_model.touched || desc_model.dirty) && desc_model.invalid}">
+            <label>Description (Optional)</label>
+            <textarea  name="description" placeholder="at most 256 characters" rows="5"
+                       maxlength="256"
+                       [(ngModel)]="form.description" #desc_model="ngModel"></textarea>
+            <div class="errors" *ngIf="desc_model.errors">
+              <label *ngIf="desc_model.errors.maxlength"><i class="times icon"></i> At most 256 characters</label>
+            </div>
+          </div>
+          <button type="submit" class="ui primary fluid button">Add</button>
+        </form>
+      </div>
+
+    </div>
+  </div>
+</div>

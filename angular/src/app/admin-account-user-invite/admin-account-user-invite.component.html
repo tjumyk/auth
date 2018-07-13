@@ -1,0 +1,73 @@
+<div class="ui error message" *ngIf="error">
+  <i class="close icon" (click)="error=undefined"></i>
+  <div class="header"><i class="times circle icon"></i> {{error.msg}}</div>
+  <p>{{error.detail}}</p>
+</div>
+
+<div class="ui two column stackable grid">
+  <div class="column">
+    <div class="ui segments">
+
+      <div class="ui segment">
+        <div class="ui header">
+          <i class="icon user add"></i>
+          Invite New User
+        </div>
+      </div>
+
+      <div class="ui segment">
+        <form #f="ngForm" class="ui form" (ngSubmit)="invite(f)" [ngClass]="{'loading': requesting}">
+          <div class="field"
+               [ngClass]="{'error': (f.submitted || name_model.touched || name_model.dirty) && name_model.invalid}">
+            <label>Name</label>
+            <input type="text" name="name" placeholder="alphanumeric, 3-16 characters"
+                   required minlength="3" maxlength="16" pattern="^[\w]{3,16}$"
+                   [(ngModel)]="form.name" #name_model="ngModel">
+            <div class="errors" *ngIf="name_model.errors">
+              <label *ngIf="name_model.errors.required"><i class="times icon"></i> Name is required</label>
+              <label *ngIf="name_model.errors.minlength"><i class="times icon"></i> At least 3 characters</label>
+              <label *ngIf="name_model.errors.maxlength"><i class="times icon"></i> At most 16 characters</label>
+              <label *ngIf="name_model.errors.pattern"><i class="times icon"></i> Invalid format</label>
+            </div>
+          </div>
+          <div class="field"
+               [ngClass]="{'error': (f.submitted || email_model.touched || email_model.dirty) && email_model.invalid}">
+            <label>E-mail</label>
+            <input type="email" name="email" placeholder="at most 64 characters"
+                   required maxlength="64" email
+                   [(ngModel)]="form.email" #email_model="ngModel">
+            <div class="errors" *ngIf="email_model.errors">
+              <label *ngIf="email_model.errors.required"><i class="times icon"></i> E-mail is required</label>
+              <label *ngIf="email_model.errors.maxlength"><i class="times icon"></i> At most 64 characters</label>
+              <label *ngIf="email_model.errors.email"><i class="times icon"></i> Invalid E-mail format</label>
+            </div>
+          </div>
+          <button type="submit" class="ui primary fluid button">Invite</button>
+        </form>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="column" *ngIf="new_users.length">
+    <div class="ui segment top attached">
+      <div class="ui header">
+        <i class="icon clipboard outline"></i>
+        New Users
+      </div>
+    </div>
+    <table class="ui table unstackable bottom attached celled compact">
+      <thead><tr><th>ID</th><th>Name</th><th>Created At</th><th class="collapsing">Ops</th></tr></thead>
+      <tbody>
+      <tr *ngFor="let user of new_users">
+        <td>{{user.id}}</td>
+        <td>{{user.name}}</td>
+        <td>{{user.created_at | date: 'short'}}</td>
+        <td class="collapsing">
+          <a routerLink="../u/{{user.id}}" class="ui small icon button"><i class="icon edit"></i></a>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

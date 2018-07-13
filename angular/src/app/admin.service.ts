@@ -1,8 +1,8 @@
 import {Injectable} from '@angular/core';
-import {HttpClient} from "@angular/common/http";
+import {HttpClient, HttpParams} from "@angular/common/http";
 import {Logger, LogService} from "./log.service";
 import {Observable} from "rxjs/internal/Observable";
-import {GroupAdvanced, LoginRecord, OAuthClientAdvanced, UserAdvanced} from "./models";
+import {GroupAdvanced, LoginRecord, OAuthClientAdvanced, OAuthAuthorization, UserAdvanced} from "./models";
 import {map, tap} from "rxjs/operators";
 
 @Injectable({
@@ -43,6 +43,15 @@ export class AdminService {
     )
   }
 
+  search_user_by_name(name: string, limit?: number): Observable<UserAdvanced[]> {
+    let params = new HttpParams().append('name', name);
+    if (limit != undefined)
+      params = params.append('limit', limit.toString());
+    return this.http.get<UserAdvanced[]>(`${this.api}/users`, {params: params}).pipe(
+      tap((results) => this.logger.info(`Search user by name "${name}": returned ${results.length} results`))
+    )
+  }
+
   invite_user(name: string, email: string): Observable<UserAdvanced> {
     return this.http.post<UserAdvanced>(`${this.api}/users`, {name: name, email: email}).pipe(
       tap((user: UserAdvanced) => this.logger.info(`Invited user ${user.name} (${user.email})`))
@@ -63,7 +72,7 @@ export class AdminService {
 
   set_user_active(uid: number, is_active: boolean): Observable<any> {
     if (is_active) {
-      return this.http.post(`${this.api}/users/${uid}/active`, null).pipe(
+      return this.http.put(`${this.api}/users/${uid}/active`, null).pipe(
         tap(() => this.logger.info(`Set user (uid: ${uid}) as active`))
       )
     } else {
@@ -131,14 +140,20 @@ export class AdminService {
     )
   }
 
+  group_get_users(gid: number): Observable<UserAdvanced[]> {
+    return this.http.get<UserAdvanced[]>(`${this.api}/groups/${gid}/users`).pipe(
+      tap((users) => this.logger.info(`Fetched user list of group (id: ${gid}) (${users.length} users)`))
+    )
+  }
+
   group_add_user(gid: number, uid: number): Observable<any> {
-    return this.http.post(`${this.api}/groups/${gid}/users/${uid}`, null).pipe(
+    return this.http.put(`${this.api}/groups/${gid}/users/${uid}`, null).pipe(
       tap(() => this.logger.info(`Added user (uid: ${uid}) to group (gid: ${gid})`))
     )
   }
 
   group_remove_user(gid: number, uid: number): Observable<any> {
-    return this.http.delete(`${this.api}/groups/${gid}/users/${uid}`, null).pipe(
+    return this.http.delete(`${this.api}/groups/${gid}/users/${uid}`).pipe(
       tap(() => this.logger.info(`Removed user (uid: ${uid}) from group (gid: ${gid})`))
     )
   }
@@ -190,9 +205,15 @@ export class AdminService {
     )
   }
 
-  client_regenerate_secret(cid: number): Observable<OAuthClientAdvanced> {
-    return this.http.post<OAuthClientAdvanced>(`${this.api}/clients/${cid}/regenerate-secret`, null).pipe(
-      tap((client) => this.logger.info(`Regenerated secret for OAuth client ${client.name}`))
+  client_regenerate_secret(cid: number): Observable<any> {
+    return this.http.post(`${this.api}/clients/${cid}/regenerate-secret`, null).pipe(
+      tap(() => this.logger.info(`Regenerated secret for OAuth client (cid: ${cid}`))
+    )
+  }
+
+  client_get_authorizations(cid: number): Observable<OAuthAuthorization[]> {
+    return this.http.get<OAuthAuthorization[]>(`${this.api}/clients/${cid}/authorizations`).pipe(
+      tap((auths) => this.logger.info(`Fetched authorizations for OAuth client (cid: ${cid}) (${auths.length} records)`))
     )
   }
 }

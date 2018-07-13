@@ -1,0 +1,32 @@
+<div class="ui error message" *ngIf="error">
+  <i class="close icon" (click)="error=undefined"></i>
+  <div class="header"><i class="times circle icon"></i> {{error.msg}}</div>
+  <p>{{error.detail}}</p>
+</div>
+
+<div class="ui centered active large inline text loader" *ngIf="loading_group_list">Loading group list...</div>
+
+<div *ngIf="!loading_group_list">
+  <p>
+    <a class="ui small button primary" routerLink="new"><i class="icon users add"></i> New Group</a>
+  </p>
+
+  <div class="table-responsive">
+    <table class="ui unstackable celled compact table">
+      <thead><tr><th>ID</th><th>Name</th><th>Description</th><th class="collapsing">Ops</th></tr></thead>
+      <tbody>
+      <tr *ngFor="let group of group_list">
+        <td>{{group.id}}</td>
+        <td>{{group.name}}</td>
+        <td>{{group.description}}</td>
+        <td class="collapsing">
+          <div class="ui small buttons">
+            <div class="ui icon button" routerLink="g/{{group.id}}"><i class="edit icon"></i></div>
+            <div class="ui icon red button" #btn (click)="deleteGroup(group, btn)" ><i class="trash icon"></i></div>
+          </div>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

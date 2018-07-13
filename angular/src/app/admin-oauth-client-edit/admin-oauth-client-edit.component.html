@@ -1,0 +1,167 @@
+<div class="ui error message" *ngIf="error">
+  <i class="close icon" (click)="error=undefined"></i>
+  <div class="header"><i class="times circle icon"></i> {{error.msg}}</div>
+  <p>{{error.detail}}</p>
+</div>
+
+<div class="ui stackable two column grid">
+  <div class="column">
+    <div class="ui large centered active inline text loader" *ngIf="loading_client">Loading client profile...</div>
+
+    <div *ngIf="!loading_client && client">
+      <div class="ui segments">
+        <div class="ui segment">
+          <div class="ui header">
+            <i class="code icon" *ngIf="!client.icon"></i>
+            <img [src]="client.icon" *ngIf="client.icon" class="ui avatar image">
+            {{client.name}}
+          </div>
+        </div>
+        <div class="ui segment">
+          <div class="ui relaxed horizontal list">
+            <div class="item">
+              <div class="header">ID</div>
+              {{client.id}}
+            </div>
+            <div class="item">
+              <div class="header">Name</div>
+              {{client.name}}
+            </div>
+
+          </div>
+        </div>
+
+        <div class="ui segment">
+          <div class="ui list">
+            <div class="item">
+              <div class="header">Secret</div>
+              {{client.secret}}
+            </div>
+            <div class="item">
+              <div class="header">Created At</div>
+              {{client.created_at | date:'medium'}}
+            </div>
+            <div class="item">
+              <div class="header">Modified At</div>
+              {{client.modified_at | date:'medium'}}
+            </div>
+          </div>
+        </div>
+
+        <div class="ui segment">
+          <div class="ui success message" *ngIf="admin_operation_success">
+            <i class="close icon" (click)="admin_operation_success=undefined"></i>
+            <div class="header"><i class="check circle icon"></i> {{admin_operation_success.msg}}</div>
+            {{admin_operation_success.detail}}
+          </div>
+
+          <p>
+            <a class="ui yellow button" [ngClass]="{'loading disabled': regenerating_secret}" (click)="regenerateSecret()">Regenerate Secret</a>
+            <a class="ui red button" (click)="deleteClient()" [ngClass]="{'loading disabled': deleting}"><i class="trash icon"></i>Delete Client</a>
+          </p>
+        </div>
+
+        <div class="ui segment">
+          <div class="ui success message" *ngIf="update_profile_success">
+            <i class="close icon" (click)="update_profile_success=undefined"></i>
+            <div class="header"><i class="check circle icon"></i> Profile updated successfully</div>
+          </div>
+          <div class="ui error message" *ngIf="update_profile_error">
+            <i class="close icon" (click)="update_profile_error=undefined"></i>
+            <div class="header"><i class="times circle icon"></i> {{update_profile_error.msg}}</div>
+            <p>{{update_profile_error.detail}}</p>
+          </div>
+
+          <form #f="ngForm" class="ui form" (ngSubmit)="updateProfile(f)" [ngClass]="{'loading': updating_profile}">
+            <div class="field"
+                 [ngClass]="{'error': (f.submitted || redirect_url_model.touched || redirect_url_model.dirty) && redirect_url_model.invalid}">
+              <label>Redirect URL</label>
+              <input type="text" name="redirect_url" placeholder="at most 128 characters"
+                     required maxlength="128"
+                     [(ngModel)]="form.redirect_url" #redirect_url_model="ngModel">
+              <div class="errors" *ngIf="redirect_url_model.errors">
+                <label *ngIf="redirect_url_model.errors.required"><i class="times icon"></i> Redirect URL is required</label>
+                <label *ngIf="redirect_url_model.errors.maxlength"><i class="times icon"></i> At most 128 characters</label>
+              </div>
+            </div>
+            <div class="field"
+                 [ngClass]="{'error': (f.submitted || home_url_model.touched || home_url_model.dirty) && home_url_model.invalid}">
+              <label>Home URL (Optional)</label>
+              <input type="text"  name="home_url" placeholder="at most 128 characters"
+                     maxlength="128"
+                     [(ngModel)]="form.home_url" #home_url_model="ngModel">
+              <div class="errors" *ngIf="home_url_model.errors">
+                <label *ngIf="home_url_model.errors.maxlength"><i class="times icon"></i> At most 128 characters</label>
+              </div>
+            </div>
+            <div class="field"
+                 [ngClass]="{'error': (f.submitted || desc_model.touched || desc_model.dirty) && desc_model.invalid}">
+              <label>Description (Optional)</label>
+              <textarea  name="description" placeholder="at most 256 characters" rows="5"
+                         maxlength="256"
+                         [(ngModel)]="form.description" #desc_model="ngModel"></textarea>
+              <div class="errors" *ngIf="desc_model.errors">
+                <label *ngIf="desc_model.errors.maxlength"><i class="times icon"></i> At most 256 characters</label>
+              </div>
+            </div>
+
+            <button class="ui primary fluid submit button" type="submit">Update Profile</button>
+          </form>
+        </div>
+
+        <div class="ui segment">
+          <div class="ui success message" *ngIf="update_icon_success">
+            <i class="close icon" (click)="update_icon_success=undefined"></i>
+            <div class="header"><i class="check circle icon"></i> Icon updated successfully</div>
+          </div>
+          <div class="ui error message" *ngIf="update_icon_error">
+            <i class="close icon" (click)="update_icon_error=undefined"></i>
+            <div class="header"><i class="times circle icon"></i> {{update_icon_error.msg}}</div>
+            <p>{{update_icon_error.detail}}</p>
+          </div>
+
+          <div class="ui center aligned grid">
+            <div class="column">
+              <form class="ui form" [ngClass]="{'loading': updating_icon}">
+                <div class="field">
+                  <label>Icon</label>
+                  <input type="file" hidden name="icon" #icon_input [accept]="icon_validator.filter.accept.join(',')" (change)="uploadIcon(icon_input)">
+                  <img class="ui small centered image" [src]="client.icon" *ngIf="client.icon">
+                  <div class="text muted" *ngIf="!client.icon">(No icon)</div>
+                </div>
+                <button class="ui primary button" type="button" (click)="icon_input.click()">Upload Icon</button>
+                <p>Max size: {{icon_validator.filter.size_limit/1024 | number}}KB, squared image only</p>
+              </form>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="column">
+    <div class="ui large centered active inline text loader" *ngIf="loading_authorizations">Loading authorizations...</div>
+
+    <div *ngIf="!loading_authorizations && authorizations">
+      <div class="ui top attached segment">
+        <div class="ui header">
+          <i class="sign in icon"></i>
+          Authorizations
+        </div>
+      </div>
+      <table class="ui table celled compact unstackable bottom attached">
+        <thead><tr><th>User ID</th><th>User Name</th><th>Created At</th><th>Updated At</th></tr></thead>
+        <tbody>
+        <tr *ngFor="let record of authorizations">
+          <td>{{record.user_id}}</td>
+          <td>{{record.user.name}}</td>
+          <td>{{record.created_at | date:'short'}}</td>
+          <td>{{record.modified_at | date:'short'}}</td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

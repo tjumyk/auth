@@ -1,0 +1,47 @@
+<div class="ui error message" *ngIf="error">
+  <i class="close icon" (click)="error=undefined"></i>
+  <div class="header"><i class="times circle icon"></i> {{error.msg}}</div>
+  <p>{{error.detail}}</p>
+</div>
+
+<div class="ui centered active large inline text loader" *ngIf="loading_user_list">Loading user list...</div>
+
+<div *ngIf="!loading_user_list">
+  <p>
+    <a class="ui small button primary" routerLink="invite"><i class="icon user add"></i> Invite New User</a>
+  </p>
+
+  <div class="table-responsive">
+    <table class="ui unstackable celled compact table">
+      <thead><tr><th>ID</th><th>Name</th><th>E-mail</th><th>Nickname</th><th>Status</th><th>Groups</th><th class="collapsing">Ops</th></tr></thead>
+      <tbody>
+      <tr *ngFor="let user of user_list; index as i">
+        <td>{{user.id}}</td>
+        <td>{{user.name}}</td>
+        <td>
+          {{user.email}}
+          <i class="icon green check circle" *ngIf="user.is_email_confirmed" title="Confirmed"></i>
+          <i class="icon yellow question circle" *ngIf="!user.is_email_confirmed" title="Not yet confirmed"></i>
+        </td>
+        <td>{{user.nickname}}</td>
+        <td>
+          <span class="text success" *ngIf="user.is_active">Active</span>
+          <span class="text error" *ngIf="!user.is_active">Inactive</span>
+        </td>
+        <td>
+          <div class="ui small labels">
+            <a *ngFor="let group of user.groups" class="ui basic label" routerLink="../../../groups/g/{{group.id}}">{{group.name}}</a>
+          </div>
+        </td>
+        <td class="collapsing">
+          <div class="ui small buttons">
+            <div class="ui icon button" routerLink="u/{{user.id}}"><i class="edit icon"></i></div>
+            <div class="ui icon red button" #btn (click)="deleteUser(user, i, btn)" ><i class="trash icon"></i></div>
+          </div>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>

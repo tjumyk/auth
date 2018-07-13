@@ -1,0 +1,169 @@
+<div class="ui error message" *ngIf="error">
+  <i class="close icon" (click)="error=undefined"></i>
+  <div class="header"><i class="times circle icon"></i> {{error.msg}}</div>
+  <p>{{error.detail}}</p>
+</div>
+
+<div class="ui two column stackable grid">
+  <div class="column">
+    <div class="ui large centered active inline text loader" *ngIf="loading_group">Loading group profile...</div>
+
+    <div *ngIf="!loading_group && group">
+      <div class="ui segments">
+        <div class="ui segment">
+          <div class="ui header">
+            <i class="tag icon"></i>
+            {{group.name}}
+          </div>
+        </div>
+        <div class="ui segment">
+          <div class="ui relaxed horizontal list">
+            <div class="item">
+              <div class="header">ID</div>
+              {{group.id}}
+            </div>
+            <div class="item">
+              <div class="header">Name</div>
+              {{group.name}}
+            </div>
+          </div>
+        </div>
+
+        <div class="ui segment">
+          <div class="ui list">
+            <div class="item">
+              <div class="header">Created At</div>
+              {{group.created_at | date: 'medium'}}
+            </div>
+            <div class="item">
+              <div class="header">Modified At</div>
+              {{group.modified_at | date: 'medium'}}
+            </div>
+          </div>
+        </div>
+
+        <div class="ui segment">
+          <button class="ui red button" (click)="deleteGroup()"><i class="icon trash"></i>Delete Group</button>
+        </div>
+
+        <div class="ui segment">
+          <div class="ui error message" *ngIf="update_profile_error">
+            <i class="close icon" (click)="update_profile_error=undefined"></i>
+            <div class="header"><i class="times circle icon"></i> {{update_profile_error.msg}}</div>
+            {{update_profile_error.detail}}
+          </div>
+          <div class="ui success message" *ngIf="update_profile_success">
+            <i class="close icon" (click)="update_profile_success=undefined"></i>
+            <div class="header"><i class="check circle icon"></i> Profile updated successfully</div>
+          </div>
+          <form #f="ngForm" class="ui form" (ngSubmit)="updateProfile(f)" [ngClass]="{'loading': updating_profile}">
+            <div class="field" [ngClass]="{'error': (f.submitted || desc_model.dirty || desc_model.touched) && desc_model.invalid}">
+              <label>Description</label>
+              <textarea placeholder="at most 256 characters" rows="5"
+                        maxlength="256"
+                        [(ngModel)]="form.description" name="description" #desc_model="ngModel"></textarea>
+              <div class="errors" *ngIf="desc_model.errors">
+                <label *ngIf="desc_model.errors.maxlength">At most 256 characters</label>
+              </div>
+            </div>
+            <button class="ui primary fluid submit button" type="submit">Update Profile</button>
+          </form>
+        </div>
+
+      </div>
+
+      <div class="ui segments">
+        <div class="ui segment top attached">
+          <div class="ui header">
+            <i class="icon user plus"></i>
+            Add New Member
+          </div>
+        </div>
+
+        <div class="ui semgent attached">
+          <div class="ui segment basic">
+
+            <div class="ui error message" *ngIf="add_member_error">
+              <i class="close icon" (click)="add_member_error=undefined"></i>
+              <div class="header"><i class="times circle icon"></i> {{add_member_error.msg}}</div>
+              <p>{{add_member_error.detail}}</p>
+            </div>
+
+            <div class="ui success message" *ngIf="added_member">
+              <i class="close icon" (click)="added_member=undefined"></i>
+              <div class="header"><i class="check circle icon"></i> Added {{added_member.name}} to group</div>
+            </div>
+
+            <div class="ui icon fluid input">
+              <input type="text" placeholder="Search users by username or nickname..."
+                     (keyup)="searchUser(searchInput.value)" #searchInput>
+              <i class="icon search"></i>
+            </div>
+            <p class="text muted" [hidden]="!user_search_results || user_search_results.length > 0"><i class="info circle icon"></i> No results</p>
+          </div>
+        </div>
+
+        <table class="ui table unstackable compact celled bottom attached" [hidden]="!user_search_results || user_search_results.length==0">
+          <thead><tr><th>ID</th><th>Name</th><th>Nickname</th><th class="collapsing">Ops</th></tr></thead>
+          <tbody>
+          <tr *ngFor="let user of user_search_results; index as i">
+            <td>{{user.id}}</td>
+            <td>{{user.name}}</td>
+            <td>{{user.nickname}}</td>
+            <td class="collapsing">
+              <div class="ui small buttons">
+                <a class="ui icon button" routerLink="../../../users/u/{{user.id}}"><i class="icon edit"></i></a>
+                <a class="ui primary icon button" *ngIf="!alreadyInGroup(user); else successBtn"
+                   #addToGroupBtn (click)="addUserToGroup(user, i, addToGroupBtn)"><i class="icon plus"></i></a>
+                <ng-template #successBtn><a class="ui green icon button"><i class="check icon"></i></a></ng-template>
+              </div>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+
+  </div>
+
+  <div class="column">
+    <div class="ui large centered active inline text loader" *ngIf="loading_group_members">Loading group member list...</div>
+
+    <div class="ui error message" *ngIf="remove_member_error">
+      <i class="close icon" (click)="remove_member_error=undefined"></i>
+      <div class="header"><i class="times circle icon"></i> {{remove_member_error.msg}}</div>
+      <p>{{remove_member_error.detail}}</p>
+    </div>
+
+    <div class="ui success message" *ngIf="removed_member">
+      <i class="close icon" (click)="removed_member=undefined"></i>
+      <div class="header"><i class="check circle icon"></i> Removed {{removed_member.name}} from group</div>
+    </div>
+
+    <div *ngIf="!loading_group_members && members">
+      <div class="ui segment top attached">
+        <div class="ui header">
+          <i class="icon users"></i>
+          Members
+        </div>
+      </div>
+
+      <table class="ui bottom attached table celled unstackable compact">
+        <thead><tr><th>ID</th><th>Name</th><th class="collapsing">Ops</th></tr></thead>
+        <tbody>
+        <tr *ngFor="let user of members; index as i">
+          <td>{{user.id}}</td>
+          <td>{{user.name}}</td>
+          <td class="collapsing">
+            <div class="ui small buttons">
+              <a routerLink="../../../users/u/{{user.id}}" class="ui icon button"><i class="icon edit"></i></a>
+              <a class="ui icon red button" #removeFromGroupBtn (click)="removeUserFromGroup(user, i, removeFromGroupBtn)"><i class="icon minus"></i></a>
+            </div>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
