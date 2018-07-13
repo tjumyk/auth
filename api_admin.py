@@ -25,15 +25,21 @@ def admin_user_list():
                         limit = int(limit)
                     except ValueError:
                         return jsonify(msg='limit must be an integer'), 400
-                    _users = UserService.search_by_name(args['name'], limit)
+                    users = UserService.search_by_name(args['name'], limit)
                 else:
-                    _users = UserService.search_by_name(args['name'])  # use default limit
-                return jsonify([user.to_dict(with_advanced_fields=True) for user in _users])
+                    users = UserService.search_by_name(args['name'])  # use default limit
+                return jsonify([user.to_dict(with_advanced_fields=True) for user in users])
             else:  # get all
-                users = [u.to_dict(with_groups=False, with_group_ids=True, with_advanced_fields=True)
-                         for u in UserService.get_all()]
-                groups = [g.to_dict(with_advanced_fields=True) for g in GroupService.get_all()]
-                return jsonify(users=users, groups=groups)
+                users = UserService.get_all()
+                user_dicts = []
+                group_set = set()
+                for u in users:
+                    user_dicts.append(u.to_dict(with_groups=False, with_group_ids=True, with_advanced_fields=True))
+                    # assume groups are lazy-loaded, otherwise need to dig into User.to_dict() to avoid redundant
+                    # SQL queries on Group table
+                    group_set.update(u.groups)
+                group_dicts = [g.to_dict(with_advanced_fields=True) for g in group_set]
+                return jsonify(users=user_dicts, groups=group_dicts)
         else:  # POST
             _json = request.json
             name = _json.get('name')
