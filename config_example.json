@@ -3,6 +3,7 @@
   "SQLALCHEMY_DATABASE_URI": "sqlite:///test.db",
   "SQLALCHEMY_TRACK_MODIFICATIONS": false,
   "MAX_CONTENT_LENGTH": 262144,
+  "SESSION_COOKIE_NAME": "idm_session",
 
   "MAIL": {
     "display_name": "IdM@UNSWKG",
