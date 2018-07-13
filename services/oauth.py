@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 from secrets import token_urlsafe
 
 from error import BasicError
-from models import OAuthClient, db, OAuthClientUser
+from models import OAuthClient, db, OAuthAuthorization
 
 
 class OAuthServiceError(BasicError):
@@ -101,14 +101,14 @@ class OAuthService:
         authorize_token = token_urlsafe()
         expire = datetime.utcnow() + timedelta(minutes=1)
 
-        client_user = OAuthClientUser.query.filter_by(client_id=client.id, user_id=user.id).first()
-        if client_user is None:
-            client_user = OAuthClientUser(client_id=client.id, user_id=user.id,
-                                          authorize_token=authorize_token, authorize_token_expire_at=expire)
-            db.session.add(client_user)
+        auth = OAuthAuthorization.query.filter_by(client_id=client.id, user_id=user.id).first()
+        if auth is None:
+            auth = OAuthAuthorization(client_id=client.id, user_id=user.id,
+                                      authorize_token=authorize_token, authorize_token_expire_at=expire)
+            db.session.add(auth)
         else:
-            client_user.authorize_token = authorize_token
-            client_user.authorize_token_expire_at = expire
+            auth.authorize_token = authorize_token
+            auth.authorize_token_expire_at = expire
         return authorize_token
 
     @staticmethod
@@ -131,22 +131,22 @@ class OAuthService:
         if client.secret != client_secret:
             raise OAuthServiceError('wrong client secret')
 
-        client_user = OAuthClientUser.query.filter_by(client_id=client.id, user_id=user.id).first()
-        if client_user is None:
+        auth = OAuthAuthorization.query.filter_by(client_id=client.id, user_id=user.id).first()
+        if auth is None:
             raise OAuthServiceError('authorize not started')
-        if client_user.authorize_token != authorize_token:
+        if auth.authorize_token != authorize_token:
             raise OAuthServiceError('wrong authorize_token')
 
         access_token = None
         for _ in range(5):  # repeat 5 times in case token collision
             token = token_urlsafe()
-            if OAuthClientUser.query.filter_by(access_token=token).count() == 0:
+            if OAuthAuthorization.query.filter_by(access_token=token).count() == 0:
                 access_token = token
                 break
         if access_token is None:
             raise OAuthServiceError('token space almost exhausted')
 
-        client_user.access_token = access_token
+        auth.access_token = access_token
         return access_token
 
     @staticmethod
@@ -154,7 +154,7 @@ class OAuthService:
         if access_token is None:
             raise OAuthServiceError('access_token is required')
 
-        client_user = OAuthClientUser.query.filter_by(access_token=access_token).first()
-        if client_user is None:
+        auth = OAuthAuthorization.query.filter_by(access_token=access_token).first()
+        if auth is None:
             raise OAuthServiceError('invalid access_token')
-        return client_user
+        return auth

@@ -30,7 +30,7 @@ class User(db.Model):
     is_email_confirmed = db.Column(db.Boolean, nullable=False, default=False)
 
     login_records = db.relationship('LoginRecord', backref=db.backref('user'), cascade="all, delete-orphan")
-    client_users = db.relationship('OAuthClientUser', backref=db.backref('user'), cascade="all, delete-orphan")
+    authorizations = db.relationship('OAuthAuthorization', backref=db.backref('user'), cascade="all, delete-orphan")
 
     def to_dict(self, with_groups=True, with_group_ids=False, with_advanced_fields=False):
         _dict = dict(id=self.id, name=self.name, email=self.email, nickname=self.nickname, avatar=self.avatar,
@@ -114,7 +114,7 @@ class OAuthClient(db.Model):
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     modified_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
 
-    users = db.relationship('OAuthClientUser', backref=db.backref('client'), cascade="all, delete-orphan")
+    authorizations = db.relationship('OAuthAuthorization', backref=db.backref('client'), cascade="all, delete-orphan")
 
     def to_dict(self, with_advanced_fields=False):
         _dict = dict(id=self.id, name=self.name, secret=self.secret, redirect_url=self.redirect_url,
@@ -130,7 +130,7 @@ class OAuthClient(db.Model):
         return '<OAuthClient %r>' % self.name
 
 
-class OAuthClientUser(db.Model):
+class OAuthAuthorization(db.Model):
     __tablename__ = 'oauth_client_user'
 
     client_id = db.Column(db.Integer, db.ForeignKey('oauth_client.id'), primary_key=True)
@@ -153,4 +153,4 @@ class OAuthClientUser(db.Model):
         return _dict
 
     def __repr__(self):
-        return '<OAuthClientUser %r,%r>' % (self.client_id, self.user_id)
+        return '<OAuthAuthorization %r,%r>' % (self.client_id, self.user_id)
