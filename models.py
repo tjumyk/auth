@@ -30,7 +30,8 @@ class User(db.Model):
     is_email_confirmed = db.Column(db.Boolean, nullable=False, default=False)
 
     login_records = db.relationship('LoginRecord', backref=db.backref('user'), cascade="all, delete-orphan")
-    authorizations = db.relationship('OAuthAuthorization', backref=db.backref('user'), cascade="all, delete-orphan")
+    authorizations = db.relationship('OAuthAuthorization', backref=db.backref('user', lazy=False),
+                                     cascade="all, delete-orphan")
 
     def to_dict(self, with_groups=True, with_group_ids=False, with_advanced_fields=False):
         _dict = dict(id=self.id, name=self.name, email=self.email, nickname=self.nickname, avatar=self.avatar,
@@ -117,10 +118,11 @@ class OAuthClient(db.Model):
     authorizations = db.relationship('OAuthAuthorization', backref=db.backref('client'), cascade="all, delete-orphan")
 
     def to_dict(self, with_advanced_fields=False):
-        _dict = dict(id=self.id, name=self.name, secret=self.secret, redirect_url=self.redirect_url,
-                     home_url=self.home_url, description=self.description, icon=self.icon)
+        _dict = dict(id=self.id, name=self.name, home_url=self.home_url, description=self.description, icon=self.icon)
 
         if with_advanced_fields:
+            _dict['secret'] = self.secret
+            _dict['redirect_url'] = self.redirect_url
             _dict['created_at'] = self.created_at
             _dict['modified_at'] = self.modified_at
 
@@ -143,8 +145,14 @@ class OAuthAuthorization(db.Model):
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     modified_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
 
-    def to_dict(self, with_advanced_fields=False):
+    def to_dict(self, with_client=False, with_user=True, with_advanced_fields=False):
         _dict = dict(client_id=self.client_id, user_id=self.user_id)
+
+        if with_client:
+            _dict['client'] = self.client.to_dict()
+
+        if with_user:
+            _dict['user'] = self.user.to_dict()
 
         if with_advanced_fields:
             _dict['created_at'] = self.created_at
