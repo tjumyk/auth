@@ -60,7 +60,7 @@ class Group(db.Model):
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     modified_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
 
-    users = db.relationship('User', secondary=user_groups, backref=db.backref('groups'))
+    users = db.relationship('User', secondary=user_groups, backref=db.backref('groups', lazy=False))
 
     def to_dict(self, with_users=False, with_user_ids=False, with_advanced_fields=False):
         _dict = dict(id=self.id, name=self.name, description=self.description)
