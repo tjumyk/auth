@@ -50,5 +50,10 @@ def init_db():
     db.session.commit()
 
 
+@app.cli.command()
+def drop_db():
+    db.drop_all()
+
+
 if __name__ == '__main__':
     app.run(host='localhost', port=8077)
