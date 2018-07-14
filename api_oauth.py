@@ -71,6 +71,9 @@ def connect():
 
 @oauth.route('/token', methods=['POST'])
 def oauth_get_access_token():
+    """
+    Return 400 with error message if any error happens
+    """
     try:
         # parse request
         form = request.form

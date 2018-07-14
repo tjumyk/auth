@@ -159,6 +159,8 @@ class OAuthService:
             raise OAuthServiceError('invalid authorization token')
         if auth.authorize_token_expire_at < datetime.utcnow():
             raise OAuthServiceError('authorization token expired')
+        if not auth.user.is_active:
+            raise OAuthServiceError('inactive user')
 
         access_token = None
         for _ in range(OAuthService.token_generation_retry):  # repeat in case token collision
@@ -176,6 +178,8 @@ class OAuthService:
     def verify_access_token(access_token):
         if access_token is None:
             raise OAuthServiceError('access_token is required')
+        if len(access_token) == 0:
+            raise OAuthServiceError('access_token can not be empty')
 
         auth = OAuthAuthorization.query.filter_by(access_token=access_token).first()
         if auth is None:

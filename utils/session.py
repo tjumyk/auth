@@ -48,8 +48,6 @@ def get_current_oauth_authorization():
     if auth is not None:
         return auth
     access_token = request.args.get('oauth_token')
-    if access_token is None:
-        return None
     auth = OAuthService.verify_access_token(access_token)
     setattr(g, _g_key_oauth_authorization, auth)
     return auth
@@ -114,13 +112,19 @@ def requires_groups(*groups):
 
 
 def requires_oauth(f):
+    """
+    Return 403 and error message if either of the following cases happen
+    1. no access token
+    2. invalid access token (empty/mismatch)
+    3. inactive user
+    """
+
     @wraps(f)
     def wrapped(*args, **kwargs):
         try:
             auth = get_current_oauth_authorization()
 
-            if auth is None:
-                return jsonify(msg='oauth access token required'), 400
+            # reject if user is inactive
             if not auth.user.is_active:
                 return jsonify(msg='inactive user'), 403
         except OAuthServiceError as e:
