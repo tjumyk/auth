@@ -32,7 +32,7 @@
         <div class="item">
           <div class="header">Groups</div>
           <div class="ui small labels">
-            <div class="ui basic label" *ngFor="let group of user.groups">{{group.name}}</div>
+            <div class="ui basic label" *ngFor="let group of user.groups" title="{{group.description}}">{{group.name}}</div>
           </div>
           <span *ngIf="user.groups.length==0" class="text muted">(None)</span>
         </div>

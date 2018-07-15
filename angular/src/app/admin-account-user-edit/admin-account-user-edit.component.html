@@ -41,7 +41,7 @@
             <div class="item">
               <div class="header">Groups</div>
               <div class="ui small labels">
-                <a class="ui basic label" *ngFor="let group of user.groups" routerLink="../../../groups/g/{{group.id}}">{{group.name}}</a>
+                <a class="ui basic label" *ngFor="let group of user.groups" routerLink="../../../groups/g/{{group.id}}" title="{{group.description}}" >{{group.name}}</a>
               </div>
               <span *ngIf="user.groups.length==0" class="text muted">(None)</span>
             </div>

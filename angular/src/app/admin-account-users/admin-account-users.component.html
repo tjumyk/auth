@@ -30,7 +30,7 @@
         </td>
         <td>
           <div class="ui small labels">
-            <a *ngFor="let group of user.groups" class="ui basic label" routerLink="../../../groups/g/{{group.id}}">{{group.name}}</a>
+            <a *ngFor="let group of user.groups" class="ui basic label" routerLink="../../../groups/g/{{group.id}}" title="{{group.description}}">{{group.name}}</a>
           </div>
         </td>
         <td class="collapsing">
