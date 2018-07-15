@@ -24,11 +24,13 @@ export class OauthService {
     this.logger = logService.get_logger('OAuthService')
   }
 
-  connect(client_id: number, redirect_url: string, state?: string): Observable<OAuthConnectResult> {
+  connect(client_id: number, redirect_url: string, original_path?:string, state?: string): Observable<OAuthConnectResult> {
     let params = new HttpParams()
       .append('client_id', client_id.toString())
       .append('redirect_url', redirect_url);
-    if (!state)
+    if (original_path)
+      params = params.append('original_path', original_path);
+    if (state)
       params = params.append('state', state);
     return this.http.get<OAuthConnectResult>(`${this.api}/connect`, {params: params}).pipe(
       tap(() => this.logger.info(`Obtained authorization token`))

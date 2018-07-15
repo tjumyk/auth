@@ -115,6 +115,9 @@ class OAuthService:
         if redirect_url is None:
             raise OAuthServiceError('redirect_url is required')
 
+        if not user.is_active:
+            raise OAuthServiceError('inactive user')
+
         OAuthService.pre_check_client(client, redirect_url)
 
         authorize_token = None

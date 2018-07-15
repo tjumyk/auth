@@ -18,36 +18,48 @@ def _error_html(msg, detail=None):
 @oauth_pages.route('/connect')
 def oauth_connect():
     """
-    A duplicate of the connect API (with some modifications) for direct redirect
+    For HTML request only
     """
+    # parse request
+    args = request.args
+    client_id = args.get('client_id')
+    redirect_url = args.get('redirect_url')
+    original_path = args.get('original_path')
+    state = args.get('state')
+    # Currently, we assume scope '*' everywhere
+
+    if client_id is None:  # NOTICE: it is OK if client_id is str here
+        return _error_html(msg='client_id is required'), 400
+    if redirect_url is None:
+        return _error_html('redirect_url is required'), 400
+
+    # get current user in session
     try:
-        # parse request
-        args = request.args
-        client_id = args.get('client_id')
-        redirect_url = args.get('redirect_url')
-        state = args.get('state')
-        # Currently, we assume scope '*' everywhere
+        user = get_current_user()
+    except UserServiceError as e:
+        return _error_html(msg=e.msg, detail=e.detail), 500
 
-        # get current user in session
-        try:
-            user = get_current_user()
-        except UserServiceError as e:
-            return _error_html(msg=e.msg, detail=e.detail), 500
+    # if not logged in
+    if user is None:
+        # redirect to login page
+        site = app.config['SITE']
+        site_url = site['root_url'] + site['base_url']
+        if site_url[-1] != '/':
+            site_url += '/'
+        path = 'oauth/login'
+        params = {'client_id': client_id, 'redirect_url': redirect_url}
+        if original_path:
+            params['original_path'] = original_path
+        if state:
+            params['state'] = state
+        full_url = url_append_param(site_url + path, params)
+        return redirect(full_url)
 
-        # if not logged in or inactive
-        if user is None or not user.is_active:
-            # redirect to login page
-            site = app.config['SITE']
-            site_url = site['root_url'] + site['base_url']
-            if site_url[-1] != '/':
-                site_url += '/'
-            path = 'oauth/login'
-            params = {'client_id': client_id, 'redirect_url': redirect_url}
-            if state:
-                params['state'] = state
-            full_url = url_append_param(site_url + path, params)
-            return redirect(full_url)
+    # if user is inactive
+    if not user.is_active:
+        return _error_html('inactive user'), 403
 
+    try:
         # get client data
         client = OAuthService.get_client(client_id)
         if client is None:
@@ -58,6 +70,8 @@ def oauth_connect():
         db.session.commit()
 
         params = {'token': authorize_token}
+        if original_path:
+            params['original_path'] = original_path
         if state:
             params['state'] = state
         full_url = url_append_param(redirect_url, params)

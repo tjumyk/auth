@@ -26,6 +26,7 @@ export class OauthLoginComponent implements OnInit {
 
   client_id: number;
   redirect_url: string;
+  original_path: string;
   state: string;
 
   user: User;
@@ -49,6 +50,7 @@ export class OauthLoginComponent implements OnInit {
     let params = this.route.snapshot.queryParamMap;
     this.client_id = parseInt(params.get('client_id'));
     this.redirect_url = params.get('redirect_url');
+    this.original_path = params.get('original_path');
     this.state = params.get('state');
 
     if (isNaN(this.client_id) || !this.redirect_url) {
@@ -88,7 +90,7 @@ export class OauthLoginComponent implements OnInit {
 
   oauthConnect() {
     this.starting_authorization = true;
-    this.oauthService.connect(this.client_id, this.redirect_url, this.state).pipe(
+    this.oauthService.connect(this.client_id, this.redirect_url, this.original_path, this.state).pipe(
       finalize(() => this.starting_authorization = false)
     ).subscribe(
       (result) => {
