@@ -13,13 +13,19 @@
 
   <div class="table-responsive">
     <table class="ui unstackable celled compact table">
-      <thead><tr><th>ID</th><th>Name</th><th>Home URL</th><th>Description</th><th class="collapsing">Ops</th></tr></thead>
+      <thead><tr><th>ID</th><th>Name</th><th>Home URL</th><th>Description</th><th>Allowed Groups</th><th class="collapsing">Ops</th></tr></thead>
       <tbody>
       <tr *ngFor="let client of client_list; index as i" #row>
         <td>{{client.id}}</td>
         <td>{{client.name}}</td>
         <td><a target="_blank" [href]="client.home_url">{{client.home_url}}</a></td>
         <td>{{client.description}}</td>
+        <td>
+          <div class="ui small labels">
+            <a *ngFor="let group of client.allowed_groups" class="ui basic label" routerLink="../../../groups/g/{{group.id}}"
+               title="{{group.description}}">{{group.name}}</a>
+          </div>
+        </td>
 
         <td class="collapsing">
           <div class="ui small buttons">

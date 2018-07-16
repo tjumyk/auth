@@ -61,10 +61,6 @@ def connect():
         full_url = url_append_param(site_url + path, params)
         return jsonify(msg='user not logged in', path='/' + path, redirect_url=full_url), 401
 
-    # if user is inactive
-    if not user.is_active:
-        return jsonify(msg='inactive user'), 403
-
     try:
         # get client data
         client = OAuthService.get_client(client_id)

@@ -147,7 +147,6 @@ export class AdminAccountGroupEditComponent implements OnInit {
       () => {
         this.added_member = user;
         this.members.push(user);
-        btn.outerHTML = '<a class="ui green icon button"><i class="check icon"></i></a>'
       },
       (error) => this.add_member_error = error.error
     )
@@ -170,8 +169,8 @@ export class AdminAccountGroupEditComponent implements OnInit {
   }
 
   alreadyInGroup(user: UserAdvanced): boolean {
-    for (let group of user.groups) {
-      if (group.id == this.gid)
+    for (let u of this.members) {
+      if (user.id == u.id)
         return true;
     }
     return false;

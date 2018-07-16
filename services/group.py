@@ -1,5 +1,7 @@
 import re
 
+from sqlalchemy import or_
+
 from error import BasicError
 from models import db, Group
 
@@ -33,6 +35,21 @@ class GroupService:
             raise GroupServiceError('name is required')
 
         return Group.query.filter_by(name=name).first()
+
+    @staticmethod
+    def search_by_name(name, limit=5):
+        if name is None:
+            raise GroupServiceError('name is required')
+        if len(name) == 0:
+            raise GroupServiceError('name must not be empty')
+
+        _filter = or_(Group.name.contains(name), Group.description.contains(name))
+        if limit is None:
+            return Group.query.filter(_filter).all()
+        else:
+            if type(limit) is not int:
+                raise GroupServiceError('limit must be an integer')
+            return Group.query.filter(_filter).limit(limit)
 
     @staticmethod
     def add(name, description):

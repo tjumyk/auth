@@ -122,11 +122,7 @@ def requires_oauth(f):
     @wraps(f)
     def wrapped(*args, **kwargs):
         try:
-            auth = get_current_oauth_authorization()
-
-            # reject if user is inactive
-            if not auth.user.is_active:
-                return jsonify(msg='inactive user'), 403
+            get_current_oauth_authorization()
         except OAuthServiceError as e:
             return jsonify(msg=e.msg, detail=e.detail), 403
         return f(*args, **kwargs)

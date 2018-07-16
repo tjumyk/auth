@@ -2,7 +2,7 @@ import {Injectable} from '@angular/core';
 import {HttpClient, HttpParams} from "@angular/common/http";
 import {Logger, LogService} from "./log.service";
 import {Observable} from "rxjs/internal/Observable";
-import {GroupAdvanced, LoginRecord, OAuthClientAdvanced, OAuthAuthorization, UserAdvanced} from "./models";
+import {GroupAdvanced, LoginRecord, OAuthAuthorization, OAuthClientAdvanced, UserAdvanced} from "./models";
 import {map, tap} from "rxjs/operators";
 
 @Injectable({
@@ -128,6 +128,16 @@ export class AdminService {
     )
   }
 
+  search_group_by_name(name: string, limit?: number): Observable<GroupAdvanced[]> {
+    let params = new HttpParams().append('name', name);
+    if (limit != undefined)
+      params = params.append('limit', limit.toString());
+    return this.http.get<GroupAdvanced[]>(`${this.api}/groups`, {params: params}).pipe(
+      tap((results) => this.logger.info(`Search group by name "${name}": returned ${results.length} results`))
+    )
+  }
+
+
   delete_group(gid: number): Observable<any> {
     return this.http.delete(`${this.api}/groups/${gid}`).pipe(
       tap(() => this.logger.info(`Deleted group (gid: ${gid})`))
@@ -205,6 +215,19 @@ export class AdminService {
     )
   }
 
+
+  client_set_public(cid: number, is_public: boolean): Observable<any> {
+    if (is_public) {
+      return this.http.put(`${this.api}/clients/${cid}/public`, null).pipe(
+        tap(() => this.logger.info(`Set OAuth client (cid: ${cid}) as public`))
+      )
+    } else {
+      return this.http.delete(`${this.api}/clients/${cid}/public`).pipe(
+        tap(() => this.logger.info(`Set OAuth client (cid: ${cid}) as non-public`))
+      )
+    }
+  }
+
   client_regenerate_secret(cid: number): Observable<any> {
     return this.http.post(`${this.api}/clients/${cid}/regenerate-secret`, null).pipe(
       tap(() => this.logger.info(`Regenerated secret for OAuth client (cid: ${cid}`))
@@ -214,6 +237,18 @@ export class AdminService {
   client_get_authorizations(cid: number): Observable<OAuthAuthorization[]> {
     return this.http.get<OAuthAuthorization[]>(`${this.api}/clients/${cid}/authorizations`).pipe(
       tap((auths) => this.logger.info(`Fetched authorizations for OAuth client (cid: ${cid}) (${auths.length} records)`))
+    )
+  }
+
+  client_add_allowed_group(cid: number, gid: number): Observable<any> {
+    return this.http.put(`${this.api}/clients/${cid}/allowed_groups/${gid}`, null).pipe(
+      tap(() => this.logger.info(`Added group (gid: ${gid}) to allowed groups of OAuth client (cid: ${cid})`))
+    )
+  }
+
+  client_remove_allowed_group(cid: number, gid: number): Observable<any> {
+    return this.http.delete(`${this.api}/clients/${cid}/allowed_groups/${gid}`).pipe(
+      tap(() => this.logger.info(`Removed group (gid: ${gid}) from allowed groups of OAuth client (cid: ${cid})`))
     )
   }
 }

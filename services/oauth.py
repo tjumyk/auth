@@ -2,8 +2,10 @@ import re
 from datetime import datetime, timedelta
 from secrets import token_urlsafe
 
+from sqlalchemy.orm import joinedload
+
 from error import BasicError
-from models import OAuthClient, db, OAuthAuthorization
+from models import OAuthClient, db, OAuthAuthorization, User
 
 
 class OAuthServiceError(BasicError):
@@ -88,7 +90,7 @@ class OAuthService:
         client.secret = token_urlsafe()
 
     @staticmethod
-    def pre_check_client(client, redirect_url):
+    def _pre_check_client(client, redirect_url):
         if client is None:
             raise OAuthServiceError('client is required')
         if redirect_url is None:
@@ -96,15 +98,6 @@ class OAuthService:
 
         if client.redirect_url != redirect_url:
             raise OAuthServiceError('redirect_url mismatch')
-
-    @staticmethod
-    def has_access_token(client, user):
-        if client is None:
-            raise OAuthServiceError('client is required')
-        if user is None:
-            raise OAuthServiceError('user is required')
-
-        return OAuthAuthorization.query.filter_by(client_id=client.id, user_id=user.id).count() > 0
 
     @staticmethod
     def start_authorization(client, user, redirect_url):
@@ -115,10 +108,8 @@ class OAuthService:
         if redirect_url is None:
             raise OAuthServiceError('redirect_url is required')
 
-        if not user.is_active:
-            raise OAuthServiceError('inactive user')
-
-        OAuthService.pre_check_client(client, redirect_url)
+        OAuthService._pre_check_client(client, redirect_url)
+        OAuthService._check_user_eligibility(client, user)
 
         authorize_token = None
         for _ in range(OAuthService.token_generation_retry):  # repeat in case token collision
@@ -152,7 +143,7 @@ class OAuthService:
         if authorize_token is None:
             raise OAuthServiceError('authorization token is required')
 
-        OAuthService.pre_check_client(client, redirect_url)
+        OAuthService._pre_check_client(client, redirect_url)
 
         if client.secret != client_secret:
             raise OAuthServiceError('wrong client secret')
@@ -162,8 +153,8 @@ class OAuthService:
             raise OAuthServiceError('invalid authorization token')
         if auth.authorize_token_expire_at < datetime.utcnow():
             raise OAuthServiceError('authorization token expired')
-        if not auth.user.is_active:
-            raise OAuthServiceError('inactive user')
+
+        OAuthService._check_user_eligibility(client, auth.user)
 
         access_token = None
         for _ in range(OAuthService.token_generation_retry):  # repeat in case token collision
@@ -184,7 +175,30 @@ class OAuthService:
         if len(access_token) == 0:
             raise OAuthServiceError('access_token can not be empty')
 
-        auth = OAuthAuthorization.query.filter_by(access_token=access_token).first()
+        auth = OAuthAuthorization.query.filter_by(access_token=access_token).options(joinedload('client')).first()
         if auth is None:
             raise OAuthServiceError('invalid access_token')
+
+        OAuthService._check_user_eligibility(auth.client, auth.user)
+
         return auth
+
+    @staticmethod
+    def _check_user_eligibility(client: OAuthClient, user: User):
+        if user is None:
+            raise OAuthServiceError('user is required')
+
+        if not user.is_active:
+            raise OAuthServiceError('inactive user')
+
+        if not client.is_public:  # check if user is in a group among the client's allowed_groups
+            access_group_found = False
+            for group_allowed in client.allowed_groups:
+                for group in user.groups:
+                    if group.id == group_allowed.id:
+                        access_group_found = True
+                        break
+                if access_group_found:
+                    break
+            if not access_group_found:
+                raise OAuthServiceError('permission denied')

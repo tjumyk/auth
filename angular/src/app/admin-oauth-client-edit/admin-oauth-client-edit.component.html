@@ -27,7 +27,11 @@
               <div class="header">Name</div>
               {{client.name}}
             </div>
-
+            <div class="item">
+              <div class="header">Access Control</div>
+              <span *ngIf="client.is_public" class="text warning"><i class="icon lock open"></i> Public</span>
+              <span *ngIf="!client.is_public" class="text success"><i class="icon lock"></i> Protected by groups</span>
+            </div>
           </div>
         </div>
 
@@ -54,6 +58,15 @@
             <div class="header"><i class="check circle icon"></i> {{admin_operation_success.msg}}</div>
             {{admin_operation_success.detail}}
           </div>
+
+          <p>
+            <a class="ui green button" [hidden]="!client.is_public" [ngClass]="{'loading disabled': setting_public}" (click)="setPublic(false)">
+              <i class="lock icon"></i> Protect by Groups
+            </a>
+            <a class="ui yellow button" [hidden]="client.is_public" [ngClass]="{'loading disabled': setting_public}"  (click)="setPublic(true)">
+              <i class="lock open icon"></i> Allow Public Access
+            </a>
+          </p>
 
           <p>
             <a class="ui yellow button" [ngClass]="{'loading disabled': regenerating_secret}" (click)="regenerateSecret()">Regenerate Secret</a>
@@ -134,20 +147,109 @@
               </form>
             </div>
           </div>
-
         </div>
+
       </div>
+
     </div>
 
   </div>
 
   <div class="column">
+
+    <div *ngIf="client && !client.is_public" class="ui segment">
+
+      <div class="ui segment top attached">
+        <div class="ui header">
+          <i class="icon users"></i>
+          Allowed Groups
+        </div>
+      </div>
+
+      <div class="ui segment attached" *ngIf="remove_allowed_group_error || removed_allowed_group">
+        <div class="ui error message" *ngIf="remove_allowed_group_error">
+          <i class="close icon" (click)="remove_allowed_group_error=undefined"></i>
+          <div class="header"><i class="times circle icon"></i> {{remove_allowed_group_error.msg}}</div>
+          <p>{{remove_allowed_group_error.detail}}</p>
+        </div>
+
+        <div class="ui success message" *ngIf="removed_allowed_group">
+          <i class="close icon" (click)="removed_allowed_group=undefined"></i>
+          <div class="header"><i class="check circle icon"></i> Removed {{removed_allowed_group.name}} from allowed group</div>
+        </div>
+      </div>
+
+      <table class="ui bottom attached table celled unstackable compact">
+        <thead><tr><th>ID</th><th>Name</th><th>Description</th><th class="collapsing">Ops</th></tr></thead>
+        <tbody>
+        <tr *ngFor="let group of client.allowed_groups; index as i">
+          <td>{{group.id}}</td>
+          <td>{{group.name}}</td>
+          <td>{{group.description}}</td>
+          <td class="collapsing">
+            <div class="ui small buttons">
+              <a routerLink="../../../../account/groups/g/{{group.id}}" class="ui icon button"><i class="icon edit"></i></a>
+              <a class="ui icon red button" #removeAllowedGroupBtn (click)="removeAllowedGroup(group, i, removeAllowedGroupBtn)"><i class="icon minus"></i></a>
+            </div>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+
+      <div class="ui segment top attached">
+        <div class="ui header">
+          <i class="icon plus"></i>
+          Add New Allowed Group
+        </div>
+      </div>
+
+      <div class="ui segment attached">
+        <div class="ui error message" *ngIf="add_allowed_group_error">
+          <i class="close icon" (click)="add_allowed_group_error=undefined"></i>
+          <div class="header"><i class="times circle icon"></i> {{add_allowed_group_error.msg}}</div>
+          <p>{{add_allowed_group_error.detail}}</p>
+        </div>
+
+        <div class="ui success message" *ngIf="added_allowed_group">
+          <i class="close icon" (click)="added_allowed_group=undefined"></i>
+          <div class="header"><i class="check circle icon"></i> Added {{added_allowed_group.name}} to allowed group</div>
+        </div>
+
+        <div class="ui icon fluid input">
+          <input type="text" placeholder="Search groups by name or description..."
+                 (keyup)="searchGroup(searchInput.value)" #searchInput>
+          <i class="icon search"></i>
+        </div>
+        <p class="text muted" [hidden]="!group_search_results || group_search_results.length > 0"><i class="info circle icon"></i> No results</p>
+      </div>
+
+      <table class="ui table unstackable compact celled bottom attached" [hidden]="!group_search_results || group_search_results.length==0">
+        <thead><tr><th>ID</th><th>Name</th><th>Description</th><th class="collapsing">Ops</th></tr></thead>
+        <tbody>
+        <tr *ngFor="let group of group_search_results; index as i">
+          <td>{{group.id}}</td>
+          <td>{{group.name}}</td>
+          <td>{{group.description}}</td>
+          <td class="collapsing">
+            <div class="ui small buttons">
+              <a class="ui icon button" routerLink="../../../../account/groups/g/{{group.id}}"><i class="icon edit"></i></a>
+              <a class="ui primary icon button" *ngIf="!groupAlreadyAllowed(group); else successBtn"
+                 #addAllowedGroupBtn (click)="addAllowedGroup(group, i, addAllowedGroupBtn)"><i class="icon plus"></i></a>
+              <ng-template #successBtn><a class="ui green icon button"><i class="check icon"></i></a></ng-template>
+            </div>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+
+    </div>
+
     <div class="ui large centered active inline text loader" *ngIf="loading_authorizations">Loading authorizations...</div>
 
     <div *ngIf="!loading_authorizations && authorizations">
       <div class="ui top attached segment">
         <div class="ui header">
-          <i class="sign in icon"></i>
+          <i class="handshake outline icon"></i>
           Authorizations
         </div>
       </div>

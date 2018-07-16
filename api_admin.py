@@ -110,7 +110,7 @@ def admin_user_set_active(uid):
 
         db.session.commit()
         return "", 204
-    except (UserServiceError, UploadError) as e:
+    except UserServiceError as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
 
 
@@ -149,8 +149,21 @@ def admin_user_login_records(uid):
 def admin_group_list():
     try:
         if request.method == 'GET':
-            groups = [g.to_dict(with_advanced_fields=True) for g in GroupService.get_all()]
-            return jsonify(groups)
+            args = request.args
+            if 'name' in args:  # search by name
+                limit = args.get('limit')
+                if limit is not None:
+                    try:
+                        limit = int(limit)
+                    except ValueError:
+                        return jsonify(msg='limit must be an integer'), 400
+                    groups = GroupService.search_by_name(args['name'], limit)
+                else:
+                    groups = GroupService.search_by_name(args['name'])  # use default limit
+                return jsonify([group.to_dict(with_advanced_fields=True) for group in groups])
+            else:  # get all
+                groups = [g.to_dict(with_advanced_fields=True) for g in GroupService.get_all()]
+                return jsonify(groups)
         else:  # POST
             _json = request.json
             name = _json.get('name')
@@ -283,6 +296,29 @@ def oauth_client(cid):
         return jsonify(msg=e.msg, detail=e.detail), 400
 
 
+@admin.route('/clients/<int:cid>/public', methods=['PUT', 'DELETE'])
+@requires_admin
+def oauth_client_set_public(cid):
+    try:
+        client = OAuthService.get_client(cid)
+        if client is None:
+            return jsonify(msg='client not found'), 404
+
+        if request.method == 'PUT':
+            if client.is_public:
+                return jsonify(msg='client already public'), 400
+            client.is_public = True
+        else:  # DELETE
+            if not client.is_public:
+                return jsonify(msg='client already non-public'), 400
+            client.is_public = False
+
+        db.session.commit()
+        return "", 204
+    except OAuthServiceError as e:
+        return jsonify(msg=e.msg, detail=e.detail), 400
+
+
 @admin.route('/clients/<int:cid>/regenerate-secret', methods=['POST'])
 @requires_admin
 def oauth_client_regenerate_secret(cid):
@@ -308,4 +344,31 @@ def oauth_client_authorizations(cid):
 
         return jsonify([auth.to_dict() for auth in client.authorizations])
     except OAuthServiceError as e:
+        return jsonify(msg=e.msg, detail=e.detail), 400
+
+
+@admin.route('/clients/<int:cid>/allowed_groups/<int:gid>', methods=['PUT', 'DELETE'])
+@requires_admin
+def oauth_client_allowed_groups(cid, gid):
+    try:
+        group = GroupService.get(gid)
+        if group is None:
+            return jsonify(msg='group not found'), 404
+        client = OAuthService.get_client(cid)
+        if client is None:
+            return jsonify(msg='client not found'), 404
+
+        if request.method == 'PUT':
+            if group in client.allowed_groups:
+                return jsonify(msg='client already in the allowed group'), 400
+            client.allowed_groups.append(group)
+            db.session.commit()
+            return "", 204
+        else:  # DELETE
+            if group not in client.allowed_groups:
+                return jsonify(msg='client not in the allowed group'), 400
+            client.allowed_groups.remove(group)
+            db.session.commit()
+            return "", 204
+    except (OAuthServiceError, GroupServiceError) as e:
         return jsonify(msg=e.msg, detail=e.detail), 400

@@ -80,27 +80,24 @@
           </div>
         </div>
 
-        <div class="ui semgent attached">
-          <div class="ui segment basic">
-
-            <div class="ui error message" *ngIf="add_member_error">
-              <i class="close icon" (click)="add_member_error=undefined"></i>
-              <div class="header"><i class="times circle icon"></i> {{add_member_error.msg}}</div>
-              <p>{{add_member_error.detail}}</p>
-            </div>
-
-            <div class="ui success message" *ngIf="added_member">
-              <i class="close icon" (click)="added_member=undefined"></i>
-              <div class="header"><i class="check circle icon"></i> Added {{added_member.name}} to group</div>
-            </div>
-
-            <div class="ui icon fluid input">
-              <input type="text" placeholder="Search users by username or nickname..."
-                     (keyup)="searchUser(searchInput.value)" #searchInput>
-              <i class="icon search"></i>
-            </div>
-            <p class="text muted" [hidden]="!user_search_results || user_search_results.length > 0"><i class="info circle icon"></i> No results</p>
+        <div class="ui segment attached">
+          <div class="ui error message" *ngIf="add_member_error">
+            <i class="close icon" (click)="add_member_error=undefined"></i>
+            <div class="header"><i class="times circle icon"></i> {{add_member_error.msg}}</div>
+            <p>{{add_member_error.detail}}</p>
           </div>
+
+          <div class="ui success message" *ngIf="added_member">
+            <i class="close icon" (click)="added_member=undefined"></i>
+            <div class="header"><i class="check circle icon"></i> Added {{added_member.name}} to group</div>
+          </div>
+
+          <div class="ui icon fluid input">
+            <input type="text" placeholder="Search users by username or nickname..."
+                   (keyup)="searchUser(searchInput.value)" #searchInput>
+            <i class="icon search"></i>
+          </div>
+          <p class="text muted" [hidden]="!user_search_results || user_search_results.length > 0"><i class="info circle icon"></i> No results</p>
         </div>
 
         <table class="ui table unstackable compact celled bottom attached" [hidden]="!user_search_results || user_search_results.length==0">
@@ -130,22 +127,24 @@
   <div class="column">
     <div class="ui large centered active inline text loader" *ngIf="loading_group_members">Loading group member list...</div>
 
-    <div class="ui error message" *ngIf="remove_member_error">
-      <i class="close icon" (click)="remove_member_error=undefined"></i>
-      <div class="header"><i class="times circle icon"></i> {{remove_member_error.msg}}</div>
-      <p>{{remove_member_error.detail}}</p>
-    </div>
-
-    <div class="ui success message" *ngIf="removed_member">
-      <i class="close icon" (click)="removed_member=undefined"></i>
-      <div class="header"><i class="check circle icon"></i> Removed {{removed_member.name}} from group</div>
-    </div>
-
     <div *ngIf="!loading_group_members && members">
       <div class="ui segment top attached">
         <div class="ui header">
           <i class="icon users"></i>
           Members
+        </div>
+      </div>
+
+      <div class="ui segment attached" *ngIf="remove_member_error || removed_member">
+        <div class="ui error message" *ngIf="remove_member_error">
+          <i class="close icon" (click)="remove_member_error=undefined"></i>
+          <div class="header"><i class="times circle icon"></i> {{remove_member_error.msg}}</div>
+          <p>{{remove_member_error.detail}}</p>
+        </div>
+
+        <div class="ui success message" *ngIf="removed_member">
+          <i class="close icon" (click)="removed_member=undefined"></i>
+          <div class="header"><i class="check circle icon"></i> Removed {{removed_member.name}} from group</div>
         </div>
       </div>
 

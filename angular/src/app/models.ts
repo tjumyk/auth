@@ -29,6 +29,7 @@ export class Group {
 
   users?: User[];
   user_ids?: number[];
+  allowed_clients?: OAuthClient[];
 }
 
 export class GroupAdvanced extends Group {
@@ -50,9 +51,12 @@ export class LoginRecord {
 export class OAuthClient {
   id: number;
   name: string;
+  is_public: boolean;
   home_url: string;
   description: string;
   icon: string;
+
+  allowed_groups?: Group[];
 }
 
 export class OAuthClientAdvanced extends OAuthClient {

@@ -8,6 +8,11 @@ user_groups = db.Table('user_groups',
                        db.Column('user_id', db.Integer, db.ForeignKey('user.id'), primary_key=True),
                        db.Column('group_id', db.Integer, db.ForeignKey('group.id'), primary_key=True))
 
+client_allowed_groups = db.Table('o_auth_client_allowed_groups',
+                                 db.Column('client_id', db.Integer, db.ForeignKey('o_auth_client.id'),
+                                           primary_key=True),
+                                 db.Column('group_id', db.Integer, db.ForeignKey('group.id'), primary_key=True))
+
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -38,7 +43,7 @@ class User(db.Model):
                      is_active=self.is_active)
         if with_groups:
             _dict['groups'] = [group.to_dict() for group in self.groups]
-        elif with_group_ids:
+        if with_group_ids:
             _dict['group_ids'] = [group.id for group in self.groups]
 
         if with_advanced_fields:
@@ -63,12 +68,15 @@ class Group(db.Model):
 
     users = db.relationship('User', secondary=user_groups, backref=db.backref('groups', lazy=False))
 
-    def to_dict(self, with_users=False, with_user_ids=False, with_advanced_fields=False):
+    def to_dict(self, with_users=False, with_user_ids=False, with_allowed_clients=False, with_advanced_fields=False):
         _dict = dict(id=self.id, name=self.name, description=self.description)
         if with_users:
             _dict['users'] = [user.to_dict(with_groups=False) for user in self.users]
-        elif with_user_ids:
-            _dict['users'] = [user.id for user in self.users]
+        if with_user_ids:
+            _dict['user_ids'] = [user.id for user in self.users]
+
+        if with_allowed_clients:
+            _dict['allowed_clients'] = [client.to_dict() for client in self.allowed_clients]
 
         if with_advanced_fields:
             _dict['created_at'] = self.created_at
@@ -106,6 +114,7 @@ class OAuthClient(db.Model):
     secret = db.Column(db.String(128), nullable=False)
     redirect_url = db.Column(db.String(128), nullable=False)
 
+    is_public = db.Column(db.Boolean, nullable=False, default=True)
     home_url = db.Column(db.String(128))
     description = db.Column(db.String(256))
     icon = db.Column(db.String(128))
@@ -114,9 +123,15 @@ class OAuthClient(db.Model):
     modified_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     authorizations = db.relationship('OAuthAuthorization', backref=db.backref('client'), cascade="all, delete-orphan")
+    allowed_groups = db.relationship('Group', secondary=client_allowed_groups, lazy=False,
+                                     backref=db.backref('allowed_clients'))
 
-    def to_dict(self, with_advanced_fields=False):
-        _dict = dict(id=self.id, name=self.name, home_url=self.home_url, description=self.description, icon=self.icon)
+    def to_dict(self, with_allowed_groups=True, with_advanced_fields=False):
+        _dict = dict(id=self.id, name=self.name, is_public=self.is_public, home_url=self.home_url,
+                     description=self.description, icon=self.icon)
+
+        if with_allowed_groups:
+            _dict['allowed_groups'] = [group.to_dict() for group in self.allowed_groups]
 
         if with_advanced_fields:
             _dict['secret'] = self.secret
