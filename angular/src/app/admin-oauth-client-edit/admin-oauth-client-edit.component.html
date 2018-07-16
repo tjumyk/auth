@@ -30,7 +30,12 @@
             <div class="item">
               <div class="header">Access Control</div>
               <span *ngIf="client.is_public" class="text warning"><i class="icon lock open"></i> Public</span>
-              <span *ngIf="!client.is_public" class="text success"><i class="icon lock"></i> Protected by groups</span>
+              <div *ngIf="!client.is_public">
+                <span *ngIf="client.allowed_groups.length" class="text success"><i class="icon lock"></i> Only members of allowed groups</span>
+                <div *ngIf="!client.allowed_groups.length" class="text error">
+                  <i class="red icon lock"></i> No one can access this client
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -60,16 +65,16 @@
           </div>
 
           <p>
-            <a class="ui green button" [hidden]="!client.is_public" [ngClass]="{'loading disabled': setting_public}" (click)="setPublic(false)">
-              <i class="lock icon"></i> Protect by Groups
+            <a class="ui primary button" [hidden]="!client.is_public" [ngClass]="{'loading disabled': setting_public}" (click)="setPublic(false)">
+              <i class="lock icon"></i> Disable Public Access
             </a>
             <a class="ui yellow button" [hidden]="client.is_public" [ngClass]="{'loading disabled': setting_public}"  (click)="setPublic(true)">
-              <i class="lock open icon"></i> Allow Public Access
+              <i class="lock open icon"></i> Enable Public Access
             </a>
           </p>
 
           <p>
-            <a class="ui yellow button" [ngClass]="{'loading disabled': regenerating_secret}" (click)="regenerateSecret()">Regenerate Secret</a>
+            <a class="ui yellow button" [ngClass]="{'loading disabled': regenerating_secret}" (click)="regenerateSecret()"><i class="repeat icon"></i> Regenerate Secret</a>
             <a class="ui red button" (click)="deleteClient()" [ngClass]="{'loading disabled': deleting}"><i class="trash icon"></i>Delete Client</a>
           </p>
         </div>
