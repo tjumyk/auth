@@ -41,8 +41,12 @@ def page_not_found(error):
 
 
 @app.cli.command()
-def init_db():
+def create_db():
     db.create_all()
+
+
+@app.cli.command()
+def init_db():
     admin_config = app.config['ADMIN']
     admin_user = UserService.init_admin(**admin_config)
     admin_group = GroupService.add('admin', 'System Administrators')
