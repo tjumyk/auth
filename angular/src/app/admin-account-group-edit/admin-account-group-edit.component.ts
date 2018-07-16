@@ -51,6 +51,12 @@ export class AdminAccountGroupEditComponent implements OnInit {
   ngOnInit() {
     this.gid = parseInt(this.route.snapshot.paramMap.get('gid'));
 
+    this.setupUserSearch();
+    this.loadGroup();
+    this.loadGroupMembers();
+  }
+
+  private setupUserSearch() {
     this.user_search_names.pipe(
       debounceTime(300),
       distinctUntilChanged(),
@@ -63,9 +69,6 @@ export class AdminAccountGroupEditComponent implements OnInit {
       (results) => this.user_search_results = results,
       (error) => this.add_member_error = error.error
     );
-
-    this.loadGroup();
-    this.loadGroupMembers();
   }
 
   private loadGroup() {
