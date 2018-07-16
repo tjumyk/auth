@@ -23,7 +23,7 @@
         <td>
           <span *ngIf="client.is_public" class="text warning"><i class="icon lock open"></i> Public</span>
           <div *ngIf="!client.is_public">
-            <div *ngIf="client.allowed_groups.length">
+            <div *ngIf="client.allowed_groups.length" class="ui labels">
               <i class="green icon lock"></i>
               <a *ngFor="let group of client.allowed_groups" class="ui basic label" routerLink="../../../../account/groups/g/{{group.id}}"
                  title="{{group.description}}">{{group.name}}</a>
