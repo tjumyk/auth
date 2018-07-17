@@ -53,6 +53,13 @@ def account_confirm_email():
         uid = args.get('uid')
         token = args.get('token')
 
+        if uid is None:
+            return jsonify(msg='user id is required')
+        try:
+            uid = int(uid)
+        except ValueError:
+            return jsonify(msg='user id must be an integer')
+
         user = UserService.get(uid)
         if user is None:
             return jsonify(msg='user not found'), 404
@@ -91,6 +98,13 @@ def account_reset_password():
         args = request.args
         uid = args.get('uid')
         token = args.get('token')
+
+        if uid is None:
+            return jsonify(msg='user id is required')
+        try:
+            uid = int(uid)
+        except ValueError:
+            return jsonify(msg='user id must be an integer')
 
         user = UserService.get(uid)
         if user is None:
