@@ -28,8 +28,12 @@ def oauth_connect():
     state = args.get('state')
     # Currently, we assume scope '*' everywhere
 
-    if client_id is None:  # NOTICE: it is OK if client_id is str here
+    if client_id is None:
         return _error_html(msg='client_id is required'), 400
+    try:
+        client_id = int(client_id)
+    except ValueError:
+        return _error_html(msg='client_id must be an integer'), 400
     if redirect_url is None:
         return _error_html('redirect_url is required'), 400
 
