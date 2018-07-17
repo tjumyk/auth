@@ -13,7 +13,8 @@
   "SITE": {
     "name": "UNSWKG",
     "root_url": "http://localhost:8077",
-    "base_url": "/"
+    "base_url": "/",
+    "behind_proxy": false
   },
   "ADMIN": {
     "name": "admin",

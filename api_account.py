@@ -18,7 +18,12 @@ def account_login():
         password = _json.get('password')
         remember = _json.get('remember')
 
-        user = UserService.login(name_or_email, password, request.remote_addr, request.user_agent)
+        if app.config['SITE'].get('behind_proxy'):
+            ip = request.environ.get('HTTP_X_FORWARDED_FOR') or request.environ.get('HTTP_X_REAL_IP') or \
+                 request.remote_addr
+        else:
+            ip = request.remote_addr
+        user = UserService.login(name_or_email, password, ip, request.user_agent)
         if user is None:
             return jsonify(msg='user not found'), 404
 
