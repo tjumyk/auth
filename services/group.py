@@ -82,13 +82,3 @@ class GroupService:
                         raise GroupServiceError('description too long')
             setattr(group, key, value)
         return old_values
-
-    @staticmethod
-    def delete(_id):
-        if _id is None:
-            raise GroupServiceError('id is required')
-
-        group = Group.query.get(_id)
-        if group is None:
-            raise GroupServiceError('group not found')
-        db.session.delete(group)
