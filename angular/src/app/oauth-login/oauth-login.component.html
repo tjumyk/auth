@@ -13,45 +13,66 @@
 </div>
 
 <div class="ui padded raised segment" *ngIf="start_authorization_success">
-  <div class="ui large centered text inline loader active">Redirecting to client...</div>
+  <div class="ui large centered text inline loader active">Redirecting<span *ngIf="client"> to {{client.name}}</span>...</div>
 </div>
 
 
 <div *ngIf="!verifying_logged_in && !user">
 
-  <form class="ui large form" #f="ngForm" (ngSubmit)="login(f)" [ngClass]="{'loading': logging_in}">
-    <div class="ui raised segment">
-      <div class="field" [ngClass]="{'error': name_or_email.invalid && (f.submitted || name_or_email.dirty || name_or_email.touched)}">
-        <div class="ui left icon input">
-          <i class="user icon"></i>
-          <input type="text" placeholder="User name or E-mail address"
-                 required
-                 [(ngModel)]="form.name_or_email" name="name_or_email" #name_or_email="ngModel">
+    <div class="ui raised segments">
+
+      <div class="ui segment center aligned" *ngIf="loading_client || client">
+
+        <div class="ui large centered text inline loader active" *ngIf="loading_client">Loading client info...</div>
+
+        <div class="ui client header" *ngIf="!loading_client && client" [ngClass]="{'icon': !client.icon}">
+          <div>
+            <img [src]="client.icon" class="ui image tiny centered" *ngIf="client.icon">
+            <i class="icon window restore outline" *ngIf="!client.icon"></i>
+          </div>
+          <div class="content">
+            {{client.name}}
+            <div class="sub header">{{client.description}}</div>
+          </div>
         </div>
-        <div *ngIf="name_or_email.errors" class="errors">
-          <label *ngIf="name_or_email.errors.required"><i class="times icon"></i> Username or E-mail address is required </label>
-        </div>
+
       </div>
-      <div class="field" [ngClass]="{'error': password.invalid && (f.submitted || password.dirty || password.touched)}">
-        <div class="ui left icon input">
-          <i class="lock icon"></i>
-          <input type="password" placeholder="Password"
-                 required
-                 [(ngModel)]="form.password" name="password" #password="ngModel">
-        </div>
-        <div *ngIf="password.errors" class="errors">
-          <label *ngIf="password.errors.required"><i class="times icon"></i> Password is required </label>
-        </div>
+
+      <div class="ui segment">
+        <form class="ui large form" #f="ngForm" (ngSubmit)="login(f)" [ngClass]="{'loading': logging_in}">
+          <div class="field" [ngClass]="{'error': name_or_email.invalid && (f.submitted || name_or_email.dirty || name_or_email.touched)}">
+            <div class="ui left icon input">
+              <i class="user icon"></i>
+              <input type="text" placeholder="User name or E-mail address"
+                     required
+                     [(ngModel)]="form.name_or_email" name="name_or_email" #name_or_email="ngModel">
+            </div>
+            <div *ngIf="name_or_email.errors" class="errors">
+              <label *ngIf="name_or_email.errors.required"><i class="times icon"></i> Username or E-mail address is required </label>
+            </div>
+          </div>
+          <div class="field" [ngClass]="{'error': password.invalid && (f.submitted || password.dirty || password.touched)}">
+            <div class="ui left icon input">
+              <i class="lock icon"></i>
+              <input type="password" placeholder="Password"
+                     required
+                     [(ngModel)]="form.password" name="password" #password="ngModel">
+            </div>
+            <div *ngIf="password.errors" class="errors">
+              <label *ngIf="password.errors.required"><i class="times icon"></i> Password is required </label>
+            </div>
+          </div>
+          <div class="ui field">
+            <div class="ui checkbox" (click)="checkbox_remember.click()">
+              <input type="checkbox" tabindex="0" class="hidden" [(ngModel)]="form.remember" name="remember" #checkbox_remember>
+              <label>Remember Me</label>
+            </div>
+          </div>
+          <button class="ui fluid large primary button" type="submit">Sign In</button>
+        </form>
       </div>
-      <div class="ui field">
-        <div class="ui checkbox" (click)="checkbox_remember.click()">
-          <input type="checkbox" tabindex="0" class="hidden" [(ngModel)]="form.remember" name="remember" #checkbox_remember>
-          <label>Remember Me</label>
-        </div>
-      </div>
-      <button class="ui fluid large primary button" type="submit">Sign In</button>
     </div>
-  </form>
+
 
   <div class="ui center aligned message">
     Forgot password? <a routerLink="/account/request-reset-password">Reset password</a>

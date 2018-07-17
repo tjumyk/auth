@@ -19,6 +19,7 @@ class LoginForm {
 })
 export class OauthLoginComponent implements OnInit {
   verifying_logged_in: boolean;
+  loading_client: boolean;
   starting_authorization: boolean;
   start_authorization_success: boolean;
   logging_in: boolean;
@@ -55,8 +56,13 @@ export class OauthLoginComponent implements OnInit {
 
     if (isNaN(this.client_id) || !this.redirect_url) {
       this.error = {msg: 'wrong url parameters'};
+      return; // stop the following initialisations
     }
 
+    this.loadCurrentUser();
+  }
+
+  private loadCurrentUser() {
     this.error = undefined;
     this.verifying_logged_in = true;
     this.accountService.get_current_user().pipe(
@@ -64,9 +70,22 @@ export class OauthLoginComponent implements OnInit {
     ).subscribe(
       user => {
         this.user = user;
-        if (user != null)
-          this.oauthConnect()
+        if (user == null)
+          this.loadClient(); // only load client info if user need to wait at login page
+        else
+          this.oauthConnect() // when auto connect, skip loading client info
       },
+      error => this.error = error.error
+    )
+  }
+
+  private loadClient() {
+    this.error = undefined;
+    this.loading_client = true;
+    this.oauthService.get_client(this.client_id).pipe(
+      finalize(() => this.loading_client = false)
+    ).subscribe(
+      client => this.client = client,
       error => this.error = error.error
     )
   }
