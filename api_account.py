@@ -185,3 +185,5 @@ def account_update_password():
         return "", 204
     except UserServiceError as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
+
+# TODO reject weak passwords
