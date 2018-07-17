@@ -1,6 +1,7 @@
 from flask import Blueprint, current_app as app, request, jsonify
 
 from models import db
+from services.oauth import OAuthService, OAuthServiceError
 from services.user import UserService, UserServiceError
 from utils.mail import send_email
 from utils.session import get_current_user, requires_login, clear_current_user, set_current_user
@@ -29,8 +30,15 @@ def account_login():
 
 @account.route('/logout')
 def account_logout():
-    clear_current_user()
-    return "", 204
+    try:
+        user = get_current_user()
+        clear_current_user()  # clear session first
+        if user:
+            OAuthService.clear_user_tokens(user)
+            db.session.commit()
+        return "", 204
+    except (UserServiceError, OAuthServiceError) as e:
+        return jsonify(msg=e.msg, detail=e.detail), 500
 
 
 @account.route('/confirm-email', methods=['GET', 'POST'])

@@ -168,6 +168,8 @@ class OAuthService:
             raise OAuthServiceError('token space almost exhausted')
 
         auth.access_token = access_token
+        auth.authorize_token = None
+        auth.authorize_token_expire_at = None
         return access_token
 
     @staticmethod
@@ -204,3 +206,12 @@ class OAuthService:
                     break
             if not access_group_found:
                 raise OAuthServiceError('permission denied')
+
+    @staticmethod
+    def clear_user_tokens(user):
+        if user is None:
+            raise OAuthServiceError('user is required')
+        for auth in OAuthAuthorization.query.with_parent(user):
+            auth.authorize_token = None
+            auth.authorize_token_expire_at = None
+            auth.access_token = None
