@@ -55,8 +55,6 @@ export class OAuthClient {
   home_url: string;
   description: string;
   icon: string;
-
-  allowed_groups?: Group[];
 }
 
 export class OAuthClientAdvanced extends OAuthClient {
@@ -64,6 +62,7 @@ export class OAuthClientAdvanced extends OAuthClient {
   modified_at: string;
   secret: string;
   redirect_url: string;
+  allowed_groups: Group[];
 }
 
 export class OAuthAuthorization {

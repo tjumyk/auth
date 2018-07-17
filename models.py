@@ -126,18 +126,16 @@ class OAuthClient(db.Model):
     allowed_groups = db.relationship('Group', secondary=client_allowed_groups, lazy=False,
                                      backref=db.backref('allowed_clients'))
 
-    def to_dict(self, with_allowed_groups=True, with_advanced_fields=False):
+    def to_dict(self, with_advanced_fields=False):
         _dict = dict(id=self.id, name=self.name, is_public=self.is_public, home_url=self.home_url,
                      description=self.description, icon=self.icon)
-
-        if with_allowed_groups:
-            _dict['allowed_groups'] = [group.to_dict() for group in self.allowed_groups]
 
         if with_advanced_fields:
             _dict['secret'] = self.secret
             _dict['redirect_url'] = self.redirect_url
             _dict['created_at'] = self.created_at
             _dict['modified_at'] = self.modified_at
+            _dict['allowed_groups'] = [group.to_dict() for group in self.allowed_groups]
 
         return _dict
 
