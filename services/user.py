@@ -31,12 +31,23 @@ class UserService:
     def get(_id):
         if _id is None:
             raise UserServiceError('id is required')
+        if type(_id) is not int:
+            raise UserServiceError('id must be an integer')
+
         return User.query.get(_id)
 
     @staticmethod
     def get_by_id_list(id_list):
         if id_list is None:
             raise UserServiceError('id list is required')
+        if not isinstance(id_list, (list, set, tuple)):
+            raise UserServiceError('id list must be a list, set or tuple')
+        if not id_list:  # accept empty list
+            return []
+        for _id in id_list:
+            if type(_id) is not int:
+                raise UserServiceError('id must be an integer')
+
         return User.query.filter(User.id.in_(id_list)).all()
 
     @staticmethod
@@ -100,7 +111,7 @@ class UserService:
             error = 'wrong password'
 
         from .login_record import LoginRecordService
-        LoginRecordService.add(user.id, ip, user_agent.string, error is None, error)
+        LoginRecordService.add(user, ip, user_agent.string, error is None, error)
         db.session.commit()  # force commit, a little bit ugly
 
         if error is not None:

@@ -29,6 +29,8 @@ class OAuthService:
     def get_client(_id):
         if _id is None:
             raise OAuthServiceError('id is required')
+        if type(_id) is not int:
+            raise OAuthServiceError('id must be an integer')
 
         return OAuthClient.query.get(_id)
 

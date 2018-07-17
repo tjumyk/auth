@@ -34,8 +34,12 @@ def connect():
     state = args.get('state')
     # Currently, we assume scope '*' everywhere
 
-    if client_id is None:  # NOTICE: it is OK if client_id is str here
+    if client_id is None:
         return jsonify(msg='client_id is required'), 400
+    try:
+        client_id = int(client_id)
+    except ValueError:
+        return jsonify(msg='client_id must be an integer'), 400
     if redirect_url is None:
         return jsonify(msg='redirect_url is required'), 400
 
@@ -98,6 +102,13 @@ def oauth_get_access_token():
         client_secret = form.get('client_secret')
         redirect_url = form.get('redirect_url')
         authorize_token = form.get('token')
+
+        if client_id is None:
+            return jsonify(msg='client_id is required'), 400
+        try:
+            client_id = int(client_id)
+        except ValueError:
+            return jsonify(msg='client_id must be an integer'), 400
 
         # get client
         client = OAuthService.get_client(client_id)

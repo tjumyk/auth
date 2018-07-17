@@ -26,6 +26,8 @@ class GroupService:
     def get(_id):
         if _id is None:
             raise GroupServiceError('id is required')
+        if type(_id) is not int:
+            raise GroupServiceError('id must be an integer')
 
         return Group.query.get(_id)
 
