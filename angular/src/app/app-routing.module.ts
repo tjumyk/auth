@@ -26,6 +26,7 @@ import {AdminOauthClientEditComponent} from "./admin-oauth-client-edit/admin-oau
 import {AdminOauthClientNewComponent} from "./admin-oauth-client-new/admin-oauth-client-new.component";
 import {AccountReqReconfirmEmailComponent} from "./account-req-reconfirm-email/account-req-reconfirm-email.component";
 import {OauthLoginComponent} from "./oauth-login/oauth-login.component";
+import {AdminAccountUsersBatchComponent} from "./admin-account-users-batch/admin-account-users-batch.component";
 
 const routes: Routes = [
   {path: '', pathMatch: 'full', redirectTo: '/settings/profile'},
@@ -84,6 +85,7 @@ const routes: Routes = [
                   {path: '', pathMatch: 'full', component: AdminAccountUsersComponent},
                   {path: 'u/:uid', component: AdminAccountUserEditComponent},
                   {path: 'invite', component: AdminAccountUserInviteComponent},
+                  {path: 'batch', component: AdminAccountUsersBatchComponent},
                 ]
               },
               {

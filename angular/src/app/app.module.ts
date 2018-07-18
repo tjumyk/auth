@@ -30,6 +30,7 @@ import { AdminAccountGroupEditComponent } from './admin-account-group-edit/admin
 import { AdminAccountGroupNewComponent } from './admin-account-group-new/admin-account-group-new.component';
 import { SameAsDirective } from './same-as.directive';
 import { AccountReqReconfirmEmailComponent } from './account-req-reconfirm-email/account-req-reconfirm-email.component';
+import { AdminAccountUsersBatchComponent } from './admin-account-users-batch/admin-account-users-batch.component';
 
 @NgModule({
   declarations: [
@@ -59,6 +60,7 @@ import { AccountReqReconfirmEmailComponent } from './account-req-reconfirm-email
     AdminAccountGroupNewComponent,
     SameAsDirective,
     AccountReqReconfirmEmailComponent,
+    AdminAccountUsersBatchComponent,
   ],
   imports: [
     BrowserModule,
