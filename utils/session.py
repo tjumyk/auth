@@ -128,3 +128,25 @@ def requires_oauth(f):
         return f(*args, **kwargs)
 
     return wrapped
+
+
+def requires_oauth_admin(f):
+    """
+    Return 403 and error message if either of the following cases happen
+    1. no access token
+    2. invalid access token (empty/mismatch)
+    3. inactive user
+    4. non-admin
+    """
+
+    @wraps(f)
+    def wrapped(*args, **kwargs):
+        try:
+            auth = get_current_oauth_authorization()
+            if not any((g.name == 'admin' for g in auth.user.groups)):
+                return jsonify(msg='admin required'), 403
+        except OAuthServiceError as e:
+            return jsonify(msg=e.msg, detail=e.detail), 403
+        return f(*args, **kwargs)
+
+    return wrapped
