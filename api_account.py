@@ -19,8 +19,7 @@ def account_login():
         remember = _json.get('remember')
 
         if app.config['SITE'].get('behind_proxy'):
-            ip = request.environ.get('HTTP_X_FORWARDED_FOR') or request.environ.get('HTTP_X_REAL_IP') or \
-                 request.remote_addr
+            ip = request.environ.get('HTTP_X_REAL_IP') or request.remote_addr
         else:
             ip = request.remote_addr
         user = UserService.login(name_or_email, password, ip, request.user_agent)
