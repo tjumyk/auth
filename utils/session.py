@@ -28,7 +28,7 @@ def get_current_uid():
     return session.get(_session_key_user_id)
 
 
-def get_current_user():
+def get_session_user():
     user = g.get(_g_key_user)
     if user is not None:
         return user
@@ -43,14 +43,26 @@ def get_current_user():
     return user
 
 
-def get_current_oauth_authorization():
+def get_oauth_authorization():
     auth = g.get(_g_key_oauth_authorization)
     if auth is not None:
         return auth
     access_token = request.args.get('oauth_token')
+    if access_token is None:
+        return None
     auth = OAuthService.verify_access_token(access_token)
     setattr(g, _g_key_oauth_authorization, auth)
     return auth
+
+
+def get_current_user():
+    # try OAuth authentication first
+    auth = get_oauth_authorization()
+    if auth is not None:
+        return auth.user
+    else:
+        # try getting session user
+        return get_session_user()
 
 
 def requires_login(f):
@@ -60,6 +72,8 @@ def requires_login(f):
             user = get_current_user()
         except UserServiceError as e:
             return jsonify(msg=e.msg, detail=e.detail), 500
+        except OAuthServiceError as e:
+            return jsonify(msg=e.msg, detail=e.detail), 403
 
         if user is None:
             return jsonify(msg='login required'), 401
@@ -77,6 +91,8 @@ def requires_admin(f):
             user = get_current_user()
         except UserServiceError as e:
             return jsonify(msg=e.msg, detail=e.detail), 500
+        except OAuthServiceError as e:
+            return jsonify(msg=e.msg, detail=e.detail), 403
 
         if user is None:
             return jsonify(msg='login required'), 401
@@ -84,69 +100,6 @@ def requires_admin(f):
             return jsonify(msg='inactive user'), 403
         if not any(group.name == _admin_group_name for group in user.groups):
             return jsonify(msg='admin required'), 403
-        return f(*args, **kwargs)
-
-    return wrapped
-
-
-def requires_groups(*groups):
-    def wrapper(f):
-        @wraps(f)
-        def wrapped(*args, **kwargs):
-            try:
-                user = get_current_user()
-            except UserServiceError as e:
-                return jsonify(msg=e.msg, detail=e.detail), 500
-
-            if user is None:
-                return jsonify(msg='login required'), 401
-            if not user.is_active:
-                return jsonify(msg='inactive user'), 403
-            if not any(group.name in groups for group in user.groups):
-                return jsonify(msg='group {group_names} required', group_names='/'.join(groups)), 403
-            return f(*args, **kwargs)
-
-        return wrapped
-
-    return wrapper
-
-
-def requires_oauth(f):
-    """
-    Return 403 and error message if either of the following cases happen
-    1. no access token
-    2. invalid access token (empty/mismatch)
-    3. inactive user
-    """
-
-    @wraps(f)
-    def wrapped(*args, **kwargs):
-        try:
-            get_current_oauth_authorization()
-        except OAuthServiceError as e:
-            return jsonify(msg=e.msg, detail=e.detail), 403
-        return f(*args, **kwargs)
-
-    return wrapped
-
-
-def requires_oauth_admin(f):
-    """
-    Return 403 and error message if either of the following cases happen
-    1. no access token
-    2. invalid access token (empty/mismatch)
-    3. inactive user
-    4. non-admin
-    """
-
-    @wraps(f)
-    def wrapped(*args, **kwargs):
-        try:
-            auth = get_current_oauth_authorization()
-            if not any((g.name == 'admin' for g in auth.user.groups)):
-                return jsonify(msg='admin required'), 403
-        except OAuthServiceError as e:
-            return jsonify(msg=e.msg, detail=e.detail), 403
         return f(*args, **kwargs)
 
     return wrapped

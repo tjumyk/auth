@@ -3,7 +3,7 @@ from flask import Blueprint, request, jsonify, current_app as app
 from models import db
 from services.oauth import OAuthService, OAuthServiceError
 from services.user import UserServiceError
-from utils.session import requires_oauth, get_current_oauth_authorization, get_current_user, requires_oauth_admin
+from utils.session import get_session_user
 from utils.url import url_append_param
 
 oauth = Blueprint('oauth', __name__)
@@ -45,7 +45,7 @@ def connect():
 
     # get current user in session
     try:
-        user = get_current_user()
+        user = get_session_user()
     except UserServiceError as e:
         return jsonify(msg=e.msg, detail=e.detail), 500
 
@@ -72,7 +72,7 @@ def connect():
             return jsonify('client not found'), 400
 
         # start the authorization process
-        authorize_token = OAuthService.start_authorization(client, get_current_user(), redirect_url)
+        authorize_token = OAuthService.start_authorization(client, user, redirect_url)
         db.session.commit()
 
         params = {'token': authorize_token}
@@ -122,37 +122,3 @@ def oauth_get_access_token():
         return jsonify(access_token=access_token)
     except OAuthServiceError as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
-
-
-@oauth.route('/me')
-@requires_oauth
-def me():
-    auth = get_current_oauth_authorization()
-    user = auth.user
-    return jsonify(user.to_dict())
-
-
-@oauth.route('/admin/users')
-@requires_oauth_admin
-def admin_users():
-    from api_admin import handle_users_get
-    return handle_users_get()
-
-
-@oauth.route('/admin/groups')
-@requires_oauth_admin
-def admin_groups():
-    from api_admin import handle_groups_get
-    return handle_groups_get()
-
-
-@oauth.route('/admin/users_groups')
-@requires_oauth_admin
-def admin_users_groups():
-    from services.user import UserService
-    from services.group import GroupService
-    users = UserService.get_all()
-    groups = GroupService.get_all()
-    user_dicts = [u.to_dict(with_groups=False, with_group_ids=True, with_advanced_fields=True) for u in users]
-    group_dicts = [g.to_dict(with_advanced_fields=True) for g in groups]
-    return jsonify(users=user_dicts, groups=group_dicts)

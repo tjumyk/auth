@@ -3,7 +3,7 @@ from flask import Blueprint, request, current_app as app, redirect
 from models import db
 from services.oauth import OAuthServiceError, OAuthService
 from services.user import UserServiceError
-from utils.session import get_current_user
+from utils.session import get_session_user
 from utils.url import url_append_param
 
 oauth_pages = Blueprint('page-oauth', __name__)
@@ -39,7 +39,7 @@ def oauth_connect():
 
     # get current user in session
     try:
-        user = get_current_user()
+        user = get_session_user()
     except UserServiceError as e:
         return _error_html(msg=e.msg, detail=e.detail), 500
 
@@ -70,7 +70,7 @@ def oauth_connect():
             return _error_html('client not found'), 400
 
         # start the authorization process
-        authorize_token = OAuthService.start_authorization(client, get_current_user(), redirect_url)
+        authorize_token = OAuthService.start_authorization(client, user, redirect_url)
         db.session.commit()
 
         params = {'token': authorize_token}

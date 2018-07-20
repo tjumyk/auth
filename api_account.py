@@ -4,7 +4,7 @@ from models import db
 from services.oauth import OAuthService, OAuthServiceError
 from services.user import UserService, UserServiceError
 from utils.mail import send_email
-from utils.session import get_current_user, requires_login, clear_current_user, set_current_user
+from utils.session import get_session_user, requires_login, clear_current_user, set_current_user, get_current_user
 from utils.upload import handle_upload, handle_post_upload, UploadError
 
 account = Blueprint('account', __name__)
@@ -36,7 +36,7 @@ def account_login():
 @account.route('/logout')
 def account_logout():
     try:
-        user = get_current_user()
+        user = get_session_user()
         clear_current_user()  # clear session first
         if user:
             OAuthService.clear_user_tokens(user)
@@ -146,6 +146,8 @@ def account_who_am_i():
         user = get_current_user()
     except UserServiceError as e:
         return jsonify(msg=e.msg, detail=e.detail), 500
+    except OAuthServiceError as e:
+        return jsonify(msg=e.msg, detail=e.detail), 403
 
     if user is None:
         return "", 204
@@ -181,6 +183,8 @@ def account_me():
 
             db.session.commit()
             return jsonify(user.to_dict())
+    except OAuthServiceError as e:
+        return jsonify(msg=e.msg, detail=e.detail), 403
     except (UserServiceError, UploadError) as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
 
@@ -193,7 +197,9 @@ def account_update_password():
         old_password = _json.get('old_password')
         new_password = _json.get('new_password')
 
-        user = get_current_user()
+        user = get_session_user()
+        if user is None:
+            return jsonify('login required'), 401
         UserService.update_password(user, new_password, old_password)
         db.session.commit()
         return "", 204
