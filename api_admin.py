@@ -17,7 +17,29 @@ admin = Blueprint('admin', __name__)
 def admin_user_list():
     try:
         if request.method == 'GET':
-            return handle_users_get()
+            args = request.args
+            if 'name' in args:  # search by name
+                limit = args.get('limit')
+                if limit is not None:
+                    try:
+                        limit = int(limit)
+                    except ValueError:
+                        return jsonify(msg='limit must be an integer'), 400
+                    users = UserService.search_by_name(args['name'], limit)
+                else:
+                    users = UserService.search_by_name(args['name'])  # use default limit
+                return jsonify([user.to_dict(with_advanced_fields=True) for user in users])
+            else:  # get all
+                users = UserService.get_all()
+                user_dicts = []
+                group_set = set()
+                for u in users:
+                    user_dicts.append(u.to_dict(with_groups=False, with_group_ids=True, with_advanced_fields=True))
+                    # assume groups are lazy-loaded, otherwise need to dig into User.to_dict() to avoid redundant
+                    # SQL queries on Group table
+                    group_set.update(u.groups)
+                group_dicts = [g.to_dict(with_advanced_fields=True) for g in group_set]
+                return jsonify(users=user_dicts, groups=group_dicts)
         else:  # POST
             _json = request.json
             name = _json.get('name')
@@ -29,32 +51,6 @@ def admin_user_list():
             return jsonify(user.to_dict(with_advanced_fields=True)), 201
     except (UserServiceError, GroupServiceError) as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
-
-
-def handle_users_get():
-    args = request.args
-    if 'name' in args:  # search by name
-        limit = args.get('limit')
-        if limit is not None:
-            try:
-                limit = int(limit)
-            except ValueError:
-                return jsonify(msg='limit must be an integer'), 400
-            users = UserService.search_by_name(args['name'], limit)
-        else:
-            users = UserService.search_by_name(args['name'])  # use default limit
-        return jsonify([user.to_dict(with_advanced_fields=True) for user in users])
-    else:  # get all
-        users = UserService.get_all()
-        user_dicts = []
-        group_set = set()
-        for u in users:
-            user_dicts.append(u.to_dict(with_groups=False, with_group_ids=True, with_advanced_fields=True))
-            # assume groups are lazy-loaded, otherwise need to dig into User.to_dict() to avoid redundant
-            # SQL queries on Group table
-            group_set.update(u.groups)
-        group_dicts = [g.to_dict(with_advanced_fields=True) for g in group_set]
-        return jsonify(users=user_dicts, groups=group_dicts)
 
 
 @admin.route('/users/<int:uid>', methods=['GET', 'DELETE', 'PUT'])
@@ -153,7 +149,21 @@ def admin_user_login_records(uid):
 def admin_group_list():
     try:
         if request.method == 'GET':
-            return handle_groups_get()
+            args = request.args
+            if 'name' in args:  # search by name
+                limit = args.get('limit')
+                if limit is not None:
+                    try:
+                        limit = int(limit)
+                    except ValueError:
+                        return jsonify(msg='limit must be an integer'), 400
+                    groups = GroupService.search_by_name(args['name'], limit)
+                else:
+                    groups = GroupService.search_by_name(args['name'])  # use default limit
+                return jsonify([group.to_dict(with_advanced_fields=True) for group in groups])
+            else:  # get all
+                groups = [g.to_dict(with_advanced_fields=True) for g in GroupService.get_all()]
+                return jsonify(groups)
         else:  # POST
             _json = request.json
             name = _json.get('name')
@@ -163,24 +173,6 @@ def admin_group_list():
             return jsonify(group.to_dict(with_advanced_fields=True)), 201
     except GroupServiceError as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
-
-
-def handle_groups_get():
-    args = request.args
-    if 'name' in args:  # search by name
-        limit = args.get('limit')
-        if limit is not None:
-            try:
-                limit = int(limit)
-            except ValueError:
-                return jsonify(msg='limit must be an integer'), 400
-            groups = GroupService.search_by_name(args['name'], limit)
-        else:
-            groups = GroupService.search_by_name(args['name'])  # use default limit
-        return jsonify([group.to_dict(with_advanced_fields=True) for group in groups])
-    else:  # get all
-        groups = [g.to_dict(with_advanced_fields=True) for g in GroupService.get_all()]
-        return jsonify(groups)
 
 
 @admin.route('/groups/<int:gid>', methods=['GET', 'DELETE', 'PUT'])
