@@ -22,12 +22,13 @@
       <div class="field" [ngClass]="{'error': (f.submitted || new_pass_model.touched || new_pass_model.dirty) && new_pass_model.invalid}">
         <label>New password</label>
         <input type="password" name="new_password" placeholder="8-20 characters"
-               required minlength="8" maxlength="20"
+               required minlength="8" maxlength="20" appStrongPassword
                [(ngModel)]="form.new_password" #new_pass_model="ngModel">
         <div class="errors" *ngIf="new_pass_model.errors">
           <label *ngIf="new_pass_model.errors.required"><i class="times icon"></i> New password is required</label>
           <label *ngIf="new_pass_model.errors.minlength"><i class="times icon"></i> At least 8 characters</label>
           <label *ngIf="new_pass_model.errors.maxlength"><i class="times icon"></i> At most 20 characters</label>
+          <label *ngIf="new_pass_model.errors.strongPassword"><i class="times icon"></i> {{new_pass_model.errors.strongPassword}}</label>
         </div>
       </div>
       <div class="field" [ngClass]="{'error': (f.submitted || repeat_new_pass_model.touched || repeat_new_pass_model.dirty) && repeat_new_pass_model.invalid}">
