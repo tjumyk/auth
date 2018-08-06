@@ -20,13 +20,13 @@
           <div class="field"
                [ngClass]="{'error': (f.submitted || name_model.touched || name_model.dirty) && name_model.invalid}">
             <label>Name</label>
-            <input type="text" name="name" placeholder="alphanumeric, 3-16 characters"
-                   required minlength="3" maxlength="16" pattern="^[\w]{3,16}$"
+            <input type="text" name="name" placeholder="alphanumeric, 3-24 characters"
+                   required minlength="3" maxlength="24" pattern="^[\w]{3,24}$"
                    [(ngModel)]="form.name" #name_model="ngModel">
             <div class="errors" *ngIf="name_model.errors">
               <label *ngIf="name_model.errors.required"><i class="times icon"></i> Name is required</label>
               <label *ngIf="name_model.errors.minlength"><i class="times icon"></i> At least 3 characters</label>
-              <label *ngIf="name_model.errors.maxlength"><i class="times icon"></i> At most 16 characters</label>
+              <label *ngIf="name_model.errors.maxlength"><i class="times icon"></i> At most 24 characters</label>
               <label *ngIf="name_model.errors.pattern"><i class="times icon"></i> Invalid format</label>
             </div>
           </div>

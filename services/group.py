@@ -11,7 +11,7 @@ class GroupServiceError(BasicError):
 
 
 class GroupService:
-    name_pattern = re.compile('^[\w]{3,16}$')
+    name_pattern = re.compile('^[\w]{3,24}$')
     description_max_length = 256
 
     profile_fields = {

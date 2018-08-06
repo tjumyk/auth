@@ -60,7 +60,7 @@ class User(db.Model):
 
 class Group(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(16), unique=True, nullable=False)
+    name = db.Column(db.String(24), unique=True, nullable=False)
     description = db.Column(db.String(256))
 
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
