@@ -1,0 +1,173 @@
+<div class="ui error message" *ngIf="error">
+  <i class="close icon" (click)="error=undefined"></i>
+  <div class="header"><i class="times circle icon"></i> {{error.msg}}</div>
+  <p>{{error.detail}}</p>
+</div>
+
+<div class="ui grid stackable">
+  <div class="column six wide">
+    <!--Users Input-->
+    <form class="ui form">
+      <div class="field" [ngClass]="{'disabled': processing}">
+        <label>User List Format</label>
+        <select name="format" [(ngModel)]="format" (change)="reloadUserList()">
+          <option value="csv">CSV</option>
+          <option value="tsv">TSV</option>
+          <option value="json">JSON</option>
+        </select>
+      </div>
+      <div class="ui message info">
+        <div class="header">Format Requirements</div>
+        <ul *ngIf="format=='csv' || format=='tsv'" class="list">
+          <li>Each line corresponds to a user record.</li>
+          <li>Any line that contains only whitespace characters are skipped.</li>
+          <li>
+            Columns are separated by
+            <span *ngIf="format=='csv'; else tsvSpliter">commas (,)</span>
+            <ng-template #tsvSpliter>tabs ('\t')</ng-template>
+          </li>
+          <li>The first column is user's name <b>(required)</b>.</li>
+          <li>The second column is user's email <b>(optional)</b>.</li>
+          <li>If email is not explicitly specified for a user, it will be generated with <b>[prefix]user_name[suffix]</b> format.</li>
+          <li>Emails are only used for <b>Inviting Users</b>. In any other cases, they are not used or checked.</li>
+        </ul>
+        <ul *ngIf="format=='json'" class="list">
+          <li>Top level is a JSON list, e.g. "{{'[ {}, {}, ... ]'}}"</li>
+          <li>Each JSON object in such list corresponds to a user record.</li>
+          <li>Inside each such object, attribute <b>name</b> is user's name <b>(required)</b>.</li>
+          <li>Attribute <b>email</b> is user's email <b>(optional)</b>.</li>
+          <li>If email is not explicitly specified for a user, it will be generated with <b>[prefix]user_name[suffix]</b> format.</li>
+          <li>Emails are only used for <b>Inviting Users</b>. In any other cases, they are not used or checked.</li>
+        </ul>
+      </div>
+      <div class="field" [ngClass]="{'disabled': processing}">
+        <label>User List</label>
+        <textarea name="user_list" rows="20" [(ngModel)]="userRawList" (keyup)="updateUserList()"
+                  placeholder="{{examples[format]}}"></textarea>
+      </div>
+      <div class="field" [ngClass]="{'disabled': processing}">
+        <label>Email Prefix</label>
+        <input type="text" name="email_prefix" [(ngModel)]="emailPrefix" (keyup)="updateUserList()" placeholder="Prefix for auto-generated email">
+      </div>
+      <div class="field" [ngClass]="{'disabled': processing}">
+        <label>Email Suffix</label>
+        <input type="text" name="email_suffix" [(ngModel)]="emailSuffix" (keyup)="updateUserList()" placeholder="Suffix for auto-generated email">
+      </div>
+    </form>
+    <!--End of Users Input-->
+  </div>
+
+  <div class="column ten wide">
+    <!--Operations-->
+    <div class="ui segment">
+      <div class="ui two column stackable grid">
+        <div class="column">
+          <!--User Operations-->
+          <h4 class="ui header">
+            <i class="icon user"></i>
+            Users
+          </h4>
+          <div class="ui fluid buttons vertical">
+            <button class="ui button" (click)="findUsers()"
+                    [ngClass]="{'loading': findingUsers, 'disabled': processing}">
+              <i class="icon search"></i> Find Users
+            </button>
+            <button class="ui green button" (click)="inviteUsers()"
+                    [ngClass]="{'loading': invitingUsers, 'disabled': processing}">
+              <i class="icon plus"></i> Invite Users
+            </button>
+            <button class="ui red button" (click)="deleteUsers()"
+                    [ngClass]="{'loading': deletingUsers, 'disabled': processing}">
+              <i class="icon trash"></i> Delete Users
+            </button>
+          </div>
+          <!--End of User Operations-->
+        </div>
+
+        <div class="column">
+          <!--Group Operations-->
+          <h4 class="ui header">
+            <i class="icon users"></i>
+            Group Associations
+          </h4>
+          <div *ngIf="loadingGroups">Loading groups... <i class="icon loading notched circle"></i></div>
+          <form class="ui form">
+            <div class="field" *ngIf="groups" [ngClass]="{'disabled': processing}">
+              <label>Group</label>
+              <select name="group_id" [(ngModel)]="selectedGroup" [compareWith]="groupCompareFn">
+                <option *ngFor="let group of groups" class="item" [ngValue]="group">
+                  {{group.name}}
+                </option>
+              </select>
+            </div>
+            <div class="ui buttons vertical fluid">
+              <button class="ui button green" type="button" (click)="addUsersToGroup()"
+                      [ngClass]="{'loading': addingUsersToGroup, 'disabled': processing}">
+                <i class="icon plus"></i> Add Users To Group
+              </button>
+              <button class="ui button red" type="button" (click)="removeUsersFromGroup()"
+                      [ngClass]="{'loading': removingUsersFromGroup, 'disabled': processing}">
+                <i class="icon minus"></i> Remove Users From Group
+              </button>
+            </div>
+          </form>
+          <!--End of Group Operations-->
+        </div>
+      </div>
+    </div>
+    <!--End of Operations-->
+
+    <!--Progress-->
+    <div *ngIf="processing">
+      <div class="ui progress">
+        <div class="bar" [ngStyle]="{'width.%': processed/userItems.length*100}">
+          <div class="progress">{{processed/userItems.length|percent}}</div>
+        </div>
+        <div class="label">
+          <span *ngIf="findingUsers">Finding users</span>
+          <span *ngIf="invitingUsers">Inviting users</span>
+          <span *ngIf="deletingUsers">Deleting users</span>
+          <span *ngIf="addingUsersToGroup">Adding users to group "{{selectedGroup.name}}"</span>
+          <span *ngIf="removingUsersFromGroup">Removing users from group "{{selectedGroup.name}}"</span>
+          ({{processed}}/{{userItems.length}})
+        </div>
+      </div>
+      <p class="abort-processing">
+        <button class="ui button secondary small" (click)="aborting=true" [ngClass]="{'loading disabled': aborting}">
+          <i class="icon times"></i> Abort
+        </button>
+      </p>
+    </div>
+    <!--End of Progress-->
+
+    <!--Users Table -->
+    <table class="ui table celled unstackable very compact">
+      <thead><tr><th>#</th><th>Name</th><th>Email</th><th>Status</th></tr></thead>
+      <tbody>
+      <tr *ngFor="let item of userItems; index as i" [ngClass]="{'error': item.clientError, 'active': item.processing}">
+        <td>{{i+1}}</td>
+        <td *ngIf="item.clientError; else noClientError" colspan="3">
+          <div><b>{{item.clientError.msg}}</b></div>
+          {{item.clientError.detail}}
+        </td>
+        <ng-template #noClientError>
+          <td>
+            <a href="admin/account/users/u/{{item.user.id}}" target="_blank" *ngIf="item.user; else noUserData">{{item.form.name}}</a>
+            <ng-template #noUserData>{{item.form.name}}</ng-template>
+          </td>
+          <td>{{item.form.email}}</td>
+          <td [ngClass]="{'error': item.serverError, 'positive': item.success}">
+            <div *ngIf="item.processing">Processing... <i class="icon loading notched circle"></i></div>
+            <div *ngIf="item.success">{{item.success}}</div>
+            <div *ngIf="item.serverError">
+              <div><b>{{item.serverError.msg}}</b></div>
+              {{item.serverError.detail}}
+            </div>
+          </td>
+        </ng-template>
+      </tr>
+      </tbody>
+    </table>
+    <!--End of Users Table -->
+  </div>
+</div>

@@ -55,40 +55,52 @@ def admin_user_list():
 
 @admin.route('/users/<int:uid>', methods=['GET', 'DELETE', 'PUT'])
 @requires_admin
-def admin_user(uid):
+def admin_user_by_id(uid):
     try:
-        user = UserService.get(uid)
-        if user is None:
-            return jsonify(msg='user not found'), 404
-
-        if request.method == 'GET':
-            return jsonify(user.to_dict(with_advanced_fields=True))
-        elif request.method == 'DELETE':
-            db.session.delete(user)
-            db.session.commit()
-            return "", 204
-        else:  # PUT
-            files = request.files
-            params = request.form or request.json or {}
-
-            # handle upload
-            avatar_file = files.get('avatar')
-            if avatar_file:
-                if not avatar_file.filename:
-                    return jsonify(msg='avatar file cannot be empty'), 400
-                url = handle_upload(avatar_file, 'avatar', image_check=True, image_check_squared=True)
-                params['avatar'] = url  # save url in params
-
-            old_profile = UserService.update_profile(user, **params)
-            if avatar_file:
-                old_avatar = old_profile.get('avatar')
-                if old_avatar:
-                    handle_post_upload(old_avatar, 'avatar')
-
-            db.session.commit()
-            return jsonify(user.to_dict(with_advanced_fields=True))
+        return _admin_user(UserService.get(uid))
     except (UserServiceError, UploadError) as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
+
+
+@admin.route('/users/<string:name>', methods=['GET', 'DELETE', 'PUT'])
+@requires_admin
+def admin_user_by_name(name):
+    try:
+        return _admin_user(UserService.get_by_name(name))
+    except (UserServiceError, UploadError) as e:
+        return jsonify(msg=e.msg, detail=e.detail), 400
+
+
+def _admin_user(user):
+    if user is None:
+        return jsonify(msg='user not found'), 404
+
+    if request.method == 'GET':
+        return jsonify(user.to_dict(with_advanced_fields=True))
+    elif request.method == 'DELETE':
+        db.session.delete(user)
+        db.session.commit()
+        return "", 204
+    else:  # PUT
+        files = request.files
+        params = request.form or request.json or {}
+
+        # handle upload
+        avatar_file = files.get('avatar')
+        if avatar_file:
+            if not avatar_file.filename:
+                return jsonify(msg='avatar file cannot be empty'), 400
+            url = handle_upload(avatar_file, 'avatar', image_check=True, image_check_squared=True)
+            params['avatar'] = url  # save url in params
+
+        old_profile = UserService.update_profile(user, **params)
+        if avatar_file:
+            old_avatar = old_profile.get('avatar')
+            if old_avatar:
+                handle_post_upload(old_avatar, 'avatar')
+
+        db.session.commit()
+        return jsonify(user.to_dict(with_advanced_fields=True))
 
 
 @admin.route('/users/<int:uid>/active', methods=['PUT', 'DELETE'])
@@ -213,7 +225,7 @@ def admin_group_users(gid):
 
 @admin.route('/groups/<int:gid>/users/<int:uid>', methods=['PUT', 'DELETE'])
 @requires_admin
-def admin_group_user(gid, uid):
+def admin_group_user_by_id(gid, uid):
     try:
         group = GroupService.get(gid)
         if group is None:
@@ -222,20 +234,40 @@ def admin_group_user(gid, uid):
         if user is None:
             return jsonify(msg='user not found'), 404
 
-        if request.method == 'PUT':
-            if group in user.groups:
-                return jsonify(msg='user already in the group'), 400
-            user.groups.append(group)
-            db.session.commit()
-            return "", 204
-        else:  # DELETE
-            if group not in user.groups:
-                return jsonify(msg='user not in the group'), 400
-            user.groups.remove(group)
-            db.session.commit()
-            return "", 204
+        return _admin_group_user(group, user)
     except (UserServiceError, GroupServiceError) as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
+
+
+@admin.route('/groups/<int:gid>/users/<string:user_name>', methods=['PUT', 'DELETE'])
+@requires_admin
+def admin_group_user_by_name(gid, user_name):
+    try:
+        group = GroupService.get(gid)
+        if group is None:
+            return jsonify(msg='group not found'), 404
+        user = UserService.get_by_name(user_name)
+        if user is None:
+            return jsonify(msg='user not found'), 404
+
+        return _admin_group_user(group, user)
+    except (UserServiceError, GroupServiceError) as e:
+        return jsonify(msg=e.msg, detail=e.detail), 400
+
+
+def _admin_group_user(group, user):
+    if request.method == 'PUT':
+        if group in user.groups:
+            return jsonify(msg='user already in the group'), 400
+        user.groups.append(group)
+        db.session.commit()
+        return "", 204
+    else:  # DELETE
+        if group not in user.groups:
+            return jsonify(msg='user not in the group'), 400
+        user.groups.remove(group)
+        db.session.commit()
+        return "", 204
 
 
 @admin.route('/clients', methods=['GET', 'POST'])
