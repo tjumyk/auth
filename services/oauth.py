@@ -5,7 +5,7 @@ from secrets import token_urlsafe
 from sqlalchemy.orm import joinedload
 
 from error import BasicError
-from models import OAuthClient, db, OAuthAuthorization, User
+from models import OAuthClient, db, OAuthAuthorization, User, client_allowed_groups, user_groups
 
 
 class OAuthServiceError(BasicError):
@@ -37,6 +37,22 @@ class OAuthService:
     @staticmethod
     def get_all_clients():
         return OAuthClient.query.all()
+
+    @staticmethod
+    def get_clients_for_user(user: User):
+        if user is None:
+            raise OAuthServiceError('user is required')
+
+        group_allowed_clients = db.session.query(OAuthClient.id.label('client_id')) \
+            .filter(client_allowed_groups.c.client_id == OAuthClient.id,
+                    client_allowed_groups.c.group_id == user_groups.c.group_id,
+                    user_groups.c.user_id == user.id)
+        public_clients = db.session.query(OAuthClient.id.label('client_id')) \
+            .filter(OAuthClient.is_public == True)
+        all_client_ids = group_allowed_clients.union(public_clients).subquery()
+        return db.session.query(OAuthClient) \
+            .filter(OAuthClient.id == all_client_ids.c.client_id) \
+            .all()
 
     @staticmethod
     def add_client(name, redirect_url, home_url, description):

@@ -205,4 +205,16 @@ def account_update_password():
     except UserServiceError as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
 
+
+@account.route('/clients', methods=['GET'])
+@requires_login
+def account_clients():
+    try:
+        user = get_current_user()
+        return jsonify([c.to_dict() for c in OAuthService.get_clients_for_user(user)])
+    except OAuthServiceError as e:
+        return jsonify(msg=e.msg, detail=e.detail), 403
+    except (UserServiceError, UploadError) as e:
+        return jsonify(msg=e.msg, detail=e.detail), 400
+
 # TODO reject weak passwords
