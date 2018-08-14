@@ -104,11 +104,12 @@
             </div>
             <div class="field"
                  [ngClass]="{'error': (f.submitted || home_url_model.touched || home_url_model.dirty) && home_url_model.invalid}">
-              <label>Home URL (Optional)</label>
+              <label>Home URL</label>
               <input type="text"  name="home_url" placeholder="at most 128 characters"
-                     maxlength="128"
+                     required maxlength="128"
                      [(ngModel)]="form.home_url" #home_url_model="ngModel">
               <div class="errors" *ngIf="home_url_model.errors">
+                <label *ngIf="home_url_model.errors.required"><i class="times icon"></i> Home URL is required</label>
                 <label *ngIf="home_url_model.errors.maxlength"><i class="times icon"></i> At most 128 characters</label>
               </div>
             </div>

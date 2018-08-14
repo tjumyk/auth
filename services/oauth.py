@@ -56,17 +56,19 @@ class OAuthService:
 
     @staticmethod
     def add_client(name, redirect_url, home_url, description):
-        if name is None:
+        if not name:
             raise OAuthServiceError('name is required')
-        if redirect_url is None:
+        if not redirect_url:
             raise OAuthServiceError('redirect_url is required')
+        if not home_url:
+            raise OAuthServiceError('home_url is required')
         secret = token_urlsafe()
 
         if not OAuthService.client_name_pattern.match(name):
             raise OAuthServiceError('invalid name format')
         if len(redirect_url) > OAuthService.client_url_max_length:
             raise OAuthServiceError('redirect_url too long')
-        if home_url and len(home_url) > OAuthService.client_url_max_length:
+        if len(home_url) > OAuthService.client_url_max_length:
             raise OAuthServiceError('home_url too long')
         if description and len(description) > OAuthService.client_description_max_length:
             raise OAuthServiceError('description too long')
@@ -87,12 +89,14 @@ class OAuthService:
 
         for key, value in kwargs.items():
             if key == 'redirect_url':
-                if value is None:
+                if not value:
                     raise OAuthServiceError('redirect_url is required')
                 if len(value) > OAuthService.client_url_max_length:
                     raise OAuthServiceError('redirect_url too long')
             elif key == 'home_url':
-                if value and len(value) > OAuthService.client_url_max_length:
+                if not value:
+                    raise OAuthServiceError('home_url is required')
+                if len(value) > OAuthService.client_url_max_length:
                     raise OAuthServiceError('home_url too long')
             elif key == 'description':
                 if value and len(value) > OAuthService.client_description_max_length:

@@ -113,9 +113,9 @@ class OAuthClient(db.Model):
     name = db.Column(db.String(16), unique=True, nullable=False)
     secret = db.Column(db.String(128), nullable=False)
     redirect_url = db.Column(db.String(128), nullable=False)
+    home_url = db.Column(db.String(128), nullable=False)
 
     is_public = db.Column(db.Boolean, nullable=False, default=True)
-    home_url = db.Column(db.String(128))
     description = db.Column(db.String(256))
     icon = db.Column(db.String(128))
 
