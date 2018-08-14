@@ -20,7 +20,7 @@
         <div class="header">Format Requirements</div>
         <ul *ngIf="format=='csv' || format=='tsv'" class="list">
           <li>Each line corresponds to a user record.</li>
-          <li>Any line that contains only whitespace characters are skipped.</li>
+          <li>Any lines that contain only whitespace characters will be skipped.</li>
           <li>
             Columns are separated by
             <span *ngIf="format=='csv'; else tsvSpliter">commas (,)</span>
