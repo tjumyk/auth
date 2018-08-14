@@ -1,9 +1,9 @@
 import {Injectable} from '@angular/core';
-import {User} from "./models";
+import {OAuthClient, User} from "./models";
 import {HttpClient, HttpParams} from "@angular/common/http";
 import {Logger, LogService} from "./log.service";
 import {Observable, of} from "rxjs";
-import {map, tap} from "rxjs/operators";
+import {tap} from "rxjs/operators";
 
 @Injectable({
   providedIn: 'root'
@@ -52,7 +52,7 @@ export class AccountService {
 
     if (check_only) {
       return this.http.get(api_entry, {params: params}).pipe(
-        tap((user:User) => this.logger.info(`verified email confirmation token for ${user.name}`))
+        tap((user: User) => this.logger.info(`verified email confirmation token for ${user.name}`))
       );
     } else {
       return this.http.post(api_entry, {new_password: new_password}, {params: params}).pipe(
@@ -78,7 +78,7 @@ export class AccountService {
     let params = new HttpParams().append('uid', uid.toString()).append('token', token);
     if (check_only) {
       return this.http.get(api_entry, {params: params}).pipe(
-        tap((user:User) => this.logger.info(`verified password reset token for ${user.name}`))
+        tap((user: User) => this.logger.info(`verified password reset token for ${user.name}`))
       )
     } else {
       return this.http.post(api_entry, {new_password: new_password}, {params: params}).pipe(
@@ -138,6 +138,12 @@ export class AccountService {
   update_password(old_password: string, new_password: string): Observable<any> {
     return this.http.put(`${this.api}/me/password`, {old_password: old_password, new_password: new_password}).pipe(
       tap(() => this.logger.info(`updated password for user ${this.user.name}`))
+    )
+  }
+
+  get_my_clients(): Observable<OAuthClient[]> {
+    return this.http.get<OAuthClient[]>(`${this.api}/clients`).pipe(
+      tap(clients => this.logger.info(`Fetched ${clients.length} clients`))
     )
   }
 }

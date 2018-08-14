@@ -32,6 +32,7 @@ import { SameAsDirective } from './same-as.directive';
 import { AccountReqReconfirmEmailComponent } from './account-req-reconfirm-email/account-req-reconfirm-email.component';
 import { StrongPasswordDirective } from './strong-password.directive';
 import { AdminAccountUsersBatchComponent } from './admin-account-users-batch/admin-account-users-batch.component';
+import { HomeComponent } from './home/home.component';
 
 @NgModule({
   declarations: [
@@ -63,6 +64,7 @@ import { AdminAccountUsersBatchComponent } from './admin-account-users-batch/adm
     AccountReqReconfirmEmailComponent,
     StrongPasswordDirective,
     AdminAccountUsersBatchComponent,
+    HomeComponent,
   ],
   imports: [
     BrowserModule,

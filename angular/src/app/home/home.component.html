@@ -1,0 +1,57 @@
+<div class="background"></div>
+
+<div class="ui container">
+  <div class="ui middle aligned centered padded stackable grid">
+    <div class="column">
+      <div class="ui padded raised segment">
+        <h2 class="ui center aligned fluid header">
+          <div>
+            <img src="static/assets/images/banner.png" class="banner image">
+          </div>
+          <div class="content text brand">
+            Computer Science & Engineering
+            <div class="sub header">
+              Professor Wei Wang's Group
+            </div>
+          </div>
+        </h2>
+
+        <div class="ui error message" *ngIf="error">
+          <i class="close icon" (click)="error=undefined"></i>
+          <div class="header"><i class="times circle icon"></i> {{error.msg}}</div>
+          <p>{{error.detail}}</p>
+        </div>
+
+
+        <div class="ui divider horizontal">My Apps</div>
+        <div class="ui text loader inline active centered" *ngIf="loadingClients">Loading app list...</div>
+        <div *ngIf="clients">
+          <div class="ui grid four column doubling centered">
+            <div class="column" *ngFor="let client of clients">
+              <a class="ui icon header client-card" [href]="client.home_url">
+                <img class="ui image icon" [src]="client.icon" *ngIf="client.icon; else defaultIcon">
+                <ng-template #defaultIcon><i class="icon window restore outline circular default-client-icon"></i></ng-template>
+                <div class="content">
+                  {{client.name}}
+                  <div class="sub header" *ngIf="client.description">{{client.description}}</div>
+                </div>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <div class="ui divider"></div>
+        <div class="ui grid center aligned">
+          <div class="column">
+            <a class="ui button basic" routerLink="/settings">
+              <img [src]="user.avatar" class="ui image avatar" *ngIf="user.avatar; else noAvatar">
+              <ng-template #noAvatar><i class="icon user circle"></i></ng-template>
+              {{user.nickname || user.name}}
+            </a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>

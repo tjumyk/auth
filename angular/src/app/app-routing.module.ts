@@ -27,9 +27,10 @@ import {AdminOauthClientNewComponent} from "./admin-oauth-client-new/admin-oauth
 import {AccountReqReconfirmEmailComponent} from "./account-req-reconfirm-email/account-req-reconfirm-email.component";
 import {OauthLoginComponent} from "./oauth-login/oauth-login.component";
 import {AdminAccountUsersBatchComponent} from "./admin-account-users-batch/admin-account-users-batch.component";
+import {HomeComponent} from "./home/home.component";
 
 const routes: Routes = [
-  {path: '', pathMatch: 'full', redirectTo: '/settings/profile'},
+  {path: '', pathMatch: 'full', canActivate: [AuthGuard], component: HomeComponent},
   {
     path: '',
     component: LandingComponent,
@@ -37,7 +38,7 @@ const routes: Routes = [
       {
         path: 'account',
         children: [
-          {path: '', pathMatch: 'full', redirectTo: '/settings/profile'},
+          {path: '', pathMatch: 'full', redirectTo: '/'},
           {path: 'login', component: AccountLoginComponent},
           {path: 'logout', component: AccountLogoutComponent},
           {path: 'request-reset-password', component: AccountReqResetPasswordComponent},
@@ -49,7 +50,7 @@ const routes: Routes = [
       {
         path: 'oauth',
         children: [
-          {path: '', pathMatch: 'full', redirectTo: '/settings/profile'},
+          {path: '', pathMatch: 'full', redirectTo: '/'},
           {path: 'login', component: OauthLoginComponent}
         ]
       }

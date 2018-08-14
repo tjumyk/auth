@@ -1,0 +1,42 @@
+.background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  background: radial-gradient(#26a0da, #314755);
+}
+
+.ui.container {
+  height: 100%;
+  > .grid {
+    height: 100%;
+    @media (max-width: 767px){
+      height: auto;
+    }
+    > .column {
+      max-width: 600px;
+    }
+  }
+}
+
+.banner.image {
+  height: 60px;
+  width: auto;
+  margin: 0.3em;
+}
+
+.ui.icon.header .default-client-icon{
+  font-size: 3.1em;
+}
+
+.client-card{
+  &:first-child{
+    margin: 0;
+  }
+  padding: .25em;
+  transition: transform .2s;
+  &:hover{
+    transform: translateY(-3px);
+  }
+}
