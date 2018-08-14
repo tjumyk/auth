@@ -42,7 +42,7 @@ export class AccountLoginComponent implements OnInit {
     ).subscribe(
       user => {
         if (user != null) {
-          let redirect = this.route.snapshot.queryParamMap.get('redirect') || "/settings/profile";
+          let redirect = this.route.snapshot.queryParamMap.get('redirect') || "/";
           this.router.navigate([redirect], {replaceUrl: true});
         }
       },
@@ -60,7 +60,7 @@ export class AccountLoginComponent implements OnInit {
       finalize(() => this.logging_in = false)
     ).subscribe(
       (user: User) => {
-        let redirect = this.route.snapshot.queryParamMap.get('redirect') || "/settings/profile";
+        let redirect = this.route.snapshot.queryParamMap.get('redirect') || "/";
         this.router.navigate([redirect], {replaceUrl: true})
       },
       (error) => this.error = error.error
