@@ -58,15 +58,15 @@ export class AdminService {
     )
   }
 
-  get_user(uid: number): Observable<UserAdvanced> {
-    return this.http.get<UserAdvanced>(`${this.api}/users/${uid}`).pipe(
+  get_user(uid_or_name: number|string): Observable<UserAdvanced> {
+    return this.http.get<UserAdvanced>(`${this.api}/users/${uid_or_name}`).pipe(
       tap((user) => this.logger.info(`Fetched profile of user ${user.name}`))
     )
   }
 
-  delete_user(uid: number): Observable<any> {
-    return this.http.delete(`${this.api}/users/${uid}`).pipe(
-      tap(() => this.logger.info(`Deleted user (uid: ${uid})`))
+  delete_user(uid_or_name: number|string): Observable<any> {
+    return this.http.delete(`${this.api}/users/${uid_or_name}`).pipe(
+      tap(() => this.logger.info(`Deleted user (${uid_or_name})`))
     )
   }
 
@@ -156,15 +156,15 @@ export class AdminService {
     )
   }
 
-  group_add_user(gid: number, uid: number): Observable<any> {
-    return this.http.put(`${this.api}/groups/${gid}/users/${uid}`, null).pipe(
-      tap(() => this.logger.info(`Added user (uid: ${uid}) to group (gid: ${gid})`))
+  group_add_user(gid: number, uid_or_name: number|string): Observable<any> {
+    return this.http.put(`${this.api}/groups/${gid}/users/${uid_or_name}`, null).pipe(
+      tap(() => this.logger.info(`Added user (${uid_or_name}) to group (gid: ${gid})`))
     )
   }
 
-  group_remove_user(gid: number, uid: number): Observable<any> {
-    return this.http.delete(`${this.api}/groups/${gid}/users/${uid}`).pipe(
-      tap(() => this.logger.info(`Removed user (uid: ${uid}) from group (gid: ${gid})`))
+  group_remove_user(gid: number, uid_or_name: number|string): Observable<any> {
+    return this.http.delete(`${this.api}/groups/${gid}/users/${uid_or_name}`).pipe(
+      tap(() => this.logger.info(`Removed user (${uid_or_name}) from group (gid: ${gid})`))
     )
   }
 
