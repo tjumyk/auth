@@ -223,6 +223,9 @@ export class AdminAccountUsersBatchComponent implements OnInit {
   }
 
   deleteUsers() {
+    if (!confirm(`Really want to delete the users?`))
+      return;
+
     this.processUsers(
       () => this.deletingUsers = true,
       () => this.deletingUsers = false,
@@ -235,6 +238,11 @@ export class AdminAccountUsersBatchComponent implements OnInit {
   }
 
   addUsersToGroup() {
+    if (!this.selectedGroup) {
+      alert('Please select a group first');
+      return;
+    }
+
     this.processUsers(
       () => this.addingUsersToGroup = true,
       () => this.addingUsersToGroup = false,
@@ -244,6 +252,11 @@ export class AdminAccountUsersBatchComponent implements OnInit {
   }
 
   removeUsersFromGroup() {
+    if (!this.selectedGroup) {
+      alert('Please select a group first');
+      return;
+    }
+
     this.processUsers(
       () => this.removingUsersFromGroup = true,
       () => this.removingUsersFromGroup = false,
@@ -266,15 +279,9 @@ export class AdminAccountUsersBatchComponent implements OnInit {
     }
 
     const process_next = () => {
-      if (this.processed >= this.userItems.length) {
+      if (this.aborting || this.processed >= this.userItems.length) {
         this.processing = false;
-        onStop();
-        return;
-      }
-
-      if (this.aborting) {
         this.aborting = false;
-        this.processing = false;
         onStop();
         return;
       }
