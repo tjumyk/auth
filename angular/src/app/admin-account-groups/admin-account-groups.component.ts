@@ -30,7 +30,7 @@ export class AdminAccountGroupsComponent implements OnInit {
     )
   }
 
-  deleteGroup(group: GroupAdvanced, btn: HTMLElement) {
+  deleteGroup(group: GroupAdvanced, index: number, btn: HTMLElement) {
     if (!confirm(`Really want to delete group ${group.name}?`))
       return;
 
@@ -38,16 +38,7 @@ export class AdminAccountGroupsComponent implements OnInit {
     this.adminService.delete_group(group.id).pipe(
       finalize(() => btn.classList.remove('loading', 'disabled'))
     ).subscribe(
-      () => {
-        let idx = 0;
-        for (let _group of this.group_list) {
-          if (_group.id == group.id) {
-            this.group_list.splice(idx, 1);
-            break;
-          }
-          idx++;
-        }
-      },
+      () => this.group_list.splice(index, 1),
       (error) => this.error = error.error
     )
   }

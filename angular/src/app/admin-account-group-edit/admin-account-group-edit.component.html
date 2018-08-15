@@ -148,14 +148,16 @@
         </div>
       </div>
 
-      <table class="ui bottom attached table celled unstackable compact">
-        <thead><tr><th>ID</th><th>Name</th><th class="collapsing">Ops</th></tr></thead>
+      <table class="ui bottom attached table celled unstackable very compact">
+        <thead><tr><th>#</th><th>ID</th><th>Name</th><th>Nickname</th><th class="collapsing">Ops</th></tr></thead>
         <tbody>
         <tr *ngFor="let user of members; index as i">
+          <td>{{i+1}}</td>
           <td>{{user.id}}</td>
           <td>{{user.name}}</td>
+          <td>{{user.nickname}}</td>
           <td class="collapsing">
-            <div class="ui small buttons">
+            <div class="ui mini buttons">
               <a routerLink="../../../users/u/{{user.id}}" class="ui icon button"><i class="icon edit"></i></a>
               <a class="ui icon red button" #removeFromGroupBtn (click)="removeUserFromGroup(user, i, removeFromGroupBtn)"><i class="icon minus"></i></a>
             </div>

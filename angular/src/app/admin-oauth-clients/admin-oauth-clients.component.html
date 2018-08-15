@@ -12,10 +12,11 @@
   </p>
 
   <div class="table-responsive">
-    <table class="ui unstackable celled compact table">
-      <thead><tr><th>ID</th><th>Name</th><th>Home URL</th><th>Description</th><th>Access Control</th><th class="collapsing">Ops</th></tr></thead>
+    <table class="ui unstackable celled very compact table">
+      <thead><tr><th>#</th><th>ID</th><th>Name</th><th>Home URL</th><th>Description</th><th>Access Control</th><th class="collapsing">Ops</th></tr></thead>
       <tbody>
-      <tr *ngFor="let client of client_list; index as i" #row>
+      <tr *ngFor="let client of client_list; index as i">
+        <td>{{i+1}}</td>
         <td>{{client.id}}</td>
         <td>{{client.name}}</td>
         <td><a target="_blank" [href]="client.home_url">{{client.home_url}}</a></td>
@@ -23,7 +24,7 @@
         <td>
           <span *ngIf="client.is_public" class="text warning"><i class="icon lock open"></i> Public</span>
           <div *ngIf="!client.is_public">
-            <div *ngIf="client.allowed_groups.length" class="ui labels">
+            <div *ngIf="client.allowed_groups.length" class="ui labels small">
               <i class="green icon lock"></i>
               <a *ngFor="let group of client.allowed_groups" class="ui basic label" routerLink="../../../../account/groups/g/{{group.id}}"
                  title="{{group.description}}">{{group.name}}</a>
@@ -35,7 +36,7 @@
         </td>
 
         <td class="collapsing">
-          <div class="ui small buttons">
+          <div class="ui mini buttons">
             <div class="ui icon button" routerLink="c/{{client.id}}"><i class="edit icon"></i></div>
             <div class="ui icon red button" #btn (click)="deleteClient(client, i, btn)" ><i class="trash icon"></i></div>
           </div>

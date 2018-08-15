@@ -259,12 +259,13 @@
           Authorizations
         </div>
       </div>
-      <table class="ui table celled compact unstackable bottom attached">
-        <thead><tr><th>User ID</th><th>User Name</th><th>Created At</th><th>Updated At</th></tr></thead>
+      <table class="ui table celled very compact unstackable bottom attached">
+        <thead><tr><th>#</th><th>User ID</th><th>User Name</th><th>Created At</th><th>Updated At</th></tr></thead>
         <tbody>
-        <tr *ngFor="let record of authorizations">
+        <tr *ngFor="let record of authorizations; index as i">
+          <td>{{i+1}}</td>
           <td>{{record.user_id}}</td>
-          <td>{{record.user.name}}</td>
+          <td><a routerLink="../../../../account/users/u/{{record.user_id}}">{{record.user.name}}</a></td>
           <td>{{record.created_at | date:'short'}}</td>
           <td>{{record.modified_at | date:'short'}}</td>
         </tr>
