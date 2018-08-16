@@ -87,7 +87,7 @@ export class Pagination<T> {
   }
 
   get endRow(): number { // start from 1, inclusive
-    return (this._page - 1) * this._itemsPerPage + (this._pageItems.length || 1)
+    return (this._page - 1) * this._itemsPerPage + this._pageItems.length
   }
 
   reload() {
