@@ -6,7 +6,7 @@
   "SESSION_COOKIE_NAME": "idm_session",
 
   "MAIL": {
-    "display_name": "IdM@UNSWKG",
+    "display_name": "UNSWKG Identity",
     "from": "example@unsw.edu.au",
     "mock_folder": "mailbox"
   },
