@@ -1,0 +1,28 @@
+<mjml>
+  <mj-head>
+    <mj-include path="./include/head.mjml"/>
+  </mj-head>
+  
+  <mj-body>
+    <mj-include path="./include/header.mjml" />
+    
+    <mj-section background-color='#fff' padding='20px'>
+      <mj-column>
+        <mj-text>
+          <h2>Welcome aboard, {{user.name}}!</h2>
+        </mj-text>
+        <mj-text padding-bottom="6px">
+          We have created an account for you in our internal identity system. This system is separated from the ones managed by the schools or the university. So, your zID and zPass will not work here. You need to confirm your E-mail adress and set a password for your new account. It will authorize you to access our internal web-based systems.
+        </mj-text>
+        <mj-text>Please click the following button to confirm your email.</mj-text>
+        <mj-button href='{{site[root_url]}}{{site[base_url]}}account/confirm-email?uid={{user.id}}&token={{user.email_confirm_token}}'>Confirm E-mail</mj-button>
+        <mj-divider/>
+        <mj-text>
+          If you find any problem, please contact the system administrators immediately.
+        </mj-text>
+      </mj-column>
+    </mj-section>
+    
+    <mj-include path="./include/footer.mjml" />
+  </mj-body>
+</mjml>
