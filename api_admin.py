@@ -62,7 +62,7 @@ def admin_user_by_id(uid):
         return jsonify(msg=e.msg, detail=e.detail), 400
 
 
-@admin.route('/users/<string:name>', methods=['GET', 'DELETE', 'PUT'])
+@admin.route('/user-by-name/<string:name>', methods=['GET', 'DELETE', 'PUT'])
 @requires_admin
 def admin_user_by_name(name):
     try:
@@ -239,7 +239,7 @@ def admin_group_user_by_id(gid, uid):
         return jsonify(msg=e.msg, detail=e.detail), 400
 
 
-@admin.route('/groups/<int:gid>/users/<string:user_name>', methods=['PUT', 'DELETE'])
+@admin.route('/groups/<int:gid>/user-by-name/<string:user_name>', methods=['PUT', 'DELETE'])
 @requires_admin
 def admin_group_user_by_name(gid, user_name):
     try:

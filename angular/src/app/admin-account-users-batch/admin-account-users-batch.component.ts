@@ -202,7 +202,7 @@ export class AdminAccountUsersBatchComponent implements OnInit {
     this.processUsers(
       () => this.findingUsers = true,
       () => this.findingUsers = false,
-      (item) => this.adminService.get_user(item.form.name),
+      (item) => this.adminService.get_user_by_name(item.form.name),
       (item, user) => {
         item.user = user;
         item.success = 'Found'
@@ -229,7 +229,7 @@ export class AdminAccountUsersBatchComponent implements OnInit {
     this.processUsers(
       () => this.deletingUsers = true,
       () => this.deletingUsers = false,
-      (item) => this.adminService.delete_user(item.form.name),
+      (item) => this.adminService.delete_user_by_name(item.form.name),
       (item) => {
         item.user = null;
         item.success = 'Deleted';
@@ -246,7 +246,7 @@ export class AdminAccountUsersBatchComponent implements OnInit {
     this.processUsers(
       () => this.addingUsersToGroup = true,
       () => this.addingUsersToGroup = false,
-      (item) => this.adminService.group_add_user(this.selectedGroup.id, item.form.name),
+      (item) => this.adminService.group_add_user_by_name(this.selectedGroup.id, item.form.name),
       (item) => item.success = `Added to group "${this.selectedGroup.name}"`
     )
   }
@@ -260,7 +260,7 @@ export class AdminAccountUsersBatchComponent implements OnInit {
     this.processUsers(
       () => this.removingUsersFromGroup = true,
       () => this.removingUsersFromGroup = false,
-      (item) => this.adminService.group_remove_user(this.selectedGroup.id, item.form.name),
+      (item) => this.adminService.group_remove_user_by_name(this.selectedGroup.id, item.form.name),
       (item) => item.success = `Removed from group "${this.selectedGroup.name}"`
     )
   }
