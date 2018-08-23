@@ -252,18 +252,22 @@
 
     <div class="ui large centered active inline text loader" *ngIf="loading_authorizations">Loading authorizations...</div>
 
-    <div *ngIf="!loading_authorizations && authorizations">
-      <div class="ui top attached segment">
-        <div class="ui header">
+    <div *ngIf="!loading_authorizations && authorizationPages">
+      <div class="ui top attached segment clearing">
+        <div class="ui small buttons right floated">
+          <a class="ui button icon" (click)="authorizationPages.previousPage()"><i class="icon left angle"></i></a>
+          <a class="ui button icon" (click)="authorizationPages.nextPage()"><i class="icon right angle"></i></a>
+        </div>
+        <div class="ui header left floated">
           <i class="handshake outline icon"></i>
           Authorizations
         </div>
       </div>
-      <table class="ui table celled very compact unstackable bottom attached">
+      <table class="ui table celled very compact unstackable attached">
         <thead><tr><th>#</th><th>User ID</th><th>User Name</th><th>Created At</th><th>Updated At</th></tr></thead>
         <tbody>
-        <tr *ngFor="let record of authorizations; index as i">
-          <td>{{i+1}}</td>
+        <tr *ngFor="let record of authorizationPages.pageItems; index as i">
+          <td>{{i+authorizationPages.startRow}}</td>
           <td>{{record.user_id}}</td>
           <td><a routerLink="../../../../account/users/u/{{record.user_id}}">{{record.user.name}}</a></td>
           <td>{{record.created_at | date:'short'}}</td>
@@ -271,6 +275,23 @@
         </tr>
         </tbody>
       </table>
+      <div class="ui segment bottom attached clearing">
+        <div class="ui secondary fitted menu right floated">
+          <div class="item">
+            Showing {{authorizationPages.startRow}}-{{authorizationPages.endRow}} Rows, Total: {{authorizationPages.items.length}}
+          </div>
+          <div class="item">
+            <form class="ui form">
+              <div class="inline field">
+                <label>Rows Per Page</label>
+                <select name="itemsPerPage" [(ngModel)]="authorizationPages.itemsPerPage">
+                  <option [value]="num" *ngFor="let num of authorizationPages.itemsPerPageOptions">{{num}}</option>
+                </select>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </div>

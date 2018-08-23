@@ -5,7 +5,8 @@ import {ActivatedRoute, Router} from "@angular/router";
 import {NgForm} from "@angular/forms";
 import {UploadFilters, UploadValidator} from "../upload-util";
 import {debounceTime, distinctUntilChanged, finalize, switchMap} from "rxjs/operators";
-import {of, Subject} from "rxjs/index";
+import {of, Subject} from "rxjs";
+import {Pagination} from "../table-util";
 
 class ProfileForm {
   redirect_url: string;
@@ -43,7 +44,7 @@ export class AdminOauthClientEditComponent implements OnInit {
   private group_search_names = new Subject<string>();
 
   loading_authorizations: boolean;
-  authorizations: OAuthAuthorization[];
+  authorizationPages: Pagination<OAuthAuthorization>;
 
   regenerating_secret: boolean;
   setting_public: boolean;
@@ -87,7 +88,7 @@ export class AdminOauthClientEditComponent implements OnInit {
     this.adminService.client_get_authorizations(this.cid).pipe(
       finalize(() => this.loading_authorizations = false)
     ).subscribe(
-      (records) => this.authorizations = records,
+      (records) => this.authorizationPages = new Pagination(records),
       (error) => this.error = error.error
     )
   }
