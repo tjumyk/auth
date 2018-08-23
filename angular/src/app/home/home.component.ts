@@ -11,6 +11,7 @@ import {finalize} from "rxjs/operators";
 export class HomeComponent implements OnInit {
   error: BasicError;
   user: User;
+  isAdmin: boolean;
   loadingClients: boolean;
   clients: OAuthClient[];
 
@@ -23,6 +24,14 @@ export class HomeComponent implements OnInit {
     this.accountService.get_current_user().subscribe(
       user=>{
         this.user = user;
+
+        this.isAdmin=false;
+        for(let group of user.groups){
+          if(group.name == 'admin'){
+            this.isAdmin = true;
+            break;
+          }
+        }
 
         this.loadingClients = true;
         this.accountService.get_my_clients().pipe(
