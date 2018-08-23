@@ -43,15 +43,15 @@
         <div class="ui divider"></div>
         <div class="ui grid center aligned">
           <div class="column">
+            <p *ngIf="isAdmin">
+              <a class="ui button basic violet" routerLink="/admin"><i class="icon cogs"></i> Management</a>
+            </p>
             <p>
               <a class="ui button basic" routerLink="/settings">
                 <img [src]="user.avatar" class="ui image avatar" *ngIf="user.avatar; else noAvatar">
                 <ng-template #noAvatar><i class="icon user circle"></i></ng-template>
                 {{user.nickname || user.name}}
               </a>
-            </p>
-            <p *ngIf="isAdmin">
-              <a class="ui button basic violet" routerLink="/admin"><i class="icon cogs"></i> Management</a>
             </p>
           </div>
         </div>
