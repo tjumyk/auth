@@ -1,8 +1,9 @@
 import {Component, OnInit} from '@angular/core';
 import {AdminService} from "../admin.service";
 import {BasicError, UserAdvanced} from "../models";
-import {finalize} from "rxjs/operators";
+import {debounceTime, finalize} from "rxjs/operators";
 import {Pagination} from "../table-util";
+import {Subject} from "rxjs";
 
 @Component({
   selector: 'app-admin-account-users',
@@ -13,7 +14,9 @@ export class AdminAccountUsersComponent implements OnInit {
 
   error: BasicError;
   loading_user_list: boolean;
-  userPages = new Pagination<UserAdvanced>();
+  userPages: Pagination<UserAdvanced>;
+
+  searchKey = new Subject<string>();
 
   constructor(
     private adminService: AdminService
@@ -21,11 +24,20 @@ export class AdminAccountUsersComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.searchKey.pipe(
+      debounceTime(300)
+    ).subscribe(
+      key => {
+        this.userPages.search('name', key)
+      },
+      error => this.error = error.error
+    );
+
     this.loading_user_list = true;
     this.adminService.get_user_list().pipe(
       finalize(() => this.loading_user_list = false)
     ).subscribe(
-      (user_list) => this.userPages.sourceItems = user_list,
+      (user_list) => this.userPages = new Pagination<UserAdvanced>(user_list),
       (error) => this.error = error.error
     );
   }
@@ -40,8 +52,8 @@ export class AdminAccountUsersComponent implements OnInit {
     ).subscribe(
       () => {
         let index = 0;
-        for(let _user of this.userPages.sourceItems){
-          if(_user.id == user.id){
+        for (let _user of this.userPages.sourceItems) {
+          if (_user.id == user.id) {
             this.userPages.sourceItems.splice(index, 1);
             this.userPages.reload();
             break;

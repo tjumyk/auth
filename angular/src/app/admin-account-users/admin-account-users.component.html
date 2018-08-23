@@ -6,7 +6,7 @@
 
 <div class="ui centered active large inline text loader" *ngIf="loading_user_list">Loading user list...</div>
 
-<div *ngIf="!loading_user_list">
+<div *ngIf="userPages">
   <div class="ui secondary menu fitted">
     <div class="item">
       <a class="ui small button primary" routerLink="invite"><i class="icon user add"></i> Invite</a>
@@ -15,6 +15,13 @@
       <a class="ui small button" routerLink="batch"><i class="icon clone outline"></i> Batch Operations</a>
     </div>
     <div class="menu right">
+      <div class="item">
+        <div class="ui input icon">
+          <input type="text" name="searchKey" (keyup)="searchKey.next(inputSearchKey.value)" #inputSearchKey
+                 placeholder="Search by name...">
+          <i class="icon search"></i>
+        </div>
+      </div>
       <div class="item">
         Showing {{userPages.startRow}}-{{userPages.endRow}} Rows, Total: {{userPages.items.length}}
       </div>
