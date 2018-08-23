@@ -30,7 +30,7 @@ export class AdminAccountUsersComponent implements OnInit {
     );
   }
 
-  deleteUser(user: UserAdvanced, index: number, btn: HTMLElement) {
+  deleteUser(user: UserAdvanced, btn: HTMLElement) {
     if (!confirm(`Really want to delete user ${user.name}?`))
       return;
 
@@ -39,8 +39,15 @@ export class AdminAccountUsersComponent implements OnInit {
       finalize(() => btn.classList.remove('loading', 'disabled'))
     ).subscribe(
       () => {
-        this.userPages.sourceItems.splice(index, 1);
-        this.userPages.reload();
+        let index = 0;
+        for(let _user of this.userPages.sourceItems){
+          if(_user.id == user.id){
+            this.userPages.sourceItems.splice(index, 1);
+            this.userPages.reload();
+            break;
+          }
+          ++index;
+        }
       },
       (error) => this.error = error.error
     )
