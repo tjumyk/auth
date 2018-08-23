@@ -17,10 +17,10 @@ export class Pagination<T> {
   private _fieldComparators: { [key: string]: (a, b) => number } = {};
 
   private _sourceItems: T[] = [];
-  private _items: T[];
+  private _items: T[] = [];
   private _itemPages: T[][] = [[]];
-  private _pageItems: T[];
-  private _pageEntries: PageEntry[] = [];
+  private _pageItems: T[] = this._itemPages[0];
+  private _pageEntries: PageEntry[] = [{page: 1, is_current: true}];
 
   constructor() {
   }
