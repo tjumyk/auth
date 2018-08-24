@@ -55,7 +55,10 @@
     <tr *ngFor="let user of userPages.pageItems; index as i">
       <td>{{i+userPages.startRow}}</td>
       <td>{{user.id}}</td>
-      <td>{{user.name}}</td>
+      <td>
+        <img [src]="user.avatar" *ngIf="user.avatar" class="ui image avatar">
+        {{user.name}}
+      </td>
       <td>
         {{user.email}}
         <i class="icon green check circle" *ngIf="user.is_email_confirmed" title="Confirmed"></i>
