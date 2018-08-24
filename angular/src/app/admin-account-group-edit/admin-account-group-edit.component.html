@@ -154,7 +154,13 @@
         <tr *ngFor="let user of members; index as i">
           <td>{{i+1}}</td>
           <td>{{user.id}}</td>
-          <td>{{user.name}}</td>
+          <td>
+            {{user.name}}
+            <i class="icon green check circle" *ngIf="user.is_email_confirmed; else emailNotConfirmed" title="Email Confirmed"></i>
+            <ng-template #emailNotConfirmed>
+              <i class="icon yellow question circle" title="Email not yet confirmed"></i>
+            </ng-template>
+          </td>
           <td>{{user.nickname}}</td>
           <td class="collapsing">
             <div class="ui mini buttons">
