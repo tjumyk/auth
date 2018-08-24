@@ -28,7 +28,7 @@ export class AdminAccountUsersComponent implements OnInit {
       debounceTime(300)
     ).subscribe(
       key => {
-        this.userPages.search('name', key)
+        this.userPages.search(key)
       },
       error => this.error = error.error
     );
@@ -37,7 +37,21 @@ export class AdminAccountUsersComponent implements OnInit {
     this.adminService.get_user_list().pipe(
       finalize(() => this.loading_user_list = false)
     ).subscribe(
-      (user_list) => this.userPages = new Pagination<UserAdvanced>(user_list),
+      (user_list) => {
+        this.userPages = new Pagination<UserAdvanced>(user_list);
+        this.userPages.setSearchMatcher((user: UserAdvanced, key: string) => {
+          const keyLower = key.toLowerCase();
+          if (user.name.toLowerCase().indexOf(keyLower) >= 0)
+            return true;
+          if (user.id.toString().indexOf(keyLower) >= 0)
+            return true;
+          if (user.nickname && user.nickname.toLowerCase().indexOf(keyLower) >= 0)
+            return true;
+          if (user.email && user.email.toLowerCase().indexOf(keyLower) >= 0)
+            return true;
+          return false;
+        });
+      },
       (error) => this.error = error.error
     );
   }
