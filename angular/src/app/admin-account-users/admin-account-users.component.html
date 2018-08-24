@@ -48,13 +48,17 @@
       </td>
       <td>
         {{user.email}}
-        <i class="icon green check circle" *ngIf="user.is_email_confirmed" title="Confirmed"></i>
-        <i class="icon yellow question circle" *ngIf="!user.is_email_confirmed" title="Not yet confirmed"></i>
+        <i class="icon green check circle" *ngIf="user.is_email_confirmed; else emailNotConfirmed" title="Confirmed"></i>
+        <ng-template #emailNotConfirmed>
+          <i class="icon yellow question circle" title="Not yet confirmed"></i>
+        </ng-template>
       </td>
       <td>{{user.nickname}}</td>
       <td>
-        <span class="text success" *ngIf="user.is_active">Active</span>
-        <span class="text error" *ngIf="!user.is_active">Inactive</span>
+        <span class="text success" *ngIf="user.is_active; else userInactive">Active</span>
+        <ng-template #userInactive>
+          <span class="text error">Inactive</span>
+        </ng-template>
       </td>
       <td>
         <div class="ui small labels">
