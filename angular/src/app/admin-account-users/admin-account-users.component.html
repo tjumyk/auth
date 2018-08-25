@@ -76,7 +76,7 @@
   </table>
 
   <div class="pagination-bar">
-    <div class="ui pagination menu left floated">
+    <div class="ui pagination menu left floated small">
       <a class="item" *ngFor="let entry of userPages.pageEntries"
          [ngClass]="{'active': entry.is_current, 'disabled': entry.is_ellipse}"
          (click)="userPages.page=entry.page||userPages.page">
