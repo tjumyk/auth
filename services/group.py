@@ -1,6 +1,6 @@
 import re
 
-from sqlalchemy import or_
+from sqlalchemy import or_, func
 
 from error import BasicError
 from models import db, Group
@@ -60,7 +60,7 @@ class GroupService:
 
         if not GroupService.name_pattern.match(name):
             raise GroupServiceError('invalid name format')
-        if Group.query.filter_by(name=name).count():
+        if db.session.query(func.count()).filter(Group.name == name).scalar():
             raise GroupServiceError('duplicate name')
         group = Group(name=name, description=description)
         db.session.add(group)
