@@ -4,6 +4,7 @@ import {AdminService} from "../admin.service";
 import {ActivatedRoute, Router} from "@angular/router";
 import {NgForm} from "@angular/forms";
 import {finalize} from "rxjs/operators";
+import {TitleService} from "../title.service";
 
 class NewClientForm{
   name: string;
@@ -27,11 +28,13 @@ export class AdminOauthClientNewComponent implements OnInit {
   constructor(
     private adminService: AdminService,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private titleService: TitleService
   ) {
   }
 
   ngOnInit() {
+    this.titleService.setTitle('New OAuth Client',' Management')
   }
 
   newClient(f: NgForm) {

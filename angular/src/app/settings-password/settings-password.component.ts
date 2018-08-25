@@ -3,6 +3,7 @@ import {BasicError} from "../models";
 import {NgForm} from "@angular/forms";
 import {AccountService} from "../account.service";
 import {finalize} from "rxjs/operators";
+import {TitleService} from "../title.service";
 
 class UpdatePasswordForm {
   old_password: string;
@@ -27,11 +28,13 @@ export class SettingsPasswordComponent implements OnInit {
   };
 
   constructor(
-    private accountService: AccountService
+    private accountService: AccountService,
+    private titleService: TitleService
   ) {
   }
 
   ngOnInit() {
+    this.titleService.setTitle('Password', 'Settings')
   }
 
   updatePassword(f: NgForm) {

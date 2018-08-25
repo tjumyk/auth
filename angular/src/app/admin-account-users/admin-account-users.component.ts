@@ -4,6 +4,7 @@ import {BasicError, UserAdvanced} from "../models";
 import {debounceTime, finalize} from "rxjs/operators";
 import {Pagination} from "../table-util";
 import {Subject} from "rxjs";
+import {TitleService} from "../title.service";
 
 @Component({
   selector: 'app-admin-account-users',
@@ -19,11 +20,14 @@ export class AdminAccountUsersComponent implements OnInit {
   searchKey = new Subject<string>();
 
   constructor(
-    private adminService: AdminService
+    private adminService: AdminService,
+    private titleService: TitleService
   ) {
   }
 
   ngOnInit() {
+    this.titleService.setTitle('Users', 'Management');
+
     this.searchKey.pipe(
       debounceTime(300)
     ).subscribe(

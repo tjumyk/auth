@@ -4,6 +4,7 @@ import {AccountService} from "../account.service";
 import {finalize} from "rxjs/operators";
 import {NgForm} from "@angular/forms";
 import {UploadFilters, UploadValidator} from "../upload-util";
+import {TitleService} from "../title.service";
 
 class ProfileForm {
   nickname: string;
@@ -32,11 +33,14 @@ export class SettingsProfileComponent implements OnInit {
 
   constructor(
     private accountService: AccountService,
+    private titleService: TitleService
   ) {
     this.avatar_validator = new UploadValidator(UploadFilters.avatar)
   }
 
   ngOnInit() {
+    this.titleService.setTitle('Profile', 'Settings');
+
     this.loading_user = true;
     this.accountService.get_me().pipe(
       finalize(() => this.loading_user = false)

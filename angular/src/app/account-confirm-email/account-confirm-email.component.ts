@@ -4,6 +4,7 @@ import {ActivatedRoute, Router} from "@angular/router";
 import {AccountService} from "../account.service";
 import {NgForm} from "@angular/forms";
 import {finalize} from "rxjs/operators";
+import {TitleService} from "../title.service";
 
 class SetPasswordForm {
   new_password: string;
@@ -28,10 +29,13 @@ export class AccountConfirmEmailComponent implements OnInit {
   constructor(
     private accountService:AccountService,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private titleService: TitleService
   ) { }
 
   ngOnInit() {
+    this.titleService.setTitle('Confirm Email');
+
     let params = this.route.snapshot.queryParams;
     this.uid = parseInt(params.uid);
     this.token = params.token;

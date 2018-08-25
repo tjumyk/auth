@@ -3,6 +3,7 @@ import {BasicError} from "../models";
 import {AccountService} from "../account.service";
 import {NgForm} from "@angular/forms";
 import {finalize} from "rxjs/operators";
+import {TitleService} from "../title.service";
 
 @Component({
   selector: 'app-account-req-reconfirm-email',
@@ -17,11 +18,13 @@ export class AccountReqReconfirmEmailComponent implements OnInit {
   name_or_email: string;
 
   constructor(
-    private accountService: AccountService
+    private accountService: AccountService,
+    private titleService: TitleService
   ) {
   }
 
   ngOnInit() {
+    this.titleService.setTitle('Request Email Re-confirmation');
   }
 
   start_request(f: NgForm) {

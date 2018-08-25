@@ -4,6 +4,7 @@ import {NgForm} from "@angular/forms";
 import {AdminService} from "../admin.service";
 import {finalize} from "rxjs/operators";
 import {ActivatedRoute, Router} from "@angular/router";
+import {TitleService} from "../title.service";
 
 class NewGroupForm {
   name: string;
@@ -24,11 +25,13 @@ export class AdminAccountGroupNewComponent implements OnInit {
   constructor(
     private adminService: AdminService,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private titleService: TitleService
   ) {
   }
 
   ngOnInit() {
+    this.titleService.setTitle('New Group', 'Management')
   }
 
   newGroup(f: NgForm) {

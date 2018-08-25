@@ -5,6 +5,7 @@ import {ActivatedRoute, Router} from "@angular/router";
 import {debounceTime, distinctUntilChanged, finalize, switchMap} from "rxjs/operators";
 import {NgForm} from "@angular/forms";
 import {of, Subject} from "rxjs";
+import {TitleService} from "../title.service";
 
 class ProfileForm {
   description: string;
@@ -44,7 +45,8 @@ export class AdminAccountGroupEditComponent implements OnInit {
   constructor(
     private adminService: AdminService,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private titleService: TitleService
   ) {
   }
 
@@ -96,6 +98,7 @@ export class AdminAccountGroupEditComponent implements OnInit {
   }
 
   private setGroup(group: GroupAdvanced) {
+    this.titleService.setTitle(group.name, 'Groups', 'Management');
     this.group = group;
     this.form.description = this.group.description;
   }

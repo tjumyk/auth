@@ -7,6 +7,7 @@ import {UploadFilters, UploadValidator} from "../upload-util";
 import {debounceTime, distinctUntilChanged, finalize, switchMap} from "rxjs/operators";
 import {of, Subject} from "rxjs";
 import {Pagination} from "../table-util";
+import {TitleService} from "../title.service";
 
 class ProfileForm {
   redirect_url: string;
@@ -59,7 +60,8 @@ export class AdminOauthClientEditComponent implements OnInit {
   constructor(
     private adminService: AdminService,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private titleService: TitleService
   ) {
     this.icon_validator = new UploadValidator(UploadFilters.icon)
   }
@@ -94,6 +96,8 @@ export class AdminOauthClientEditComponent implements OnInit {
   }
 
   private setClient(client: OAuthClientAdvanced) {
+    this.titleService.setTitle(client.name, 'OAuth Clients', 'Management');
+
     this.client = client;
 
     this.form.redirect_url = client.redirect_url;

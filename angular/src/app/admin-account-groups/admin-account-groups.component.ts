@@ -2,6 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {BasicError, GroupAdvanced} from "../models";
 import {AdminService} from "../admin.service";
 import {finalize} from "rxjs/operators";
+import {TitleService} from "../title.service";
 
 @Component({
   selector: 'app-admin-account-groups',
@@ -16,11 +17,14 @@ export class AdminAccountGroupsComponent implements OnInit {
   group_list: GroupAdvanced[] = [];
 
   constructor(
-    private adminService: AdminService
+    private adminService: AdminService,
+    private titleService: TitleService
   ) {
   }
 
   ngOnInit() {
+    this.titleService.setTitle('Groups', 'Management');
+
     this.loading_group_list = true;
     this.adminService.get_group_list().pipe(
       finalize(() => this.loading_group_list = false)

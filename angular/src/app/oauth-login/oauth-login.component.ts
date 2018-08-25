@@ -5,6 +5,7 @@ import {NgForm} from "@angular/forms";
 import {BasicError, OAuthClient, User} from "../models";
 import {finalize} from "rxjs/operators";
 import {OauthService} from "../oauth.service";
+import {TitleService} from "../title.service";
 
 class LoginForm {
   name_or_email: string;
@@ -43,11 +44,14 @@ export class OauthLoginComponent implements OnInit {
     private accountService: AccountService,
     private oauthService: OauthService,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private titleService: TitleService
   ) {
   }
 
   ngOnInit() {
+    this.titleService.setTitle('OAuth Sign In');
+
     let params = this.route.snapshot.queryParamMap;
     this.client_id = parseInt(params.get('client_id'));
     this.redirect_url = params.get('redirect_url');
@@ -85,7 +89,10 @@ export class OauthLoginComponent implements OnInit {
     this.oauthService.get_client(this.client_id).pipe(
       finalize(() => this.loading_client = false)
     ).subscribe(
-      client => this.client = client,
+      client => {
+        this.client = client;
+        this.titleService.setTitle(client.name, 'OAuth Sign In');
+      },
       error => this.error = error.error
     )
   }

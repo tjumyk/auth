@@ -5,6 +5,7 @@ import {UploadFilters, UploadValidator} from "../upload-util";
 import {finalize} from "rxjs/operators";
 import {ActivatedRoute, Router} from "@angular/router";
 import {AdminService} from "../admin.service";
+import {TitleService} from "../title.service";
 
 
 class StatusForm {
@@ -54,7 +55,8 @@ export class AdminAccountUserEditComponent implements OnInit {
   constructor(
     private adminService: AdminService,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private titleService: TitleService
   ) {
     this.avatar_validator = new UploadValidator(UploadFilters.avatar)
   }
@@ -88,6 +90,8 @@ export class AdminAccountUserEditComponent implements OnInit {
   }
 
   private setUser(user: UserAdvanced) {
+    this.titleService.setTitle(user.name, 'Users', 'Management');
+
     this.user = user;
     this.form.nickname = this.user.nickname;
     this.status_form.is_active = this.user.is_active

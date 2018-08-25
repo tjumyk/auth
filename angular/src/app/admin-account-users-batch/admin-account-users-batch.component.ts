@@ -3,6 +3,7 @@ import {BasicError, GroupAdvanced, UserAdvanced} from "../models";
 import {AdminService} from "../admin.service";
 import {debounceTime, delay, distinctUntilChanged, finalize, switchMap} from "rxjs/operators";
 import {Observable, of, Subject} from "rxjs";
+import {TitleService} from "../title.service";
 
 export class InviteUserForm {
   name: string;
@@ -72,12 +73,15 @@ export class AdminAccountUsersBatchComponent implements OnInit {
   processDelay: number = 300;
 
   constructor(
-    private adminService: AdminService
+    private adminService: AdminService,
+    private titleService: TitleService
   ) {
     this.format = 'csv'; // default format
   }
 
   ngOnInit() {
+    this.titleService.setTitle('User Batch Operations', 'Management');
+
     // directly load all the groups for quicker development
     this.loadingGroups = true;
     this.adminService.get_group_list().pipe(

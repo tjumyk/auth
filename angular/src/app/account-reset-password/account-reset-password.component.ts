@@ -4,6 +4,7 @@ import {AccountService} from "../account.service";
 import {ActivatedRoute} from "@angular/router";
 import {finalize} from "rxjs/operators";
 import {NgForm} from "@angular/forms";
+import {TitleService} from "../title.service";
 
 class ResetPasswordForm {
   new_password: string;
@@ -28,10 +29,13 @@ export class AccountResetPasswordComponent implements OnInit {
 
   constructor(
     private accountService:AccountService,
+    private titleService: TitleService,
     private route: ActivatedRoute
   ) { }
 
   ngOnInit() {
+    this.titleService.setTitle('Reset Password');
+
     let params = this.route.snapshot.queryParams;
     this.uid = parseInt(params.uid);
     this.token = params.token;

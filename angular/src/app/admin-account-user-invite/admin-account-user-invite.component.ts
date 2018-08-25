@@ -3,6 +3,7 @@ import {BasicError, UserAdvanced} from "../models";
 import {AdminService} from "../admin.service";
 import {finalize} from "rxjs/operators";
 import {NgForm} from "@angular/forms";
+import {TitleService} from "../title.service";
 
 class InviteForm {
   name: string;
@@ -24,10 +25,12 @@ export class AdminAccountUserInviteComponent implements OnInit {
 
   constructor(
     private adminService: AdminService,
+    private titleService: TitleService
   ) {
   }
 
   ngOnInit() {
+    this.titleService.setTitle('Invite User', 'Management')
   }
 
   invite(f: NgForm) {

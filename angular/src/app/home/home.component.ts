@@ -2,6 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {BasicError, OAuthClient, User} from "../models";
 import {AccountService} from "../account.service";
 import {finalize} from "rxjs/operators";
+import {TitleService} from "../title.service";
 
 @Component({
   selector: 'app-home',
@@ -16,11 +17,14 @@ export class HomeComponent implements OnInit {
   clients: OAuthClient[];
 
   constructor(
-    private accountService: AccountService
+    private accountService: AccountService,
+    private titleService: TitleService
   ) {
   }
 
   ngOnInit() {
+    this.titleService.setTitle();
+
     this.accountService.get_current_user().subscribe(
       user=>{
         this.user = user;

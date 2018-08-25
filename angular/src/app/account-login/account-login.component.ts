@@ -4,6 +4,7 @@ import {BasicError, User} from "../models";
 import {ActivatedRoute, Router} from "@angular/router";
 import {finalize} from "rxjs/operators";
 import {NgForm} from "@angular/forms";
+import {TitleService} from "../title.service";
 
 class LoginForm {
   name_or_email: string;
@@ -30,11 +31,14 @@ export class AccountLoginComponent implements OnInit {
   constructor(
     private accountService: AccountService,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private titleService: TitleService
   ) {
   }
 
   ngOnInit() {
+    this.titleService.setTitle('Sign In');
+
     this.error = undefined;
     this.verifying_logged_in = true;
     this.accountService.get_current_user().pipe(

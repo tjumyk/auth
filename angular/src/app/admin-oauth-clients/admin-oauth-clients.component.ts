@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import {BasicError, OAuthClientAdvanced, UserAdvanced} from "../models";
 import {AdminService} from "../admin.service";
 import {finalize} from "rxjs/operators";
+import {TitleService} from "../title.service";
 
 @Component({
   selector: 'app-admin-oauth-clients',
@@ -16,11 +17,14 @@ export class AdminOauthClientsComponent implements OnInit {
   client_list: OAuthClientAdvanced[] = [];
 
   constructor(
-    private adminService: AdminService
+    private adminService: AdminService,
+    private titleService: TitleService
   ) {
   }
 
   ngOnInit() {
+    this.titleService.setTitle('OAuth Clients', 'Management');
+
     this.loading_client_list = true;
     this.adminService.get_oauth_clients().pipe(
       finalize(() => this.loading_client_list = false)
