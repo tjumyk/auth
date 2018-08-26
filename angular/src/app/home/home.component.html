@@ -48,7 +48,7 @@
             </p>
             <p>
               <a class="ui button basic" routerLink="/settings">
-                <img [src]="user.avatar" class="ui image avatar" *ngIf="user.avatar; else noAvatar">
+                <img src="{{user.avatar}}?size=64" class="ui image avatar" *ngIf="user.avatar; else noAvatar">
                 <ng-template #noAvatar><i class="icon user circle"></i></ng-template>
                 {{user.nickname || user.name}}
               </a>

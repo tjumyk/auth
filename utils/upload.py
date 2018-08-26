@@ -1,8 +1,9 @@
 import os
+import tempfile
 from uuid import uuid4
 
 from PIL import Image
-from flask import current_app as app, send_from_directory
+from flask import current_app as app, send_from_directory, request, jsonify
 
 from error import BasicError
 
@@ -12,7 +13,29 @@ class UploadError(BasicError):
 
 
 def get_upload(path):
-    return send_from_directory(app.config['UPLOAD']['root_folder'], path)
+    source_root = app.config['UPLOAD']['root_folder']
+    size_param = request.args.get('size')
+    if size_param:
+        try:
+            size = int(size_param)
+            prefix, ext = os.path.splitext(path)
+            thumbnail_root = os.path.join(tempfile.gettempdir(), 'idm_thumbnails')
+            thumbnail_path = '%s_s%d%s' % (prefix, size, ext)
+            thumbnail_path_full = os.path.join(thumbnail_root, thumbnail_path)
+            if not os.path.exists(thumbnail_path_full):
+                source_path_full = os.path.join(source_root, path)
+                im = Image.open(source_path_full)
+                im.thumbnail((size, size))
+                thumbnail_folder_full = os.path.dirname(thumbnail_path_full)
+                if not os.path.exists(thumbnail_folder_full):
+                    os.makedirs(thumbnail_folder_full)
+                im.save(thumbnail_path_full)
+            return send_from_directory(thumbnail_root, thumbnail_path)
+        except ValueError:
+            return jsonify(msg='invalid thumbnail parameter'), 400
+        except IOError as e:
+            return jsonify(msg='failed to create thumbnail', detail=str(e)), 500
+    return send_from_directory(source_root, path)
 
 
 def init_app(app):

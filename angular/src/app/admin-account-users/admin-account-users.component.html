@@ -43,7 +43,7 @@
       <td>{{i+userPages.startRow}}</td>
       <td>{{user.id}}</td>
       <td>
-        <img [src]="user.avatar" *ngIf="user.avatar" class="ui image avatar">
+        <img src="{{user.avatar}}?size=64" *ngIf="user.avatar" class="ui image avatar">
         {{user.name}}
       </td>
       <td>
