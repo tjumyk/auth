@@ -3,7 +3,7 @@ from datetime import timedelta, datetime
 from secrets import token_urlsafe
 
 from passlib.hash import pbkdf2_sha256
-from sqlalchemy import or_
+from sqlalchemy import or_, func
 
 from error import BasicError
 from models import db, User
@@ -131,9 +131,9 @@ class UserService:
             raise UserServiceError('invalid email format')
         if len(email) > UserService.email_max_length:
             raise UserServiceError('email too long')
-        if User.query.filter_by(name=name).count():
+        if db.session.query(func.count()).filter(User.name == name).scalar():
             raise UserServiceError('duplicate name')
-        if User.query.filter_by(email=email).count():
+        if db.session.query(func.count()).filter(User.email == email).scalar():
             raise UserServiceError('duplicate email')
 
         password = pbkdf2_sha256.hash(token_urlsafe(12))
@@ -160,9 +160,9 @@ class UserService:
             raise UserServiceError('email too long')
         if not UserService.password_pattern.match(password):
             raise UserServiceError('invalid password format')
-        if User.query.filter_by(name=name).count():
+        if db.session.query(func.count()).filter(User.name == name).scalar():
             raise UserServiceError('duplicate name')
-        if User.query.filter_by(email=email).count():
+        if db.session.query(func.count()).filter(User.email == email).scalar():
             raise UserServiceError('duplicate email')
 
         password_hash = pbkdf2_sha256.hash(password)
@@ -255,7 +255,8 @@ class UserService:
                 if value is not None:
                     if not UserService.nickname_pattern.match(value):
                         raise UserServiceError('invalid nickname format')
-                    if value != user.nickname and User.query.filter_by(nickname=value).count():
+                    if value != user.nickname and db.session.query(func.count()). \
+                            filter(User.nickname == value).scalar():
                         raise UserServiceError('duplicate nickname')
             setattr(user, key, value)
         return old_values

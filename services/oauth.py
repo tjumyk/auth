@@ -2,6 +2,7 @@ import re
 from datetime import datetime, timedelta
 from secrets import token_urlsafe
 
+from sqlalchemy import func
 from sqlalchemy.orm import joinedload
 
 from error import BasicError
@@ -136,7 +137,7 @@ class OAuthService:
         authorize_token = None
         for _ in range(OAuthService.token_generation_retry):  # repeat in case token collision
             token = token_urlsafe()
-            if OAuthAuthorization.query.filter_by(authorize_token=token).count() == 0:
+            if db.session.query(func.count()).filter(OAuthAuthorization.authorize_token == token).scalar() == 0:
                 authorize_token = token
                 break
         if authorize_token is None:
@@ -181,7 +182,7 @@ class OAuthService:
         access_token = None
         for _ in range(OAuthService.token_generation_retry):  # repeat in case token collision
             token = token_urlsafe()
-            if OAuthAuthorization.query.filter_by(access_token=token).count() == 0:
+            if db.session.query(func.count()).filter(OAuthAuthorization.access_token == token).scalar() == 0:
                 access_token = token
                 break
         if access_token is None:
