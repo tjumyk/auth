@@ -83,7 +83,7 @@ def _admin_user(user):
         return "", 204
     else:  # PUT
         files = request.files
-        params = request.form or request.json or {}
+        params = request.form.to_dict() or request.json or {}
 
         # handle upload
         avatar_file = files.get('avatar')
@@ -306,7 +306,7 @@ def oauth_client(cid):
             return "", 204
         else:  # PUT
             files = request.files
-            params = request.form or request.json or {}
+            params = request.form.to_dict() or request.json or {}
 
             # handle upload
             icon_file = files.get('icon')

@@ -164,7 +164,7 @@ def account_me():
             return jsonify(user.to_dict())
         else:
             files = request.files
-            params = request.form or request.json or {}
+            params = request.form.to_dict() or request.json or {}
 
             # handle upload
             avatar_file = files.get('avatar')
