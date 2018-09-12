@@ -53,6 +53,7 @@ class OAuthService:
         all_client_ids = group_allowed_clients.union(public_clients).subquery()
         return db.session.query(OAuthClient) \
             .filter(OAuthClient.id == all_client_ids.c.client_id) \
+            .order_by(OAuthClient.id) \
             .all()
 
     @staticmethod
