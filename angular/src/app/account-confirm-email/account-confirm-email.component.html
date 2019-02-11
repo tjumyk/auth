@@ -13,11 +13,11 @@
     <div class="ui raised segment">
       <div class="field">
         <label>Username</label>
-        {{user.name}}
+        <input type="text" name="name" [(ngModel)]="user.name" readonly="">
       </div>
       <div class="field">
         <label>E-mail</label>
-        {{user.email}}
+        <input type="text" name="email" [(ngModel)]="user.email" readonly="">
       </div>
       <div class="field" [ngClass]="{'error': (f.submitted || new_pass_model.touched || new_pass_model.dirty) && new_pass_model.invalid}">
         <label>New password</label>
