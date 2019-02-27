@@ -17,6 +17,7 @@ export class BatchedUserItem {
   success?: string;
   user?: UserAdvanced;
   processing?: boolean;
+  waiting?: boolean;
 }
 
 @Component({
@@ -297,12 +298,16 @@ export class AdminAccountUsersBatchComponent implements OnInit, OnDestroy {
       }
 
       const item = this.userItems[this.processed];
-      item.processing = true;
+      item.processing = false;
+      item.waiting = true;
       item.serverError = null;
       item.success = null;
       // item.user is cached
 
       setTimeout(() => {
+        item.processing = true;
+        item.waiting = false;
+
         onItem(item).pipe(
           finalize(() => {
             item.processing = false;
