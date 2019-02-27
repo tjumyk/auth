@@ -25,6 +25,14 @@
 
         <div class="ui divider horizontal">My Apps</div>
         <div class="ui text loader inline active centered" *ngIf="loadingClients">Loading app list...</div>
+        <div *ngIf="clients && clients.length==0" class="no-clients">
+          <div class="ui center aligned icon disabled header">
+            <i class="times circle outline icon"></i>
+            <div class="content">
+              You have no access to any apps right now
+            </div>
+          </div>
+        </div>
         <div *ngIf="clients">
           <div class="ui grid four column doubling centered">
             <div class="column" *ngFor="let client of clients">
