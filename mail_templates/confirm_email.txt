@@ -1,7 +1,9 @@
 Email Confirmation
 Welcome aboard, {user.name}!
 
-We have created an account for you in our internal identity system. This system is separated from the ones managed by the schools or the university. So, your zID and zPass will not work here. You need to confirm your E-mail adress and set a password for your new account. It will authorize you to access our internal web-based systems.
+You are receiving this E-mail because you are either a new coursework student in COMP9318/COMP6714, a new group member, or any other people relevant to our group.
+
+We have created an account for you in our system to give you access to some of our internal web apps. Because this system is separated from the ones managed by the schools or the university, your zID and zPass will not work here. You need to confirm your E-mail address and set a password for your new account.
 
 Please use the following link to confirm your email.
 
