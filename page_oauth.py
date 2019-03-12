@@ -23,7 +23,7 @@ def oauth_connect():
     # parse request
     args = request.args
     client_id = args.get('client_id')
-    redirect_url = args.get('redirect_url')
+    redirect_url = args.get('redirect_url') or args.get('redirect_uri')  # make it compatible
     original_path = args.get('original_path')
     state = args.get('state')
     # Currently, we assume scope '*' everywhere
@@ -73,7 +73,7 @@ def oauth_connect():
         authorize_token = OAuthService.start_authorization(client, user, redirect_url)
         db.session.commit()
 
-        params = {'token': authorize_token}
+        params = {'token': authorize_token, 'code': authorize_token}  # make it compatible
         if original_path:
             params['original_path'] = original_path
         if state:

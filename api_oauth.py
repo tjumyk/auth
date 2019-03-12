@@ -29,7 +29,7 @@ def connect():
     # parse request
     args = request.args
     client_id = args.get('client_id')
-    redirect_url = args.get('redirect_url')
+    redirect_url = args.get('redirect_url') or args.get('redirect_uri')  # make it compatible
     original_path = args.get('original_path')
     state = args.get('state')
     # Currently, we assume scope '*' everywhere
@@ -75,7 +75,7 @@ def connect():
         authorize_token = OAuthService.start_authorization(client, user, redirect_url)
         db.session.commit()
 
-        params = {'token': authorize_token}
+        params = {'token': authorize_token, 'code': authorize_token}  # make it compatible
         if original_path:
             params['original_path'] = original_path
         if state:
@@ -100,8 +100,8 @@ def oauth_get_access_token():
         form = request.form
         client_id = form.get('client_id')
         client_secret = form.get('client_secret')
-        redirect_url = form.get('redirect_url')
-        authorize_token = form.get('token')
+        redirect_url = form.get('redirect_url') or form.get('redirect_uri')  # make it compatible
+        authorize_token = form.get('token') or form.get('code')  # make it compatible
 
         if client_id is None:
             return jsonify(msg='client_id is required'), 400

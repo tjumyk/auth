@@ -48,6 +48,12 @@ def get_oauth_authorization():
     if auth is not None:
         return auth
     access_token = request.args.get('oauth_token')
+    if access_token is None:  # try to find it from HTTP header
+        auth = request.headers.get('Authorization')
+        if auth:
+            parts = auth.strip().split(None, 1)
+            if len(parts) == 2 and parts[0] == 'Bearer':  # only support Bearer type
+                access_token = parts[1]
     if access_token is None:
         return None
     auth = OAuthService.verify_access_token(access_token)
