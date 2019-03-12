@@ -144,7 +144,7 @@
     <table class="ui table celled unstackable very compact">
       <thead><tr><th>#</th><th>Name</th><th>Email</th><th>Status</th></tr></thead>
       <tbody>
-      <tr *ngFor="let item of userItems; index as i" [ngClass]="{'error': item.clientError, 'active': item.processing}">
+      <tr *ngFor="let item of userItems; index as i" [ngClass]="{'error': item.clientError, 'active': item.processing || item.waiting}">
         <td>{{i+1}}</td>
         <td *ngIf="item.clientError; else noClientError" colspan="3">
           <div><b>{{item.clientError.msg}}</b></div>
@@ -158,6 +158,7 @@
           <td>{{item.form.email}}</td>
           <td [ngClass]="{'error': item.serverError, 'positive': item.success}">
             <div *ngIf="item.processing">Processing... <i class="icon loading notched circle"></i></div>
+            <div *ngIf="item.waiting">Waiting... <i class="icon hourglass half"></i></div>
             <div *ngIf="item.success">{{item.success}}</div>
             <div *ngIf="item.serverError">
               <div><b>{{item.serverError.msg}}</b></div>

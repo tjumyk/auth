@@ -9,7 +9,7 @@
     <mj-section background-color='#fff' padding='20px'>
       <mj-column>
         <mj-text>
-          <h2>Welcome aboard, {{user.name}}!</h2>
+          <h2>Hi {{user.name}},</h2>
         </mj-text>
         <mj-text padding-bottom="10px">
           You are receiving this E-mail because you are either a new coursework student in COMP9318/COMP6714, a new group member, or any other people relevant to our group.

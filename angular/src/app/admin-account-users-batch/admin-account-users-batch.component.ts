@@ -1,7 +1,7 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {BasicError, GroupAdvanced, UserAdvanced} from "../models";
 import {AdminService} from "../admin.service";
-import {debounceTime, delay, distinctUntilChanged, finalize, switchMap} from "rxjs/operators";
+import {debounceTime, finalize, switchMap} from "rxjs/operators";
 import {Observable, of, Subject} from "rxjs";
 import {TitleService} from "../title.service";
 
@@ -17,6 +17,7 @@ export class BatchedUserItem {
   success?: string;
   user?: UserAdvanced;
   processing?: boolean;
+  waiting?: boolean;
 }
 
 @Component({
@@ -24,7 +25,7 @@ export class BatchedUserItem {
   templateUrl: './admin-account-users-batch.component.html',
   styleUrls: ['./admin-account-users-batch.component.less']
 })
-export class AdminAccountUsersBatchComponent implements OnInit {
+export class AdminAccountUsersBatchComponent implements OnInit, OnDestroy {
   error: BasicError;
 
   format: string;
@@ -98,6 +99,12 @@ export class AdminAccountUsersBatchComponent implements OnInit {
       items => this.userItems = items,
       error => this.error = error.error
     )
+  }
+
+  ngOnDestroy(): void {
+    if (this.processing) {
+      this.aborting = true;
+    }
   }
 
   updateUserList() {
@@ -291,12 +298,16 @@ export class AdminAccountUsersBatchComponent implements OnInit {
       }
 
       const item = this.userItems[this.processed];
-      item.processing = true;
+      item.processing = false;
+      item.waiting = true;
       item.serverError = null;
       item.success = null;
       // item.user is cached
 
       setTimeout(() => {
+        item.processing = true;
+        item.waiting = false;
+
         onItem(item).pipe(
           finalize(() => {
             item.processing = false;

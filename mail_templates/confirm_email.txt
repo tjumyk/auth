@@ -1,5 +1,5 @@
 Email Confirmation
-Welcome aboard, {user.name}!
+Hi {user.name},
 
 You are receiving this E-mail because you are either a new coursework student in COMP9318/COMP6714, a new group member, or any other people relevant to our group.
 
