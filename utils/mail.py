@@ -20,6 +20,13 @@ def send_emails(to_list, template, **kwargs):
     msg = EmailMessage()
     from_user, from_domain = mail_config['from'].split('@', 1)
     msg['From'] = Address(mail_config['display_name'], from_user, from_domain)
+
+    reply_to_address = mail_config.get('reply_to')
+    if reply_to_address:
+        reply_to_user, reply_to_domain = reply_to_address.split('@', 1)
+        reply_to_name = mail_config.get('reply_to_name') or ''
+        msg['Reply-To'] = Address(reply_to_name, reply_to_user, reply_to_domain)
+
     to_addresses = []
     for name, email in to_list:
         to_user, to_domain = email.split('@', 1)

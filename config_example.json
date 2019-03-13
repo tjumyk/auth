@@ -8,6 +8,8 @@
   "MAIL": {
     "display_name": "UNSWKG Identity",
     "from": "example@unsw.edu.au",
+    "reply_to_name": "Do Not Reply",
+    "reply_to": "noreply@example.com",
     "mock_folder": "mailbox"
   },
   "SITE": {
