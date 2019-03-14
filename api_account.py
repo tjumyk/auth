@@ -161,7 +161,17 @@ def account_me():
     try:
         user = get_current_user()
         if request.method == 'GET':
-            return jsonify(user.to_dict())
+            user_dict = user.to_dict()
+
+            # add full avatar URL for compatibility with 3rd-party OAuth clients
+            user_avatar = user_dict.get('avatar')
+            user_avatar_full = None
+            if user_avatar:
+                site_config = app.config['SITE']
+                user_avatar_full = site_config['root_url'] + site_config['base_url'] + user_avatar
+            user_dict['avatar_full'] = user_avatar_full
+
+            return jsonify(user_dict)
         else:
             files = request.files
             params = request.form.to_dict() or request.json or {}
@@ -181,6 +191,7 @@ def account_me():
                     handle_post_upload(old_avatar, 'avatar')
 
             db.session.commit()
+            # TODO also add full avatar URL for PUT method? and any other locations?
             return jsonify(user.to_dict())
     except OAuthServiceError as e:
         return jsonify(msg=e.msg, detail=e.detail), 403
