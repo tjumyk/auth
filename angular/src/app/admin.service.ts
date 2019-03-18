@@ -70,6 +70,12 @@ export class AdminService {
     )
   }
 
+  impersonate_user(uid: number): Observable<UserAdvanced> {
+    return this.http.get<UserAdvanced>(`${this.api}/users/${uid}/impersonate`).pipe(
+      tap((user) => this.logger.info(`Impersonating user ${user.name}`))
+    )
+  }
+
   delete_user(uid: number): Observable<any> {
     return this.http.delete(`${this.api}/users/${uid}`).pipe(
       tap(() => this.logger.info(`Deleted user (uid: ${uid})`))
