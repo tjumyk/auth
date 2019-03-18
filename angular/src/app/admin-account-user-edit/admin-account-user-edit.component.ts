@@ -196,6 +196,9 @@ export class AdminAccountUserEditComponent implements OnInit {
   }
 
   impersonateUser() {
+    if(!confirm(`You will log out from the current account and log in as ${this.user.name}.\nContinue?`))
+      return;
+
     this.impersonating = true;
     this.adminService.impersonate_user(this.uid).pipe(
       finalize(() => {

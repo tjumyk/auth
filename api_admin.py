@@ -6,7 +6,7 @@ from services.login_record import LoginRecordService
 from services.oauth import OAuthServiceError, OAuthService
 from services.user import UserService, UserServiceError
 from utils.mail import send_email
-from utils.session import requires_admin, set_current_user
+from utils.session import requires_admin, set_current_user, get_session_user, clear_current_user
 from utils.upload import handle_upload, handle_post_upload, UploadError
 
 admin = Blueprint('admin', __name__)
@@ -66,12 +66,21 @@ def admin_user_by_id(uid):
 @requires_admin
 def admin_impersonate_user(uid):
     try:
-        user = UserService.get(uid)
-        if user is None:
-            return jsonify(msg='user not found'), 404
+        target_user = UserService.get(uid)
+        if target_user is None:
+            return jsonify(msg='target user not found'), 404
 
-        set_current_user(user, remember=False)
-        return jsonify(user.to_dict(with_advanced_fields=True))
+        # logout current user
+        user = get_session_user()
+        clear_current_user()  # clear session first
+        if user:
+            OAuthService.clear_user_tokens(user)
+            db.session.commit()
+
+        # log in as target user
+        set_current_user(target_user, remember=False)
+
+        return jsonify(target_user.to_dict(with_advanced_fields=True))
     except UserServiceError as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
 
