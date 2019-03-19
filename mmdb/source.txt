@@ -1,4 +1,2 @@
 https://geolite.maxmind.com/download/geoip/database/GeoLite2-City.tar.gz
 https://geolite.maxmind.com/download/geoip/database/GeoLite2-ASN.tar.gz
-COPYRIGHT.txt
-LICENSE.txt
