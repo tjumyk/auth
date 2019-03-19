@@ -2,7 +2,7 @@ import {Injectable} from '@angular/core';
 import {HttpClient, HttpParams} from "@angular/common/http";
 import {Logger, LogService} from "./log.service";
 import {Observable} from "rxjs/internal/Observable";
-import {GroupAdvanced, LoginRecord, OAuthAuthorization, OAuthClientAdvanced, UserAdvanced} from "./models";
+import {GroupAdvanced, IPInfo, LoginRecord, OAuthAuthorization, OAuthClientAdvanced, UserAdvanced} from "./models";
 import {map, tap} from "rxjs/operators";
 
 @Injectable({
@@ -273,6 +273,15 @@ export class AdminService {
   client_remove_allowed_group(cid: number, gid: number): Observable<any> {
     return this.http.delete(`${this.api}/clients/${cid}/allowed_groups/${gid}`).pipe(
       tap(() => this.logger.info(`Removed group (gid: ${gid}) from allowed groups of OAuth client (cid: ${cid})`))
+    )
+  }
+
+  lookup_ip_info(ip_addr: string, resolve_hostname: boolean): Observable<IPInfo> {
+    let params = new HttpParams();
+    if (resolve_hostname)
+      params = params.append('resolve-hostname', 'true');
+    return this.http.get(`${this.api}/ip-info/${ip_addr}`, {params:params}).pipe(
+      tap(() => this.logger.info(`Fetched IP info of ${ip_addr}`))
     )
   }
 }

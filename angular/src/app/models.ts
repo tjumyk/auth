@@ -74,3 +74,16 @@ export class OAuthAuthorization {
   client?: OAuthClient;
   user?: User;
 }
+
+export class IPInfo{
+  country?: string;
+  country_code?: string;
+  region?: string;
+  city?: string;
+  latitude?: number;
+  longitude?: number;
+  postal_code?: string;
+  asn?: number;
+  organization?: string;
+  hostname?: string;
+}

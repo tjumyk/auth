@@ -5,6 +5,7 @@ from services.group import GroupService, GroupServiceError
 from services.login_record import LoginRecordService
 from services.oauth import OAuthServiceError, OAuthService
 from services.user import UserService, UserServiceError
+from utils.ip import get_ip_info
 from utils.mail import send_email
 from utils.session import requires_admin
 from utils.upload import handle_upload, handle_post_upload, UploadError
@@ -404,3 +405,13 @@ def oauth_client_allowed_groups(cid, gid):
             return "", 204
     except (OAuthServiceError, GroupServiceError) as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
+
+
+@admin.route('/ip-info/<string:ip_addr>')
+@requires_admin
+def lookup_ip_info(ip_addr):
+    try:
+        resolve_hostname = request.args.get('resolve-hostname') == 'true'
+        return jsonify(get_ip_info(ip_addr, resolve_hostname=resolve_hostname).to_dict())
+    except ValueError as e:
+        return jsonify(msg=str(e)), 400

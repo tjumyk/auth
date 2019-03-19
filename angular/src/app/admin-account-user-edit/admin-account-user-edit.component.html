@@ -154,7 +154,7 @@
         </div>
       </div>
       <table class="ui table celled very compact unstackable bottom attached">
-        <thead><tr><th>#</th><th>ID</th><th>Time</th><th>IP</th><th>Result</th></tr></thead>
+        <thead><tr><th>#</th><th>ID</th><th>Time</th><th>IP</th><th>Result</th><th>Ops</th></tr></thead>
         <tbody>
         <tr *ngFor="let record of login_records; index as i" [ngClass]="{'error': !record.success}">
           <td>{{i+1}}</td>
@@ -164,6 +164,9 @@
           <td>
             <span *ngIf="record.success">Success</span>
             <span *ngIf="!record.success">{{record.reason}}</span>
+          </td>
+          <td>
+            <a class="ui tiny icon button" title="IP Lookup" (click)="lookupIPInfo(record.ip, btnLookupIPInfo)" #btnLookupIPInfo><i class="icon info"></i></a>
           </td>
         </tr>
         </tbody>

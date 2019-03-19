@@ -192,4 +192,18 @@ export class AdminAccountUserEditComponent implements OnInit {
     )
   }
 
+  lookupIPInfo(ip_addr: string, btn: HTMLElement) {
+    btn.classList.add('disabled', 'loading');
+    this.adminService.lookup_ip_info(ip_addr, true).pipe(
+      finalize(() => {
+        btn.classList.remove('disabled', 'loading');
+      })
+    ).subscribe(
+      info => {
+        alert(JSON.stringify(info, null, 4))
+      },
+      error => this.error = error.error
+    )
+  }
+
 }
