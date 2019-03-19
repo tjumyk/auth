@@ -1,3 +1,4 @@
+import requests
 from flask import Blueprint, current_app as app, request, jsonify
 
 from models import db
@@ -60,6 +61,38 @@ def admin_user_by_id(uid):
     try:
         return _admin_user(UserService.get(uid))
     except (UserServiceError, UploadError) as e:
+        return jsonify(msg=e.msg, detail=e.detail), 400
+
+
+@admin.route('/users/<int:uid>/ext-info')
+@requires_admin
+def admin_user_external_info(uid):
+    try:
+        user = UserService.get(uid)
+        if user is None:
+            return jsonify(msg='user not found'), 404
+
+        results = []
+        for source in app.config.get('EXTERNAL_USER_INFO') or []:
+            source_type = source.get('type')
+            if source_type == 'pwd_agent':  # the only supported source right now
+                result = dict(id=source.get('id'), name=source.get('name'), type=source_type)
+                try:
+                    api = 'http://%s:%d/api' % (source.get('host'), source.get('port'))
+                    resp = requests.get(api, params=dict(names=user.name))
+                    if resp.status_code == 200:
+                        _json = resp.json() or {}
+                        result['result'] = _json.get(user.name)
+                    else:
+                        result['error'] = dict(msg='failed to get passwd entry', detail=resp.text)
+                except requests.exceptions.ConnectionError:
+                    result['error'] = dict(msg='connection error')
+                except IOError as e:
+                    result['error'] = dict(msg=str(e))
+                results.append(result)
+
+        return jsonify(results)
+    except UserServiceError as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
 
 

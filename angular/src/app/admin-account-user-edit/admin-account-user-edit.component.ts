@@ -1,6 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {Location} from "@angular/common";
-import {BasicError, LoginRecord, UserAdvanced} from "../models";
+import {BasicError, ExternalUserInfoResult, LoginRecord, UserAdvanced} from "../models";
 import {NgForm} from "@angular/forms";
 import {UploadFilters, UploadValidator} from "../upload-util";
 import {finalize} from "rxjs/operators";
@@ -46,6 +46,9 @@ export class AdminAccountUserEditComponent implements OnInit {
   setting_active: boolean;
   deleting: boolean;
   impersonating: boolean;
+
+  external_info: ExternalUserInfoResult[];
+  getting_external_info: boolean;
 
   avatar_validator: UploadValidator;
 
@@ -97,7 +100,9 @@ export class AdminAccountUserEditComponent implements OnInit {
 
     this.user = user;
     this.form.nickname = this.user.nickname;
-    this.status_form.is_active = this.user.is_active
+    this.status_form.is_active = this.user.is_active;
+
+    this.getExternalInfo();
   }
 
 
@@ -223,6 +228,16 @@ export class AdminAccountUserEditComponent implements OnInit {
       info => {
         alert(JSON.stringify(info, null, 4))
       },
+      error => this.error = error.error
+    )
+  }
+
+  getExternalInfo() {
+    this.getting_external_info = true;
+    this.adminService.get_user_external_info(this.uid).pipe(
+      finalize(() => this.getting_external_info = false)
+    ).subscribe(
+      info => this.external_info = info,
       error => this.error = error.error
     )
   }

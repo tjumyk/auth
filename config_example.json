@@ -39,5 +39,14 @@
       "accept_ext": ["png", "jpg", "jpeg", "gif"],
       "size_limit": 262144
     }
-  }
+  },
+  "EXTERNAL_USER_INFO": [
+    {
+      "id": "local_pwd_agent",
+      "name": "Local pwd agent",
+      "type": "pwd_agent",
+      "host": "localhost",
+      "port": 6391
+    }
+  ]
 }

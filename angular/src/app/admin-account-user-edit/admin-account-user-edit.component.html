@@ -66,6 +66,43 @@
           </div>
         </div>
 
+        <div class="ui segment" *ngIf="getting_external_info">
+          <div class="ui centered active inline text loader">Loading external user info...</div>
+        </div>
+
+        <ng-container *ngFor="let source of external_info">
+          <div class="ui segment">
+            <h4 class="ui header">{{source.name}}</h4>
+            <div class="ui warning message" *ngIf="source.error">
+              <div class="header"><i class="exclamation triangle icon"></i> {{source.error.msg}}</div>
+              <p>{{source.error.detail}}</p>
+            </div>
+            <ng-container *ngIf="source.result; else noExternalInfoResult">
+              <ng-container *ngIf="source.type=='pwd_agent'">
+                <div class="ui list">
+                  <div class="item">
+                    <div class="header">Full Name</div>
+                    {{source.result.full_name}}
+                  </div>
+                  <div class="item">
+                    <div class="header">Expired?</div>
+                    {{source.result.expired}}
+                  </div>
+                  <div class="item" *ngIf="source.result.details.length">
+                    <div class="header">Details</div>
+                    <ul>
+                      <li *ngFor="let detail of source.result.details">{{detail}}</li>
+                    </ul>
+                  </div>
+                </div>
+              </ng-container>
+            </ng-container>
+            <ng-template #noExternalInfoResult>
+              <div *ngIf="!source.error">(No result)</div>
+            </ng-template>
+          </div>
+        </ng-container>
+
         <div class="ui segment">
           <div class="ui success message" *ngIf="admin_operation_success">
             <i class="close icon" (click)="admin_operation_success=undefined"></i>

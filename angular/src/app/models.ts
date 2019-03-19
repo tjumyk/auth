@@ -87,3 +87,11 @@ export class IPInfo{
   organization?: string;
   hostname?: string;
 }
+
+export class ExternalUserInfoResult{
+  id: string;
+  name: string;
+  type: string;
+  result?: any;
+  error?: BasicError;
+}

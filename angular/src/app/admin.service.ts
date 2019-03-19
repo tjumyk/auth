@@ -2,7 +2,15 @@ import {Injectable} from '@angular/core';
 import {HttpClient, HttpParams} from "@angular/common/http";
 import {Logger, LogService} from "./log.service";
 import {Observable} from "rxjs/internal/Observable";
-import {GroupAdvanced, IPInfo, LoginRecord, OAuthAuthorization, OAuthClientAdvanced, UserAdvanced} from "./models";
+import {
+  ExternalUserInfoResult,
+  GroupAdvanced,
+  IPInfo,
+  LoginRecord,
+  OAuthAuthorization,
+  OAuthClientAdvanced,
+  UserAdvanced
+} from "./models";
 import {map, tap} from "rxjs/operators";
 
 @Injectable({
@@ -61,6 +69,12 @@ export class AdminService {
   get_user(uid: number): Observable<UserAdvanced> {
     return this.http.get<UserAdvanced>(`${this.api}/users/${uid}`).pipe(
       tap((user) => this.logger.info(`Fetched profile of user ${user.name}`))
+    )
+  }
+
+  get_user_external_info(uid: number): Observable<ExternalUserInfoResult[]> {
+    return this.http.get<ExternalUserInfoResult[]>(`${this.api}/users/${uid}/ext-info`).pipe(
+      tap(() => this.logger.info(`Fetched external user info (uid: ${uid})`))
     )
   }
 
