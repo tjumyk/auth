@@ -100,7 +100,7 @@ export class AdminAccountUserEditComponent implements OnInit {
 
   reconfirmEmail() {
     this.error = undefined;
-    this.admin_operation_success= undefined;
+    this.admin_operation_success = undefined;
 
     this.requesting_reconfirm_email = true;
     this.adminService.reconfirm_email(this.uid).pipe(
@@ -108,7 +108,7 @@ export class AdminAccountUserEditComponent implements OnInit {
     ).subscribe(
       () => {
         this.loadUser();
-        this.admin_operation_success = {msg:'Reconfirm E-mail process started'}
+        this.admin_operation_success = {msg: 'Reconfirm E-mail process started'}
       },
       (error) => this.error = error.error
     )
@@ -124,7 +124,7 @@ export class AdminAccountUserEditComponent implements OnInit {
     ).subscribe(
       () => {
         this.loadUser();
-        this.admin_operation_success = {msg:'User status updated successfully'}
+        this.admin_operation_success = {msg: 'User status updated successfully'}
       },
       (error) => this.error = error.error
     )
