@@ -1,5 +1,6 @@
 import os
 import re
+import smtplib
 import time
 from email.headerregistry import Address
 from email.message import EmailMessage
@@ -55,7 +56,8 @@ def send_emails(to_list, template, **kwargs):
         html = re.sub(r"(\{\{[^}]+\}\})", lambda m: m.group(1)[1:-1].format(**kwargs), temp_html)
         msg.add_alternative(html, subtype='html')
 
-    mock_folder = app.config['MAIL'].get('mock_folder')
+    # use mock folder?
+    mock_folder = mail_config.get('mock_folder')
     if mock_folder:
         for name, email in to_list:
             folder = os.path.join(mock_folder, email)
@@ -63,6 +65,15 @@ def send_emails(to_list, template, **kwargs):
                 os.makedirs(folder)
             with open(os.path.join(folder, '%f.txt' % time.time()), 'w') as f:
                 f.write("From: %s\nSubject: %s\n\n%s" % (str(msg['From']), msg['Subject'], msg.get_body()))
-    else:
-        p = Popen(["/usr/sbin/sendmail", "-t", "-oi"], stdin=PIPE)
-        p.communicate(msg.as_bytes())
+        return
+
+    # use mail catcher? (https://github.com/sj26/mailcatcher)
+    mail_catcher_config = mail_config.get('mail_catcher')
+    if mail_catcher_config:
+        with smtplib.SMTP(host=mail_catcher_config.get('host'), port=mail_catcher_config.get('port')) as smtp:
+            smtp.send_message(msg)
+        return
+
+    # use sendmail directly
+    p = Popen(["/usr/sbin/sendmail", "-t", "-oi"], stdin=PIPE)
+    p.communicate(msg.as_bytes())
