@@ -1,4 +1,5 @@
 import {Component, OnInit} from '@angular/core';
+import {Location} from "@angular/common";
 import {BasicError, LoginRecord, UserAdvanced} from "../models";
 import {NgForm} from "@angular/forms";
 import {UploadFilters, UploadValidator} from "../upload-util";
@@ -44,6 +45,7 @@ export class AdminAccountUserEditComponent implements OnInit {
 
   setting_active: boolean;
   deleting: boolean;
+  impersonating: boolean;
 
   avatar_validator: UploadValidator;
 
@@ -56,7 +58,8 @@ export class AdminAccountUserEditComponent implements OnInit {
     private adminService: AdminService,
     private route: ActivatedRoute,
     private router: Router,
-    private titleService: TitleService
+    private titleService: TitleService,
+    private location: Location
   ) {
     this.avatar_validator = new UploadValidator(UploadFilters.avatar)
   }
@@ -189,6 +192,24 @@ export class AdminAccountUserEditComponent implements OnInit {
         this.update_avatar_success = true
       },
       (error) => this.update_avatar_error = error.error
+    )
+  }
+
+  impersonateUser() {
+    if(!confirm(`You will log out from the current account and log in as ${this.user.name}.\nContinue?`))
+      return;
+
+    this.impersonating = true;
+    this.adminService.impersonate_user(this.uid).pipe(
+      finalize(() => {
+        this.impersonating = false;
+      })
+    ).subscribe(
+      () => {
+        this.location.go('/');
+        window.location.reload();
+      },
+      error => this.error = error.error
     )
   }
 

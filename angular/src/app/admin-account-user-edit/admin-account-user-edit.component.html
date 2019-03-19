@@ -85,6 +85,9 @@
             </a>
             <a class="ui red button" (click)="deleteUser()" [ngClass]="{'loading disabled': deleting}"><i class="trash icon"></i>Delete User</a>
           </p>
+          <p>
+            <a class="ui button" (click)="impersonateUser()" [ngClass]="{'loading disabled': impersonating}"><i class="icon user secret"></i> Impersonate User</a>
+          </p>
         </div>
 
         <div class="ui segment">
