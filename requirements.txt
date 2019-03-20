@@ -4,3 +4,4 @@ psycopg2-binary
 passlib[bcrypt]
 Pillow
 geoip2
+requests
