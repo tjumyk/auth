@@ -70,8 +70,11 @@ def get_geo_asn(ip_addr: str) -> Optional[ASN]:
         return None
 
 
-def get_hostname(ip_addr: str) -> str:
-    return socket.gethostbyaddr(ip_addr)[0]
+def get_hostname(ip_addr: str) -> Optional[str]:
+    try:
+        return socket.gethostbyaddr(ip_addr)[0]
+    except socket.herror:
+        return None
 
 
 def get_ip_info(ip_addr: str, resolve_hostname: bool = False) -> IPInfo:
