@@ -21,6 +21,8 @@ class UserService:
     email_max_length = 64
     email_confirm_token_valid = timedelta(days=30)
     password_reset_token_valid = timedelta(minutes=15)
+    email_reconfirm_request_wait = timedelta(minutes=1)
+    password_reset_request_wait = timedelta(minutes=1)
 
     profile_fields = {
         'nickname',
@@ -189,6 +191,14 @@ class UserService:
         if user.is_email_confirmed:
             raise UserServiceError('email already confirmed')
 
+        if user.email_confirm_token_expire_at is not None:  # check if requested too frequently
+            wait = user.email_confirm_token_expire_at - UserService.email_confirm_token_valid + \
+                   UserService.email_reconfirm_request_wait - datetime.utcnow()
+            wait_seconds = round(wait.total_seconds())
+            if wait_seconds > 0:
+                raise UserServiceError('requested too frequently',
+                                       'please wait for %d seconds and then try again' % wait_seconds)
+
         user.is_email_confirmed = False
         user.email_confirm_token = token_urlsafe()
         user.email_confirm_token_expire_at = datetime.utcnow() + UserService.email_confirm_token_valid
@@ -295,6 +305,15 @@ class UserService:
             raise UserServiceError('inactive user')
         if user.email is None:
             raise UserServiceError('no email')
+
+        if user.password_reset_token_expire_at is not None:  # check if requested too frequently
+            wait = user.password_reset_token_expire_at - UserService.password_reset_token_valid + \
+                   UserService.password_reset_request_wait - datetime.utcnow()
+            wait_seconds = round(wait.total_seconds())
+            if wait_seconds > 0:
+                raise UserServiceError('requested too frequently',
+                                       'please wait for %d seconds and then try again' % wait_seconds)
+
         user.password_reset_token = token_urlsafe()
         user.password_reset_token_expire_at = datetime.utcnow() + UserService.password_reset_token_valid
         return user
