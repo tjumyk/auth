@@ -23,6 +23,8 @@ class UserService:
     password_reset_token_valid = timedelta(minutes=15)
     email_reconfirm_request_wait = timedelta(minutes=1)
     password_reset_request_wait = timedelta(minutes=1)
+    login_recent_failures_time_span = timedelta(minutes=15)
+    login_recent_failures_lock_threshold = 5
 
     profile_fields = {
         'nickname',
@@ -104,6 +106,14 @@ class UserService:
         if user is None:
             return None
 
+        from .login_record import LoginRecordService
+        recent_failures_time_span = UserService.login_recent_failures_time_span
+        if LoginRecordService.count_recent_failures_for_user(user, recent_failures_time_span) >= \
+                UserService.login_recent_failures_lock_threshold:
+            recent_failures_minutes = round(recent_failures_time_span.total_seconds() / 60)
+            raise UserServiceError('too many recent failures', 'Please wait for at most %d minutes and then try again'
+                                   % recent_failures_minutes)
+
         error = None
         if not user.is_active:
             error = 'inactive user'
@@ -112,7 +122,6 @@ class UserService:
         elif not pbkdf2_sha256.verify(password, user.password):
             error = 'wrong password'
 
-        from .login_record import LoginRecordService
         LoginRecordService.add(user, ip, user_agent.string, error is None, error)
         db.session.commit()  # force commit, a little bit ugly
 

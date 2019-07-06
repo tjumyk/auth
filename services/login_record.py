@@ -1,7 +1,9 @@
+from datetime import timedelta, datetime
+
 from sqlalchemy import desc
 
 from error import BasicError
-from models import db, LoginRecord
+from models import db, LoginRecord, User
 
 
 class LoginRecordServiceError(BasicError):
@@ -34,3 +36,18 @@ class LoginRecordService:
                              success=success, reason=reason)
         db.session.add(record)
         return record
+
+    @staticmethod
+    def count_recent_failures_for_user(user: User, time_span: timedelta) -> int:
+        if user is None:
+            raise LoginRecordServiceError('user is required')
+
+        failures = 0
+        for record in db.session.query(LoginRecord) \
+                .filter(LoginRecord.user_id == user.id,
+                        LoginRecord.time >= datetime.utcnow() - time_span) \
+                .order_by(desc(LoginRecord.id)):
+            if record.success:  # only count the latest consecutive failures
+                break
+            failures += 1
+        return failures
