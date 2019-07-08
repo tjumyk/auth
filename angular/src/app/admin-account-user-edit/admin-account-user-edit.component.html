@@ -45,6 +45,13 @@
               </div>
               <span *ngIf="user.groups.length==0" class="text muted">(None)</span>
             </div>
+            <div class="item">
+              <div class="header">Two-Factor Authentication</div>
+              <span *ngIf="user.is_two_factor_enabled; else no2FA" class="text success">Enabled</span>
+              <ng-template #no2FA>
+                <span class="text muted">Disabled</span>
+              </ng-template>
+            </div>
           </div>
         </div>
 
