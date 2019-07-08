@@ -147,6 +147,8 @@ class UserService:
             error = 'inactive user'
         elif not user.is_email_confirmed:
             error = 'email not confirmed'
+        elif not user.is_two_factor_enabled:
+            error = 'two-factor authentication is not enabled'
         else:
             try:
                 two_factor.verify(user, token)
@@ -163,7 +165,6 @@ class UserService:
                 raise UserServiceError(msg=error_source.msg, detail=error_source.detail)
             else:
                 raise UserServiceError(error)
-        return user
 
     @staticmethod
     def check_login_recent_failures(user):
