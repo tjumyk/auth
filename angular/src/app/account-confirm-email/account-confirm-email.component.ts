@@ -51,7 +51,7 @@ export class AccountConfirmEmailComponent implements OnInit {
     )
   }
 
-  start_reset(f:NgForm){
+  start_confirm(f:NgForm){
     if(f.invalid)
       return;
 

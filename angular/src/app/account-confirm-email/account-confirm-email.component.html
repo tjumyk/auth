@@ -9,7 +9,7 @@
 </div>
 
 <div *ngIf="!verifying && user">
-  <form class="ui large form" #f="ngForm" (ngSubmit)="start_reset(f)" [ngClass]="{'loading': requesting}">
+  <form class="ui large form" #f="ngForm" (ngSubmit)="start_confirm(f)" [ngClass]="{'loading': requesting}">
     <div class="ui raised segment">
       <div class="field">
         <label>Username</label>
