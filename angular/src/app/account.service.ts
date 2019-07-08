@@ -178,4 +178,17 @@ export class AccountService {
       })
     )
   }
+
+  request_disable_two_factor_by_email(): Observable<any>{
+    return this.http.get(`${this.api}/two-factor/request-disable-by-email`).pipe(
+      tap(() => this.logger.info(`Requested disabling two-factor authentication by Email`))
+    )
+  }
+
+  disable_two_factor_by_email(uid:number, token: string): Observable<any>{
+    let params = new HttpParams().append('uid', uid.toString()).append('token', token);
+    return this.http.get(`${this.api}/two-factor/disable-by-email`, {params}).pipe(
+      tap(() => this.logger.info(`Disabled two-factor authentication by Email`))
+    )
+  }
 }

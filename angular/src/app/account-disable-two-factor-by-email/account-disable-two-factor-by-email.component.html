@@ -1,0 +1,20 @@
+<div class="ui error message" *ngIf="error">
+  <i class="close icon" (click)="error=undefined"></i>
+  <div class="header"><i class="times circle icon"></i> {{error.msg}}</div>
+  <p>{{error.detail}}</p>
+</div>
+
+<div class="ui padded raised segment" *ngIf="disabling">
+  <div class="ui centered large text inline loader active">Disabling Two-Factor Authentication...</div>
+</div>
+
+<div class="ui padded raised segment" *ngIf="success">
+  <div class="ui center aligned fluid header">
+    <div class="content">
+      <i class="check circle green icon"></i> Disabled Two-Factor Authentication
+      <div class="sub header">
+        Now you should be able to sign in without the Two-Factor Authentication.
+      </div>
+    </div>
+  </div>
+</div>

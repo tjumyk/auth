@@ -29,6 +29,8 @@ import {OauthLoginComponent} from "./oauth-login/oauth-login.component";
 import {AdminAccountUsersBatchComponent} from "./admin-account-users-batch/admin-account-users-batch.component";
 import {HomeComponent} from "./home/home.component";
 import {SettingsTwoFactorComponent} from "./settings-two-factor/settings-two-factor.component";
+import {AccountRequestDisableTwoFactorByEmailComponent} from "./account-request-disable-two-factor-by-email/account-request-disable-two-factor-by-email.component";
+import {AccountDisableTwoFactorByEmailComponent} from "./account-disable-two-factor-by-email/account-disable-two-factor-by-email.component";
 
 const routes: Routes = [
   {path: '', pathMatch: 'full', canActivate: [AuthGuard], component: HomeComponent},
@@ -45,7 +47,9 @@ const routes: Routes = [
           {path: 'request-reset-password', component: AccountReqResetPasswordComponent},
           {path: 'reset-password', component: AccountResetPasswordComponent},
           {path: 'confirm-email', component: AccountConfirmEmailComponent},
-          {path: 'request-reconfirm-email', component: AccountReqReconfirmEmailComponent}
+          {path: 'request-reconfirm-email', component: AccountReqReconfirmEmailComponent},
+          {path: 'disable-two-factor-by-email', component: AccountDisableTwoFactorByEmailComponent},
+          {path: 'request-disable-two-factor-by-email', component: AccountRequestDisableTwoFactorByEmailComponent}
         ]
       },
       {

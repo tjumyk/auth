@@ -35,6 +35,8 @@ import { AdminAccountUsersBatchComponent } from './admin-account-users-batch/adm
 import { HomeComponent } from './home/home.component';
 import { SettingsTwoFactorComponent } from './settings-two-factor/settings-two-factor.component';
 import { TwoFactorLoginBoxComponent } from './two-factor-login-box/two-factor-login-box.component';
+import { AccountRequestDisableTwoFactorByEmailComponent } from './account-request-disable-two-factor-by-email/account-request-disable-two-factor-by-email.component';
+import { AccountDisableTwoFactorByEmailComponent } from './account-disable-two-factor-by-email/account-disable-two-factor-by-email.component';
 
 @NgModule({
   declarations: [
@@ -69,6 +71,8 @@ import { TwoFactorLoginBoxComponent } from './two-factor-login-box/two-factor-lo
     HomeComponent,
     SettingsTwoFactorComponent,
     TwoFactorLoginBoxComponent,
+    AccountRequestDisableTwoFactorByEmailComponent,
+    AccountDisableTwoFactorByEmailComponent,
   ],
   imports: [
     BrowserModule,
