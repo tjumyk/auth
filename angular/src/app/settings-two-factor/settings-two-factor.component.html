@@ -14,7 +14,7 @@
   <div class="ui segment">
     <ng-container *ngIf="user">
       <ng-container *ngIf="user.is_two_factor_enabled; else no2FA">
-        <p><i class="icon green check circle"></i> Two-factor authentication is already enabled!</p>
+        <p><i class="icon green check circle"></i> Two-factor authentication has been enabled.</p>
 
         <div class="disable-start" *ngIf="!show_disable_form; else disable_form">
           <button class="ui button red" (click)="show_disable_form=true">Disable Two-Factor Authentication</button>
@@ -24,7 +24,7 @@
           <form class="ui form" [ngClass]="{'loading': disabling}" #f="ngForm" (ngSubmit)="disable(f)">
             <div class="field" [ngClass]="{'error': (f.submitted || token_model.touched || token_model.dirty) && token_model.invalid}">
               <label>Token</label>
-              <input type="text" name="token" maxlength="6" placeholder="Please enter the 6-digit token from your Authenticator app" required
+              <input type="text" name="token" maxlength="6" placeholder="Please enter the 6-digit token shown in your Authenticator app" required
                      [(ngModel)]="disable_token" #token_model="ngModel" autocomplete="off">
               <div class="errors" *ngIf="token_model.errors">
                 <label *ngIf="token_model.errors.required"><i class="icon times"></i> Token is required</label>
@@ -50,7 +50,7 @@
           <form class="ui form" [ngClass]="{'loading': confirming}" #f="ngForm" (ngSubmit)="confirmSetup(f)">
             <div class="field" [ngClass]="{'error': (f.submitted || token_model.touched || token_model.dirty) && token_model.invalid, 'disabled': setup_info_expired}">
               <label>Token</label>
-              <input type="text" name="token" maxlength="6" placeholder="Please enter the 6-digit token from your Authenticator app" required
+              <input type="text" name="token" maxlength="6" placeholder="Please enter the 6-digit token shown in your Authenticator app" required
                      [(ngModel)]="confirm_token" #token_model="ngModel" autocomplete="off">
               <div class="errors" *ngIf="token_model.errors">
                 <label *ngIf="token_model.errors.required"><i class="icon times"></i> Token is required</label>
