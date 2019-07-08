@@ -33,6 +33,8 @@ import { AccountReqReconfirmEmailComponent } from './account-req-reconfirm-email
 import { StrongPasswordDirective } from './strong-password.directive';
 import { AdminAccountUsersBatchComponent } from './admin-account-users-batch/admin-account-users-batch.component';
 import { HomeComponent } from './home/home.component';
+import { SettingsTwoFactorComponent } from './settings-two-factor/settings-two-factor.component';
+import { TwoFactorLoginBoxComponent } from './two-factor-login-box/two-factor-login-box.component';
 
 @NgModule({
   declarations: [
@@ -65,6 +67,8 @@ import { HomeComponent } from './home/home.component';
     StrongPasswordDirective,
     AdminAccountUsersBatchComponent,
     HomeComponent,
+    SettingsTwoFactorComponent,
+    TwoFactorLoginBoxComponent,
   ],
   imports: [
     BrowserModule,

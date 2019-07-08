@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {OAuthClient, User} from "./models";
+import {OAuthClient, TwoFactorSetupInfo, User} from "./models";
 import {HttpClient, HttpParams} from "@angular/common/http";
 import {Logger, LogService} from "./log.service";
 import {Observable, of} from "rxjs";
@@ -29,9 +29,13 @@ export class AccountService {
       remember: remember
     }).pipe(
       tap((user: User) => {
-        this.user = user;
-        this.is_synced = true;
-        this.logger.info(`Logged in as ${user.name}`)
+        if(user.is_two_factor_enabled){
+          this.logger.info('Two-factor authentication required')
+        }else {
+          this.user = user;
+          this.is_synced = true;
+          this.logger.info(`Logged in as ${user.name}`)
+        }
       })
     )
   }
@@ -144,6 +148,34 @@ export class AccountService {
   get_my_clients(): Observable<OAuthClient[]> {
     return this.http.get<OAuthClient[]>(`${this.api}/clients`).pipe(
       tap(clients => this.logger.info(`Fetched ${clients.length} clients`))
+    )
+  }
+
+  setup_two_factor(): Observable<TwoFactorSetupInfo>{
+    return this.http.get<TwoFactorSetupInfo>(`${this.api}/two-factor/setup`).pipe(
+      tap(() => this.logger.info(`Setup two-factor authentication`))
+    )
+  }
+
+  confirm_setup_two_factor(token: string): Observable<any>{
+    return this.http.post<TwoFactorSetupInfo>(`${this.api}/two-factor/confirm-setup`, {token}).pipe(
+      tap(() => this.logger.info(`Confirmed setting-up two-factor authentication`))
+    )
+  }
+
+  disable_two_factor(token: string): Observable<any>{
+    return this.http.post<TwoFactorSetupInfo>(`${this.api}/two-factor/disable`, {token}).pipe(
+      tap(() => this.logger.info(`Disabled two-factor authentication`))
+    )
+  }
+
+  two_factor_login(token: string, remember: boolean): Observable<User>{
+    return this.http.post<User>(`${this.api}/two-factor/login`, {token, remember}).pipe(
+      tap((user: User) => {
+        this.user = user;
+        this.is_synced = true;
+        this.logger.info(`Logged in as ${user.name} with two-factor authentication`)
+      })
     )
   }
 }

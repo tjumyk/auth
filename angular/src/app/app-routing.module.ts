@@ -28,6 +28,7 @@ import {AccountReqReconfirmEmailComponent} from "./account-req-reconfirm-email/a
 import {OauthLoginComponent} from "./oauth-login/oauth-login.component";
 import {AdminAccountUsersBatchComponent} from "./admin-account-users-batch/admin-account-users-batch.component";
 import {HomeComponent} from "./home/home.component";
+import {SettingsTwoFactorComponent} from "./settings-two-factor/settings-two-factor.component";
 
 const routes: Routes = [
   {path: '', pathMatch: 'full', canActivate: [AuthGuard], component: HomeComponent},
@@ -67,7 +68,8 @@ const routes: Routes = [
         children: [
           {path: '', pathMatch: 'full', redirectTo: 'profile'},
           {path: 'profile', component: SettingsProfileComponent},
-          {path: 'password', component: SettingsPasswordComponent}
+          {path: 'password', component: SettingsPasswordComponent},
+          {path: 'two-factor', component: SettingsTwoFactorComponent}
         ]
       },
       {

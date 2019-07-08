@@ -10,46 +10,52 @@
 
 <div [hidden]="verifying_logged_in">
 
-  <form class="ui large form" #f="ngForm" (ngSubmit)="login(f)" [ngClass]="{'loading': logging_in}">
-    <div class="ui raised segment">
-      <div class="field" [ngClass]="{'error': name_or_email.invalid && (f.submitted || name_or_email.dirty || name_or_email.touched)}">
-        <div class="ui left icon input">
-          <i class="user icon"></i>
-          <input type="text" placeholder="User name or E-mail address"
-                 required
-                 [(ngModel)]="form.name_or_email" name="name_or_email" #name_or_email="ngModel">
-        </div>
-        <div *ngIf="name_or_email.errors" class="errors">
-          <label *ngIf="name_or_email.errors.required"><i class="times icon"></i> Username or E-mail address is required </label>
-        </div>
-      </div>
-      <div class="field" [ngClass]="{'error': password.invalid && (f.submitted || password.dirty || password.touched)}">
-        <div class="ui left icon input">
-          <i class="lock icon"></i>
-          <input type="password" placeholder="Password"
-                 required
-                 [(ngModel)]="form.password" name="password" #password="ngModel">
-        </div>
-        <div *ngIf="password.errors" class="errors">
-          <label *ngIf="password.errors.required"><i class="times icon"></i> Password is required </label>
-        </div>
-      </div>
-      <div class="ui field">
-        <div class="ui checkbox" (click)="checkbox_remember.click()">
-          <input type="checkbox" tabindex="0" class="hidden" [(ngModel)]="form.remember" name="remember" #checkbox_remember>
-          <label>Remember Me</label>
-        </div>
-      </div>
-      <button class="ui fluid large primary button" type="submit">Sign In</button>
-    </div>
-  </form>
+  <ng-container *ngIf="show_two_factor; else login_form">
+    <app-two-factor-login-box (error)="error=$event" (back)="show_two_factor=false" (verified)="afterLogin($event)" [remember]="form.remember"></app-two-factor-login-box>
+  </ng-container>
 
-  <div class="ui message">
-    <ul class="list">
-      <li>You need to confirm your E-mail address before your first login. If you can't find the confirmation letter in your mailbox, please
-        <a routerLink="../request-reconfirm-email">request sending it again</a>.</li>
-      <li>We do not support zPass. Please use the system-specific password that you set during the E-mail confirmation. If you forgot it, please <a routerLink="../request-reset-password">request a password reset</a>.</li>
-    </ul>
-  </div>
+  <ng-template #login_form>
+    <form class="ui large form" #f="ngForm" (ngSubmit)="login(f)" [ngClass]="{'loading': logging_in}">
+      <div class="ui raised segment">
+        <div class="field" [ngClass]="{'error': name_or_email.invalid && (f.submitted || name_or_email.dirty || name_or_email.touched)}">
+          <div class="ui left icon input">
+            <i class="user icon"></i>
+            <input type="text" placeholder="User name or E-mail address"
+                   required
+                   [(ngModel)]="form.name_or_email" name="name_or_email" #name_or_email="ngModel">
+          </div>
+          <div *ngIf="name_or_email.errors" class="errors">
+            <label *ngIf="name_or_email.errors.required"><i class="times icon"></i> Username or E-mail address is required </label>
+          </div>
+        </div>
+        <div class="field" [ngClass]="{'error': password.invalid && (f.submitted || password.dirty || password.touched)}">
+          <div class="ui left icon input">
+            <i class="lock icon"></i>
+            <input type="password" placeholder="Password"
+                   required
+                   [(ngModel)]="form.password" name="password" #password="ngModel">
+          </div>
+          <div *ngIf="password.errors" class="errors">
+            <label *ngIf="password.errors.required"><i class="times icon"></i> Password is required </label>
+          </div>
+        </div>
+        <div class="ui field">
+          <div class="ui checkbox" (click)="checkbox_remember.click()">
+            <input type="checkbox" tabindex="0" class="hidden" [(ngModel)]="form.remember" name="remember" #checkbox_remember>
+            <label>Remember Me</label>
+          </div>
+        </div>
+        <button class="ui fluid large primary button" type="submit">Sign In</button>
+      </div>
+    </form>
+
+    <div class="ui message">
+      <ul class="list">
+        <li>You need to confirm your E-mail address before your first login. If you can't find the confirmation letter in your mailbox, please
+          <a routerLink="../request-reconfirm-email">request sending it again</a>.</li>
+        <li>We do not support zPass. Please use the system-specific password that you set during the E-mail confirmation. If you forgot it, please <a routerLink="../request-reset-password">request a password reset</a>.</li>
+      </ul>
+    </div>
+  </ng-template>
 
 </div>

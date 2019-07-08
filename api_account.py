@@ -4,8 +4,11 @@ from models import db
 from services.oauth import OAuthService, OAuthServiceError
 from services.user import UserService, UserServiceError
 from utils.mail import send_email
-from utils.session import get_session_user, requires_login, clear_current_user, set_current_user, get_current_user
+from utils.session import get_session_user, requires_login, clear_current_user, set_current_user, get_current_user, \
+    start_two_factor, get_two_factor_user, requires_two_factor_session
 from utils.upload import handle_upload, handle_post_upload, UploadError
+import utils.two_factor as two_factor
+from utils.qr_code import build_qr_code, img_to_base64
 
 account = Blueprint('account', __name__)
 
@@ -18,18 +21,25 @@ def account_login():
         password = _json.get('password')
         remember = _json.get('remember')
 
-        if app.config['SITE'].get('behind_proxy'):
-            ip = request.environ.get('HTTP_X_REAL_IP') or request.remote_addr
-        else:
-            ip = request.remote_addr
-        user = UserService.login(name_or_email, password, ip, request.user_agent)
+        user = UserService.login(name_or_email, password, _get_client_ip(), request.user_agent)
         if user is None:
             return jsonify(msg='user not found'), 404
 
-        set_current_user(user, remember)
+        if user.is_two_factor_enabled:
+            start_two_factor(user)
+        else:
+            set_current_user(user, remember)
         return jsonify(user.to_dict())
     except UserServiceError as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
+
+
+def _get_client_ip():
+    if app.config['SITE'].get('behind_proxy'):
+        ip = request.environ.get('HTTP_X_REAL_IP') or request.remote_addr
+    else:
+        ip = request.remote_addr
+    return ip
 
 
 @account.route('/logout')
@@ -227,5 +237,117 @@ def account_clients():
         return jsonify(msg=e.msg, detail=e.detail), 403
     except (UserServiceError, UploadError) as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
+
+
+@account.route('/two-factor/setup', methods=['GET', 'POST'])
+@requires_login
+def account_two_factor_setup():
+    try:
+        user = get_current_user()
+
+        two_factor.setup(user)
+        uri = two_factor.build_uri(user)
+
+        qr_code = build_qr_code(uri)
+        qr_code_b64 = img_to_base64(qr_code)
+
+        db.session.commit()
+        return jsonify(qr_code=qr_code_b64)
+    except OAuthServiceError as e:
+        return jsonify(msg=e.msg, detail=e.detail), 403
+    except two_factor.TwoFactorError as e:
+        return jsonify(msg=e.msg, detail=e.detail), 500
+
+
+@account.route('/two-factor/confirm-setup', methods=['POST'])
+@requires_login
+def account_two_factor_confirm_setup():
+    try:
+        user = get_current_user()
+
+        token = request.json.get('token')
+        two_factor.confirm_setup(user, token)
+
+        db.session.commit()
+        return "", 204
+    except OAuthServiceError as e:
+        return jsonify(msg=e.msg, detail=e.detail), 403
+    except two_factor.TwoFactorError as e:
+        return jsonify(msg=e.msg, detail=e.detail), 400
+
+
+@account.route('/two-factor/disable', methods=['POST'])
+@requires_login
+def account_two_factor_disable():
+    try:
+        user = get_current_user()
+
+        token = request.json.get('token')
+        two_factor.disable(user, token)
+
+        db.session.commit()
+        return "", 204
+    except OAuthServiceError as e:
+        return jsonify(msg=e.msg, detail=e.detail), 403
+    except two_factor.TwoFactorError as e:
+        return jsonify(msg=e.msg, detail=e.detail), 400
+
+
+@account.route('/two-factor/login', methods=['POST'])
+@requires_two_factor_session
+def account_two_factor_login():
+    try:
+        user = get_two_factor_user()
+
+        _json = request.json
+        token = _json.get('token')
+        remember = _json.get('remember')
+        UserService.two_factor_login(user, token, _get_client_ip(), request.user_agent)
+
+        set_current_user(user, remember)
+        return jsonify(user.to_dict())
+    except UserServiceError as e:
+        return jsonify(msg=e.msg, detail=e.detail), 400
+
+
+@account.route('/two-factor/request-disable-by-email')
+@requires_two_factor_session
+def account_two_factor_request_disable_by_email():
+    try:
+        user = get_two_factor_user()
+
+        UserService.two_factor_request_disable_by_email(user)
+        db.session.commit()
+
+        send_email(user.name, user.email, 'disable-two-factor', user=user, site=app.config['SITE'])
+        return "", 204
+    except UserServiceError as e:
+        return jsonify(msg=e.msg, detail=e.detail), 400
+
+
+@account.route('/two-factor/disable-by-email')
+def account_two_factor_disable_by_email():
+    try:
+        args = request.args
+        uid = args.get('uid')
+        token = args.get('token')
+
+        if uid is None:
+            return jsonify(msg='user id is required')
+        try:
+            uid = int(uid)
+        except ValueError:
+            return jsonify(msg='user id must be an integer')
+
+        user = UserService.get(uid)
+        if user is None:
+            return jsonify(msg='user not found'), 404
+
+        UserService.two_factor_disable_by_email(user, token)
+        db.session.commit()
+        return "", 204
+    except UserServiceError as e:
+        return jsonify(msg=e.msg, detail=e.detail), 400
+
 
 # TODO reject weak passwords

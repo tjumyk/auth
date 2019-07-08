@@ -1,3 +1,4 @@
+import time
 from functools import wraps
 
 from flask import session, jsonify, g, request
@@ -9,6 +10,11 @@ _session_key_user_id = 'user_id'
 _g_key_user = 'user'
 _g_key_oauth_authorization = 'oauth_authorization'
 _admin_group_name = 'admin'
+
+_session_key_two_factor_user_id = 'two_factor_user_id'
+_session_key_two_factor_window = 'two_factor_window'
+_g_key_two_factor_user = 'two_factor_user'
+_two_factor_window_span = 300  # seconds
 
 
 def set_current_user(user, remember):
@@ -71,6 +77,42 @@ def get_current_user():
         return get_session_user()
 
 
+def start_two_factor(user):
+    session[_session_key_two_factor_user_id] = user.id
+    session[_session_key_two_factor_window] = time.time() + _two_factor_window_span
+
+
+def clear_two_factor():
+    if _g_key_two_factor_user in g:
+        g.pop(_g_key_two_factor_user)
+    if _session_key_two_factor_user_id in session:
+        del session[_session_key_two_factor_user_id]
+    if _session_key_two_factor_window in session:
+        del session[_session_key_two_factor_window]
+
+
+def get_two_factor_user():
+    # check window
+    window = session.get(_session_key_two_factor_window)
+    if window is None or window < time.time():
+        clear_two_factor()
+        return None
+
+    user = g.get(_g_key_two_factor_user)
+    if user is not None:
+        return user
+    uid = session.get(_session_key_two_factor_user_id)
+    if uid is None:
+        return None
+    user = UserService.get(uid)
+    if user is None:  # user deleted?
+        clear_two_factor()  # avoid next db query
+        return None
+
+    setattr(g, _g_key_two_factor_user, user)
+    return user
+
+
 def requires_login(f):
     @wraps(f)
     def wrapped(*args, **kwargs):
@@ -106,6 +148,24 @@ def requires_admin(f):
             return jsonify(msg='inactive user'), 403
         if not any(group.name == _admin_group_name for group in user.groups):
             return jsonify(msg='admin required'), 403
+        return f(*args, **kwargs)
+
+    return wrapped
+
+
+def requires_two_factor_session(f):
+    @wraps(f)
+    def wrapped(*args, **kwargs):
+        try:
+            user = get_two_factor_user()
+        except UserServiceError as e:
+            return jsonify(msg=e.msg, detail=e.detail), 500
+
+        if user is None:
+            return jsonify(msg='two-factor session required',
+                           details='two-factor authentication was not started or is already expired'), 403
+        if not user.is_active:
+            return jsonify(msg='inactive user'), 403
         return f(*args, **kwargs)
 
     return wrapped

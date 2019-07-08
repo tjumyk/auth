@@ -10,6 +10,7 @@ export class User {
   nickname: string;
   avatar: string;
   is_active: boolean;
+  is_two_factor_enabled: boolean;
 
   groups?: Group[];
   group_ids?: number[];
@@ -94,4 +95,8 @@ export class ExternalUserInfoResult{
   type: string;
   result?: any;
   error?: BasicError;
+}
+
+export class TwoFactorSetupInfo{
+  qr_code: string;
 }

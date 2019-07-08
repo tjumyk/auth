@@ -34,6 +34,8 @@ export class OauthLoginComponent implements OnInit {
   user: User;
   client: OAuthClient;
 
+  show_two_factor: boolean;
+
   form: LoginForm = {
     name_or_email: undefined,
     password: undefined,
@@ -107,11 +109,19 @@ export class OauthLoginComponent implements OnInit {
       finalize(() => this.logging_in = false)
     ).subscribe(
       (user) => {
-        this.user = user;
-        this.oauthConnect()
+        if(user.is_two_factor_enabled){
+          this.show_two_factor = true;
+        }else{
+          this.afterLogin(user)
+        }
       },
       (error) => this.error = error.error
     );
+  }
+
+  afterLogin(user: User){
+    this.user = user;
+    this.oauthConnect()
   }
 
   oauthConnect() {

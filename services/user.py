@@ -7,6 +7,7 @@ from sqlalchemy import or_, func
 
 from error import BasicError
 from models import db, User
+import utils.two_factor as two_factor
 
 
 class UserServiceError(BasicError):
@@ -25,6 +26,8 @@ class UserService:
     password_reset_request_wait = timedelta(minutes=1)
     login_recent_failures_time_span = timedelta(minutes=15)
     login_recent_failures_lock_threshold = 5
+    two_factor_disable_token_valid = timedelta(minutes=15)
+    two_factor_disable_token_request_wait = timedelta(minutes=1)
 
     profile_fields = {
         'nickname',
@@ -106,13 +109,7 @@ class UserService:
         if user is None:
             return None
 
-        from .login_record import LoginRecordService
-        recent_failures_time_span = UserService.login_recent_failures_time_span
-        if LoginRecordService.count_recent_failures_for_user(user, recent_failures_time_span) >= \
-                UserService.login_recent_failures_lock_threshold:
-            recent_failures_minutes = round(recent_failures_time_span.total_seconds() / 60)
-            raise UserServiceError('too many recent failures', 'Please wait for at most %d minutes and then try again'
-                                   % recent_failures_minutes)
+        UserService.check_login_recent_failures(user)
 
         error = None
         if not user.is_active:
@@ -122,12 +119,61 @@ class UserService:
         elif not pbkdf2_sha256.verify(password, user.password):
             error = 'wrong password'
 
+        # two-factor authentication
+        if error is None and user.is_two_factor_enabled:  # skip adding 'success' login record
+            return user
+
+        from .login_record import LoginRecordService
         LoginRecordService.add(user, ip, user_agent.string, error is None, error)
         db.session.commit()  # force commit, a little bit ugly
 
         if error is not None:
             raise UserServiceError(error)
         return user
+
+    @staticmethod
+    def two_factor_login(user: User, token, ip, user_agent):
+        if user is None:
+            raise UserServiceError('user is required')
+        if token is None:
+            raise UserServiceError('token is required')
+
+        UserService.check_login_recent_failures(user)
+
+        error = None
+        error_source = None
+        # duplicate user status checks to ensure safety
+        if not user.is_active:
+            error = 'inactive user'
+        elif not user.is_email_confirmed:
+            error = 'email not confirmed'
+        else:
+            try:
+                two_factor.verify(user, token)
+            except two_factor.TwoFactorError as e:
+                error = 'two-factor: %s' % e.msg
+                error_source = e
+
+        from .login_record import LoginRecordService
+        LoginRecordService.add(user, ip, user_agent.string, error is None, error)
+        db.session.commit()  # force commit, a little bit ugly
+
+        if error is not None:
+            if error_source is not None:
+                raise UserServiceError(msg=error_source.msg, detail=error_source.detail)
+            else:
+                raise UserServiceError(error)
+        return user
+
+    @staticmethod
+    def check_login_recent_failures(user):
+        from .login_record import LoginRecordService
+        recent_failures_time_span = UserService.login_recent_failures_time_span
+        if LoginRecordService.count_recent_failures_for_user(user, recent_failures_time_span) >= \
+                UserService.login_recent_failures_lock_threshold:
+            recent_failures_minutes = round(recent_failures_time_span.total_seconds() / 60)
+            raise UserServiceError('too many recent failures', 'Please wait for at most %d minutes and then try again'
+                                   % recent_failures_minutes)
 
     @staticmethod
     def invite(name, email):
@@ -352,3 +398,43 @@ class UserService:
             user.password = pbkdf2_sha256.hash(new_password)
             user.password_reset_token = None
             user.password_reset_token_expire_at = None
+
+    @staticmethod
+    def two_factor_request_disable_by_email(user: User):
+        if user is None:
+            raise UserServiceError('user is required')
+
+        if not user.is_active:
+            raise UserServiceError('inactive user')
+        if user.email is None:
+            raise UserServiceError('no email')
+
+        if user.two_factor_disable_token_expire_at is not None:  # check if requested too frequently
+            wait = user.two_factor_disable_token_expire_at - UserService.two_factor_disable_token_valid + \
+                   UserService.two_factor_disable_token_request_wait - datetime.utcnow()
+            wait_seconds = round(wait.total_seconds())
+            if wait_seconds > 0:
+                raise UserServiceError('requested too frequently',
+                                       'please wait for %d seconds and then try again' % wait_seconds)
+
+        user.two_factor_disable_token = token_urlsafe()
+        user.two_factor_disable_token_expire_at = datetime.utcnow() + UserService.two_factor_disable_token_valid
+
+    @staticmethod
+    def two_factor_disable_by_email(user: User, reset_token):
+        if user is None:
+            raise UserServiceError('user is required')
+        if reset_token is None:
+            raise UserServiceError('token is required')
+
+        if not user.is_active:
+            raise UserServiceError('inactive user')
+        if user.two_factor_disable_token is None:
+            raise UserServiceError('not to reset')
+        if user.two_factor_disable_token != reset_token:
+            raise UserServiceError('invalid token')
+        if user.two_factor_disable_token_expire_at < datetime.utcnow():
+            raise UserServiceError('token expired')
+
+        user.two_factor_disable_token = None
+        user.two_factor_disable_token_expire_at = None

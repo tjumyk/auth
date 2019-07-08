@@ -22,6 +22,8 @@ export class AccountLoginComponent implements OnInit {
   logging_in: boolean;
   error: BasicError;
 
+  show_two_factor: boolean;
+
   form: LoginForm = {
     name_or_email: undefined,
     password: undefined,
@@ -46,8 +48,7 @@ export class AccountLoginComponent implements OnInit {
     ).subscribe(
       user => {
         if (user != null) {
-          let redirect = this.route.snapshot.queryParamMap.get('redirect') || "/";
-          this.router.navigate([redirect], {replaceUrl: true});
+          this.afterLogin(user)
         }
       },
       error => this.error = error.error
@@ -64,10 +65,18 @@ export class AccountLoginComponent implements OnInit {
       finalize(() => this.logging_in = false)
     ).subscribe(
       (user: User) => {
-        let redirect = this.route.snapshot.queryParamMap.get('redirect') || "/";
-        this.router.navigate([redirect], {replaceUrl: true})
+        if(user.is_two_factor_enabled){
+          this.show_two_factor = true;
+        }else{
+          this.afterLogin(user)
+        }
       },
       (error) => this.error = error.error
     );
+  }
+
+  afterLogin(user: User){
+    let redirect = this.route.snapshot.queryParamMap.get('redirect') || "/";
+    this.router.navigate([redirect], {replaceUrl: true})
   }
 }

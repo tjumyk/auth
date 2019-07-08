@@ -1,0 +1,101 @@
+<div class="ui error message" *ngIf="error">
+  <i class="close icon" (click)="error=undefined"></i>
+  <div class="header"><i class="times circle icon"></i> {{error.msg}}</div>
+  <p>{{error.detail}}</p>
+</div>
+
+<div class="ui raised segments">
+  <div class="ui segment">
+    <div class="ui header">
+      <i class="icon shield alternate"></i>
+      Two-Factor Authentication
+    </div>
+  </div>
+  <div class="ui segment">
+    <ng-container *ngIf="user">
+      <ng-container *ngIf="user.is_two_factor_enabled; else no2FA">
+        <p><i class="icon green check circle"></i> Two-factor authentication is already enabled!</p>
+
+        <div class="disable-start" *ngIf="!show_disable_form; else disable_form">
+          <button class="ui button red" (click)="show_disable_form=true">Disable Two-Factor Authentication</button>
+        </div>
+
+        <ng-template #disable_form>
+          <form class="ui form" [ngClass]="{'loading': disabling}" #f="ngForm" (ngSubmit)="disable(f)">
+            <div class="field" [ngClass]="{'error': (f.submitted || token_model.touched || token_model.dirty) && token_model.invalid}">
+              <label>Token</label>
+              <input type="text" name="token" maxlength="6" placeholder="Please enter the 6-digit token from your Authenticator app" required
+                     [(ngModel)]="disable_token" #token_model="ngModel" autocomplete="off">
+              <div class="errors" *ngIf="token_model.errors">
+                <label *ngIf="token_model.errors.required"><i class="icon times"></i> Token is required</label>
+              </div>
+            </div>
+            <button class="ui red fluid button" type="submit">Verify & Disable</button>
+          </form>
+        </ng-template>
+      </ng-container>
+
+      <ng-template #no2FA>
+        <div class="setup-info" *ngIf="setup_info; else setup_start">
+          <div class="qr-code">
+            <img class="ui image large centered" [src]="setup_info.qr_code" alt="qr_code">
+            <div class="expired" *ngIf="setup_info_expired">
+              <div>
+                <h3>QR code has been expired</h3>
+                <button class="ui button" (click)="setup()" [ngClass]="{'loading disabled': setting_up}"><i class="icon repeat"></i> Re-generate QR code</button>
+              </div>
+            </div>
+          </div>
+
+          <form class="ui form" [ngClass]="{'loading': confirming}" #f="ngForm" (ngSubmit)="confirmSetup(f)">
+            <div class="field" [ngClass]="{'error': (f.submitted || token_model.touched || token_model.dirty) && token_model.invalid, 'disabled': setup_info_expired}">
+              <label>Token</label>
+              <input type="text" name="token" maxlength="6" placeholder="Please enter the 6-digit token from your Authenticator app" required
+                     [(ngModel)]="confirm_token" #token_model="ngModel" autocomplete="off">
+              <div class="errors" *ngIf="token_model.errors">
+                <label *ngIf="token_model.errors.required"><i class="icon times"></i> Token is required</label>
+              </div>
+            </div>
+            <button class="ui primary fluid button" [ngClass]="{'disabled': setup_info_expired}" type="submit">Verify & Enable</button>
+          </form>
+        </div>
+
+        <ng-template #setup_start>
+          <div class="setup-start">
+            <h4 class="ui header">How to enable Two-Factor Authentication?</h4>
+            <ol class="ui list">
+              <li class="item">
+                <div class="content">
+                  Install Google Authenticator App or any other similar apps.
+                  <div>
+                    <a class="ui button tiny" target="_blank" href="https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2&pcampaignid=MKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1">
+                      <i class="icon google play"></i> Google Play
+                    </a>
+                    <a class="ui button tiny" target="_blank" href="https://apps.apple.com/us/app/google-authenticator/id388497605?mt=8">
+                      <i class="icon apple"></i> App Store
+                    </a>
+                  </div>
+                </div>
+
+              </li>
+              <li class="item">
+                <div class="content">Click the following 'Enable Two-Factor Authentication' button.</div>
+              </li>
+              <li class="item">
+                <div class="content">Scan the generated QR code in the Authenticator app.</div>
+              </li>
+              <li class="item">
+                <div class="content">Enter the token shown in the Authenticator app.</div>
+              </li>
+              <li class="item">
+                <div class="content">Click 'Verify & Enable' to finish the process.</div>
+              </li>
+            </ol>
+            <button class="ui button primary" (click)="setup()" [ngClass]="{'loading disabled': setting_up}">Enable Two-Factor Authentication</button>
+          </div>
+        </ng-template>
+
+      </ng-template>
+    </ng-container>
+  </div>
+</div>

@@ -19,6 +19,11 @@
 
 <div *ngIf="!verifying_logged_in && !user">
 
+  <div *ngIf="show_two_factor; else login_form">
+    <app-two-factor-login-box (error)="error=$event" (back)="show_two_factor=false" (verified)="afterLogin($event)" [remember]="form.remember"></app-two-factor-login-box>
+  </div>
+
+  <ng-template #login_form>
     <div class="ui raised segments">
 
       <div class="ui segment center aligned" *ngIf="loading_client || client">
@@ -73,13 +78,13 @@
       </div>
     </div>
 
-
-  <div class="ui message">
-    <ul class="list">
-      <li>You need to confirm your E-mail address before your first login. If you can't find the confirmation letter in your mailbox, please
-        <a routerLink="/account/request-reconfirm-email">request sending it again</a>.</li>
-      <li>We do not support zPass. Please use the system-specific password that you set during the E-mail confirmation. If you forgot it, please <a routerLink="/account/request-reset-password">request a password reset</a>.</li>
-    </ul>
-  </div>
+    <div class="ui message">
+      <ul class="list">
+        <li>You need to confirm your E-mail address before your first login. If you can't find the confirmation letter in your mailbox, please
+          <a routerLink="/account/request-reconfirm-email">request sending it again</a>.</li>
+        <li>We do not support zPass. Please use the system-specific password that you set during the E-mail confirmation. If you forgot it, please <a routerLink="/account/request-reset-password">request a password reset</a>.</li>
+      </ul>
+    </div>
+  </ng-template>
 
 </div>

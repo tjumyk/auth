@@ -5,3 +5,5 @@ passlib[bcrypt]
 Pillow
 geoip2
 requests
+cryptography
+qrcode[pil]
