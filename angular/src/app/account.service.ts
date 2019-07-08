@@ -158,13 +158,13 @@ export class AccountService {
   }
 
   confirm_setup_two_factor(token: string): Observable<any>{
-    return this.http.post<TwoFactorSetupInfo>(`${this.api}/two-factor/confirm-setup`, {token}).pipe(
+    return this.http.post(`${this.api}/two-factor/confirm-setup`, {token}).pipe(
       tap(() => this.logger.info(`Confirmed setting-up two-factor authentication`))
     )
   }
 
   disable_two_factor(token: string): Observable<any>{
-    return this.http.post<TwoFactorSetupInfo>(`${this.api}/two-factor/disable`, {token}).pipe(
+    return this.http.post(`${this.api}/two-factor/disable`, {token}).pipe(
       tap(() => this.logger.info(`Disabled two-factor authentication`))
     )
   }
