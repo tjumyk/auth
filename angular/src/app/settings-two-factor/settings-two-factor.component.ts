@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {BasicError, TwoFactorSetupInfo, User} from "../models";
 import {finalize} from "rxjs/operators";
 import {TitleService} from "../title.service";
@@ -10,7 +10,7 @@ import {NgForm} from "@angular/forms";
   templateUrl: './settings-two-factor.component.html',
   styleUrls: ['./settings-two-factor.component.less']
 })
-export class SettingsTwoFactorComponent implements OnInit {
+export class SettingsTwoFactorComponent implements OnInit, OnDestroy {
   error: BasicError;
 
   loading_user: boolean;
@@ -19,6 +19,7 @@ export class SettingsTwoFactorComponent implements OnInit {
   setting_up: boolean;
   setup_info: TwoFactorSetupInfo;
   setup_info_expired: boolean;
+  setup_info_expire_timer: number;
   setup_info_expire_time = 55 * 1000;  // -5 seconds to ensure not expired
 
   confirming: boolean;
@@ -45,6 +46,10 @@ export class SettingsTwoFactorComponent implements OnInit {
     )
   }
 
+  ngOnDestroy(): void {
+    clearTimeout(this.setup_info_expire_timer);
+  }
+
   setup(){
     this.setting_up = true;
     this.accountService.setup_two_factor().pipe(
@@ -54,7 +59,8 @@ export class SettingsTwoFactorComponent implements OnInit {
         this.setup_info = info;
         this.setup_info_expired = false;
 
-        setTimeout(
+        clearTimeout(this.setup_info_expire_timer);  // clear possible existing timer
+        this.setup_info_expire_timer = setTimeout(
           ()=>this.setup_info_expired = true,
           this.setup_info_expire_time
         )
@@ -74,6 +80,7 @@ export class SettingsTwoFactorComponent implements OnInit {
       ()=>{
         this.user.is_two_factor_enabled = true;
         this.setup_info = undefined;
+        clearTimeout(this.setup_info_expire_timer);
         this.show_disable_form = false;
       },
       error=>this.error = error.error
