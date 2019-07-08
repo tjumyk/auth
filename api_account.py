@@ -81,7 +81,8 @@ def account_confirm_email():
             new_password = request.json.get('new_password')
             UserService.confirm_email(user, token, new_password)
             db.session.commit()
-            set_current_user(user, False)  # auto login for better user experience
+            if not user.is_two_factor_enabled:
+                set_current_user(user, False)  # auto login for better user experience
             return "", 204
     except UserServiceError as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
