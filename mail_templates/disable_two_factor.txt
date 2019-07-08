@@ -1,0 +1,10 @@
+Disable Two-Factor Authentication
+Hi {user.name},
+
+Please use the following link to disable the Two-Factor Authentication for your account.
+
+{site[root_url]}{site[base_url]}account/disable-two-factor-by-email?uid={user.id}&token={user.two_factor_disable_token}
+
+If you find any problem, please contact the system administrators immediately.
+
+{site[name]}

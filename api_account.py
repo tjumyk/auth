@@ -319,7 +319,7 @@ def account_two_factor_request_disable_by_email():
         UserService.two_factor_request_disable_by_email(user)
         db.session.commit()
 
-        send_email(user.name, user.email, 'disable-two-factor', user=user, site=app.config['SITE'])
+        send_email(user.name, user.email, 'disable_two_factor', user=user, site=app.config['SITE'])
         return "", 204
     except UserServiceError as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
