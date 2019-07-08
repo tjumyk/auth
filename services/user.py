@@ -409,6 +409,9 @@ class UserService:
         if user.email is None:
             raise UserServiceError('no email')
 
+        if not user.is_two_factor_enabled:
+            raise UserServiceError('two-factor authentication is not enabled')
+
         if user.two_factor_disable_token_expire_at is not None:  # check if requested too frequently
             wait = user.two_factor_disable_token_expire_at - UserService.two_factor_disable_token_valid + \
                    UserService.two_factor_disable_token_request_wait - datetime.utcnow()
@@ -429,6 +432,9 @@ class UserService:
 
         if not user.is_active:
             raise UserServiceError('inactive user')
+
+        if not user.is_two_factor_enabled:
+            raise UserServiceError('two-factor authentication is not enabled')
         if user.two_factor_disable_token is None:
             raise UserServiceError('not to reset')
         if user.two_factor_disable_token != reset_token:
@@ -438,3 +444,4 @@ class UserService:
 
         user.two_factor_disable_token = None
         user.two_factor_disable_token_expire_at = None
+        user.is_two_factor_enabled = False
