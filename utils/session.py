@@ -151,21 +151,3 @@ def requires_admin(f):
         return f(*args, **kwargs)
 
     return wrapped
-
-
-def requires_two_factor_session(f):
-    @wraps(f)
-    def wrapped(*args, **kwargs):
-        try:
-            user = get_two_factor_user()
-        except UserServiceError as e:
-            return jsonify(msg=e.msg, detail=e.detail), 500
-
-        if user is None:
-            return jsonify(msg='two-factor session required',
-                           detail='two-factor authentication was not started or is already expired'), 403
-        if not user.is_active:
-            return jsonify(msg='inactive user'), 403
-        return f(*args, **kwargs)
-
-    return wrapped

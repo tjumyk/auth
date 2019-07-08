@@ -5,7 +5,7 @@ from services.oauth import OAuthService, OAuthServiceError
 from services.user import UserService, UserServiceError
 from utils.mail import send_email
 from utils.session import get_session_user, requires_login, clear_current_user, set_current_user, get_current_user, \
-    start_two_factor, get_two_factor_user, requires_two_factor_session
+    start_two_factor, get_two_factor_user
 from utils.upload import handle_upload, handle_post_upload, UploadError
 import utils.two_factor as two_factor
 from utils.qr_code import build_qr_code, img_to_base64
@@ -295,10 +295,11 @@ def account_two_factor_disable():
 
 
 @account.route('/two-factor/login', methods=['POST'])
-@requires_two_factor_session
 def account_two_factor_login():
     try:
         user = get_two_factor_user()
+        if user is None:
+            return jsonify(msg='two-factor authentication was not started or is already expired'), 403
 
         _json = request.json
         token = _json.get('token')
@@ -312,16 +313,21 @@ def account_two_factor_login():
 
 
 @account.route('/two-factor/request-disable-by-email')
-@requires_two_factor_session
 def account_two_factor_request_disable_by_email():
     try:
-        user = get_two_factor_user()
+        user = get_current_user()  # if logged in, still allow disabling 2FA by email
+        if user is None:  # if not logged in
+            user = get_two_factor_user()  # try to get the user from temporary two-factor session
+            if user is None:
+                return jsonify(msg='two-factor authentication was not started or is already expired'), 403
 
         UserService.two_factor_request_disable_by_email(user)
         db.session.commit()
 
         send_email(user.name, user.email, 'disable_two_factor', user=user, site=app.config['SITE'])
         return "", 204
+    except OAuthServiceError as e:
+        return jsonify(msg=e.msg, detail=e.detail), 403
     except UserServiceError as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
 
