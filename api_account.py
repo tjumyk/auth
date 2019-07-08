@@ -26,6 +26,7 @@ def account_login():
             return jsonify(msg='user not found'), 404
 
         if user.is_two_factor_enabled:
+            # the user id will be temporarily stored in session for 2FA purpose only (so-called "two-factor user")
             start_two_factor(user)
         else:
             set_current_user(user, remember)
