@@ -163,7 +163,7 @@ def requires_two_factor_session(f):
 
         if user is None:
             return jsonify(msg='two-factor session required',
-                           details='two-factor authentication was not started or is already expired'), 403
+                           detail='two-factor authentication was not started or is already expired'), 403
         if not user.is_active:
             return jsonify(msg='inactive user'), 403
         return f(*args, **kwargs)
