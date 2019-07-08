@@ -16,6 +16,12 @@
           </div>
         </h2>
 
+        <div class="ui warning message" *ngIf="isAdmin && !user.is_two_factor_enabled">
+          <div class="header"><i class="exclamation triangle icon"></i> Please enable the Two-Factor Authentication!</div>
+          <p>Since admins have superpowers, we strongly suggest you enabling the Two-Factor Authentication to protect both your account and the systems.</p>
+          <a class="ui button tiny" routerLink="/settings/two-factor">Enable it Now!</a>
+        </div>
+
         <div class="ui error message" *ngIf="error">
           <i class="close icon" (click)="error=undefined"></i>
           <div class="header"><i class="times circle icon"></i> {{error.msg}}</div>
