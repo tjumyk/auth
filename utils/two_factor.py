@@ -54,7 +54,7 @@ def confirm_setup(user: User, token: str):
     if user.is_two_factor_enabled:
         raise TwoFactorError('two-factor authentication is already enabled')
     if user.two_factor_setup_expire_at < datetime.utcnow():
-        raise TwoFactorError('QR code expired')
+        raise TwoFactorError('setup session expired')
 
     verify(user, token)
     user.is_two_factor_enabled = True

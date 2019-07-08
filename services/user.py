@@ -289,7 +289,7 @@ class UserService:
         if user.is_email_confirmed:
             raise UserServiceError('already confirmed')
         if user.email_confirm_token is None:
-            raise UserServiceError('not to confirm')
+            raise UserServiceError('no active request')
         if user.email_confirm_token != token:
             raise UserServiceError('invalid token')
         if user.email_confirm_token_expire_at < datetime.utcnow():
@@ -386,7 +386,7 @@ class UserService:
         if not user.is_active:
             raise UserServiceError('inactive user')
         if user.password_reset_token is None:
-            raise UserServiceError('not to reset')
+            raise UserServiceError('no active request')
         if user.password_reset_token != reset_token:
             raise UserServiceError('invalid token')
         if user.password_reset_token_expire_at < datetime.utcnow():
@@ -436,7 +436,7 @@ class UserService:
         if not user.is_two_factor_enabled:
             raise UserServiceError('two-factor authentication is not enabled')
         if user.two_factor_disable_token is None:
-            raise UserServiceError('not to reset')
+            raise UserServiceError('no active request')
         if user.two_factor_disable_token != reset_token:
             raise UserServiceError('invalid token')
         if user.two_factor_disable_token_expire_at < datetime.utcnow():
