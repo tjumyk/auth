@@ -1,4 +1,6 @@
-from flask import Blueprint, current_app as app, request, jsonify
+from time import time
+
+from flask import Blueprint, current_app as app, request, jsonify, current_app, json
 
 from models import db
 from services.group import GroupService, GroupServiceError
@@ -401,6 +403,77 @@ def oauth_client_regenerate_secret(cid):
         OAuthService.regenerate_client_secret(client)
         db.session.commit()
         return "", 204
+    except OAuthServiceError as e:
+        return jsonify(msg=e.msg, detail=e.detail), 400
+
+
+@admin.route('/clients/<int:cid>/generate-config-file')
+@requires_admin
+def oauth_client_generate_config_file(cid):
+    try:
+        client = OAuthService.get_client(cid)
+        if client is None:
+            return jsonify(msg='client not found'), 404
+
+        config = current_app.config
+        site_config = config['SITE']
+
+        # slash, slash, slash
+        site_url = ('%s/%s' % (site_config['root_url'].rstrip('/'), site_config['base_url'].strip('/'))).rstrip('/')
+
+        # I forgot why I put both Redirect URL and Home URL into the database.
+        # Normally, the Redirect URL should always start with Home URL (again, it should be names as 'Root URL').
+        # It should be necessary to store a Root URL and a Callback Path (or params) as the config file does.
+        # Nevertheless, it requires much work in db, services, apis, front-end to apply this change. Especially, the
+        # logic change about authentications is very sensitive to any potential defects.
+        # So, I just leave this strange design here as it is.
+
+        # remove redundant slash for concatenation with callback path
+        client_root_url_stripped = client.home_url.rstrip('/')
+        if not client.redirect_url.startswith(client_root_url_stripped):
+            return jsonify(msg='Redirect URL does not start with Home URL'), 400
+        callback_path = client.redirect_url[len(client_root_url_stripped):]
+
+        client_config_file_name = 'oauth.config.json'
+        client_config = {
+            "enabled": True,
+            "resolve_real_ip": site_config.get('behind_proxy', False),
+            "whitelist": [],
+            "server": {
+                "url": site_url,
+                "connect_page": "/oauth/connect",
+                "token_api": "/api/oauth/token",
+                "profile_api": "/api/account/me",
+                "admin_users_api": "/api/admin/users",
+                "admin_groups_api": "/api/admin/groups",
+                "profile_page": "/settings/profile",
+                "admin_user_page": "/admin/account/users/u/{uid}",
+                "admin_group_page": "/admin/account/groups/g/{gid}"
+            },
+            "client": {
+                "id": client.id,
+                "secret": client.secret,
+                "url": client_root_url_stripped,
+                "callback_path": callback_path,
+                "profile_path": "/account/profile",
+                "admin_user_path": "/admin/users/<int:uid>",
+                "admin_group_path": "/admin/groups/<int:gid>"
+            }
+        }
+
+        # use flask internal json apis to enforce key-order-preserving pretty-print on output json.
+        rv = current_app.response_class(
+            json.dumps(client_config, indent=2, separators=(', ', ': '), sort_keys=False) + '\n',
+            mimetype=current_app.config['JSONIFY_MIMETYPE'],
+            headers={
+                'Content-Disposition': 'attachment; filename="%s"' % client_config_file_name
+            }
+        )
+        # disable cache
+        rv.cache_control.max_age = 0
+        rv.expires = int(time())
+
+        return rv
     except OAuthServiceError as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
 

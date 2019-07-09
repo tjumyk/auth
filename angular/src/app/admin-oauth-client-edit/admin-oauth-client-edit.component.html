@@ -77,6 +77,10 @@
             <a class="ui yellow button" [ngClass]="{'loading disabled': regenerating_secret}" (click)="regenerateSecret()"><i class="repeat icon"></i> Regenerate Secret</a>
             <a class="ui red button" (click)="deleteClient()" [ngClass]="{'loading disabled': deleting}"><i class="trash icon"></i>Delete Client</a>
           </p>
+
+          <p>
+            <a class="ui green button fluid" href="/api/admin/clients/{{cid}}/generate-config-file"><i class="download icon"></i> Download Client Configuration File</a>
+          </p>
         </div>
 
         <div class="ui segment">
