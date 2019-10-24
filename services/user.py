@@ -112,12 +112,19 @@ class UserService:
         UserService.check_login_recent_failures(user)
 
         error = None
+        error_detail = None
         if not user.is_active:
             error = 'inactive user'
         elif not user.is_email_confirmed:
             error = 'email not confirmed'
+            error_detail = 'Please find the E-mail Confirmation letter in your mailbox and click the link in the ' \
+                           'letter to confirm your E-mail address. If you want us to resend the letter, please click ' \
+                           'the "Re-confirm E-mail" link below.'
         elif not pbkdf2_sha256.verify(password, user.password):
             error = 'wrong password'
+            error_detail = 'ZPass is not supported. Please use the password that you set during the E-mail ' \
+                           'confirmation. If you forgot your password, please click the "Reset ' \
+                           'Password" link below.'
 
         # two-factor authentication
         if error is None and user.is_two_factor_enabled:  # skip adding 'success' login record
@@ -128,7 +135,7 @@ class UserService:
         db.session.commit()  # force commit, a little bit ugly
 
         if error is not None:
-            raise UserServiceError(error)
+            raise UserServiceError(error, detail=error_detail)
         return user
 
     @staticmethod
