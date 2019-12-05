@@ -445,6 +445,7 @@ def oauth_client_generate_config_file(cid):
                 "token_api": "/api/oauth/token",
                 "profile_api": "/api/account/me",
                 "admin_users_api": "/api/admin/users",
+                "admin_user_by_name_api": "/api/admin/user-by-name",
                 "admin_groups_api": "/api/admin/groups",
                 "profile_page": "/settings/profile",
                 "admin_user_page": "/admin/account/users/u/{uid}",
