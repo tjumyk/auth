@@ -16,7 +16,9 @@ class KerberosAuthProvider(ExternalAuthProvider):
     def check(self, name: str, password: str) -> bool:
         try:
             return kerberos.checkPassword(name, password, self.endpoint_url, self.default_realm)
-        except Exception as e:
+        except kerberos.KrbError as e:
+            if e.args and e.args[0] == 'Preauthentication failed':  # do not treat it as an error
+                return False
             raise ExternalAuthError('External authentication failed', str(e)) from e
 
     def to_dict(self) -> dict:
