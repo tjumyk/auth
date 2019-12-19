@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {BasicError} from "../models";
+import {BasicError, ExternalAuthProvider, User} from "../models";
 import {NgForm} from "@angular/forms";
 import {AccountService} from "../account.service";
 import {finalize} from "rxjs/operators";
@@ -17,6 +17,9 @@ class UpdatePasswordForm {
   styleUrls: ['./settings-password.component.less']
 })
 export class SettingsPasswordComponent implements OnInit {
+  user: User;
+  provider: ExternalAuthProvider;
+
   updating_password: boolean;
   error: BasicError;
   success: boolean;
@@ -34,7 +37,21 @@ export class SettingsPasswordComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.titleService.setTitle('Password', 'Settings')
+    this.titleService.setTitle('Password', 'Settings');
+
+    this.accountService.get_current_user().subscribe(
+      user => {
+        this.user = user;
+
+        if (user.external_auth_provider_id) {
+          this.accountService.get_external_auth_provider(user.external_auth_provider_id).subscribe(
+            provider => this.provider = provider,
+            error => this.error = error.error
+          )
+        }
+      },
+      error => this.error = error.error
+    )
   }
 
   updatePassword(f: NgForm) {

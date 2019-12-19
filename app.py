@@ -8,12 +8,14 @@ from page_oauth import oauth_pages
 from services.group import GroupService
 from services.user import UserService
 from utils import upload
+from utils.external_auth import provider
 
 app = Flask(__name__)
 app.config.from_json('config.json')
 
 db.init_app(app)
 upload.init_app(app)
+provider.init_app(app)
 
 app.register_blueprint(account, url_prefix='/api/account')
 app.register_blueprint(admin, url_prefix='/api/admin')

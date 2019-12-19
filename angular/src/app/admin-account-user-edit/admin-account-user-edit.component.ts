@@ -1,12 +1,13 @@
 import {Component, OnInit} from '@angular/core';
 import {Location} from "@angular/common";
-import {BasicError, ExternalUserInfoResult, LoginRecord, UserAdvanced} from "../models";
+import {BasicError, ExternalAuthProvider, ExternalUserInfoResult, LoginRecord, UserAdvanced} from "../models";
 import {NgForm} from "@angular/forms";
 import {UploadFilters, UploadValidator} from "../upload-util";
 import {finalize} from "rxjs/operators";
 import {ActivatedRoute, Router} from "@angular/router";
 import {AdminService} from "../admin.service";
 import {TitleService} from "../title.service";
+import {AccountService} from "../account.service";
 
 
 class StatusForm {
@@ -56,8 +57,10 @@ export class AdminAccountUserEditComponent implements OnInit {
   uid: number;
   status_form: StatusForm = new StatusForm();
   form: ProfileForm = new ProfileForm();
+  provider: ExternalAuthProvider;
 
   constructor(
+    private accountService: AccountService,
     private adminService: AdminService,
     private route: ActivatedRoute,
     private router: Router,
@@ -103,6 +106,13 @@ export class AdminAccountUserEditComponent implements OnInit {
     this.status_form.is_active = this.user.is_active;
 
     this.getExternalInfo();
+
+    if(user.external_auth_provider_id){
+      this.accountService.get_external_auth_provider(user.external_auth_provider_id).subscribe(
+        provider=>this.provider = provider,
+        error=>this.error = error.error
+      )
+    }
   }
 
 

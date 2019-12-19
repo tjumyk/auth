@@ -3,6 +3,7 @@ import {HttpClient, HttpParams} from "@angular/common/http";
 import {Logger, LogService} from "./log.service";
 import {Observable} from "rxjs/internal/Observable";
 import {
+  ExternalAuthProvider,
   ExternalUserInfoResult,
   GroupAdvanced,
   IPInfo,
@@ -12,6 +13,13 @@ import {
   UserAdvanced
 } from "./models";
 import {map, tap} from "rxjs/operators";
+
+export class InviteForm {
+  name: string;
+  email: string;
+  external_auth_provider_id?: ExternalAuthProvider;
+  skip_email_confirmation?: boolean;
+}
 
 @Injectable({
   providedIn: 'root'
@@ -60,8 +68,8 @@ export class AdminService {
     )
   }
 
-  invite_user(name: string, email: string): Observable<UserAdvanced> {
-    return this.http.post<UserAdvanced>(`${this.api}/users`, {name: name, email: email}).pipe(
+  invite_user(form: InviteForm): Observable<UserAdvanced> {
+    return this.http.post<UserAdvanced>(`${this.api}/users`, form).pipe(
       tap((user: UserAdvanced) => this.logger.info(`Invited user ${user.name} (${user.email})`))
     )
   }

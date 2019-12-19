@@ -46,6 +46,15 @@
               <span *ngIf="user.groups.length==0" class="text muted">(None)</span>
             </div>
             <div class="item">
+              <div class="header">Auth Provider</div>
+              <ng-container *ngIf="user.external_auth_provider_id; else localProvider">
+                <span *ngIf="provider; else noProviderInfo">{{provider.name}}</span>
+                <ng-template #noProviderInfo>{{user.external_auth_provider_id}}</ng-template>
+                <span *ngIf="!user.external_auth_enforced"> / Local</span>
+              </ng-container>
+              <ng-template #localProvider>Local</ng-template>
+            </div>
+            <div class="item">
               <div class="header">Two-Factor Authentication</div>
               <span *ngIf="user.is_two_factor_enabled; else no2FA" class="text success">Enabled</span>
               <ng-template #no2FA>

@@ -1,9 +1,10 @@
 import {Component, OnInit} from '@angular/core';
-import {BasicError} from "../models";
+import {BasicError, ExternalAuthProvider} from "../models";
 import {AccountService} from "../account.service";
 import {NgForm} from "@angular/forms";
 import {finalize} from "rxjs/operators";
 import {TitleService} from "../title.service";
+import {Router} from "@angular/router";
 
 @Component({
   selector: 'app-account-req-reset-password',
@@ -16,9 +17,12 @@ export class AccountReqResetPasswordComponent implements OnInit {
   success: boolean;
   name_or_email: string;
 
+  provider: ExternalAuthProvider;
+
   constructor(
     private accountService: AccountService,
-    private titleService: TitleService
+    private titleService: TitleService,
+    private router: Router
   ) {
   }
 
@@ -34,7 +38,13 @@ export class AccountReqResetPasswordComponent implements OnInit {
     this.accountService.request_reset_password(this.name_or_email).pipe(
       finalize(() => this.requesting = false)
     ).subscribe(
-      () => this.success = true,
+      resp => {
+        if(resp === null){
+          this.success = true;
+        }else{
+          this.provider = resp as ExternalAuthProvider;
+        }
+      },
       (error) => this.error = error.error
     )
   }

@@ -42,6 +42,22 @@
               <label *ngIf="email_model.errors.email"><i class="times icon"></i> Invalid E-mail format</label>
             </div>
           </div>
+          <ng-container *ngIf="providers">
+            <div class="field">
+              <label>Auth Provider</label>
+              <select name="external_auth_provider" [(ngModel)]="form.external_auth_provider_id" (change)="onChangeProvider()">
+                <option [ngValue]="undefined">Local</option>
+                <option [ngValue]="provider.id" *ngFor="let provider of providers">{{provider.name}}</option>
+              </select>
+            </div>
+            <div class="field" *ngIf="form.external_auth_provider_id">
+              <div class="ui toggle checkbox">
+                <input type="checkbox" class="hidden" name="skip_email_confirmation"
+                       [(ngModel)]="form.skip_email_confirmation" #checkboxSkipEmailConfirmation>
+                <label (click)="checkboxSkipEmailConfirmation.click()">Skip Email Confirmation</label>
+              </div>
+            </div>
+          </ng-container>
           <button type="submit" class="ui primary fluid button">Invite</button>
         </form>
       </div>

@@ -40,13 +40,18 @@ class User(db.Model):
     two_factor_disable_token = db.Column(db.String(64))
     two_factor_disable_token_expire_at = db.Column(db.DateTime)
 
+    external_auth_provider_id = db.Column(db.String(32))
+    external_auth_enforced = db.Column(db.Boolean, nullable=False, default=False)
+
     login_records = db.relationship('LoginRecord', backref=db.backref('user'), cascade="all, delete-orphan")
     authorizations = db.relationship('OAuthAuthorization', backref=db.backref('user', lazy=False),
                                      cascade="all, delete-orphan")
 
     def to_dict(self, with_groups=True, with_group_ids=False, with_advanced_fields=False):
         _dict = dict(id=self.id, name=self.name, email=self.email, nickname=self.nickname, avatar=self.avatar,
-                     is_active=self.is_active, is_two_factor_enabled=self.is_two_factor_enabled)
+                     is_active=self.is_active, is_two_factor_enabled=self.is_two_factor_enabled,
+                     external_auth_provider_id=self.external_auth_provider_id,
+                     external_auth_enforced=self.external_auth_enforced)
         if with_groups:
             _dict['groups'] = [group.to_dict() for group in self.groups]
         if with_group_ids:

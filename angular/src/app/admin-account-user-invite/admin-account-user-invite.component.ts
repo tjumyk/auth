@@ -1,14 +1,10 @@
 import {Component, OnInit} from '@angular/core';
-import {BasicError, UserAdvanced} from "../models";
-import {AdminService} from "../admin.service";
+import {BasicError, ExternalAuthProvider, UserAdvanced} from "../models";
+import {AdminService, InviteForm} from "../admin.service";
 import {finalize} from "rxjs/operators";
 import {NgForm} from "@angular/forms";
 import {TitleService} from "../title.service";
-
-class InviteForm {
-  name: string;
-  email: string;
-}
+import {AccountService} from "../account.service";
 
 @Component({
   selector: 'app-admin-account-user-invite',
@@ -23,14 +19,23 @@ export class AdminAccountUserInviteComponent implements OnInit {
 
   new_users: UserAdvanced[] = [];
 
+  providers: ExternalAuthProvider[];
+
   constructor(
     private adminService: AdminService,
+    private accountService: AccountService,
     private titleService: TitleService
   ) {
   }
 
   ngOnInit() {
-    this.titleService.setTitle('Invite User', 'Management')
+    this.titleService.setTitle('Invite User', 'Management');
+    this.accountService.get_external_auth_providers().subscribe(
+      providers => {
+        this.providers = providers;
+      },
+      error => this.error = error.error
+    )
   }
 
   invite(f: NgForm) {
@@ -40,7 +45,7 @@ export class AdminAccountUserInviteComponent implements OnInit {
     this.error = undefined;
     this.new_user = undefined;
     this.requesting = true;
-    this.adminService.invite_user(this.form.name, this.form.email).pipe(
+    this.adminService.invite_user(this.form).pipe(
       finalize(() => this.requesting = false)
     ).subscribe(
       (user) => {
@@ -49,5 +54,11 @@ export class AdminAccountUserInviteComponent implements OnInit {
       },
       (error) => this.error = error.error
     )
+  }
+
+  onChangeProvider() {
+    if(!this.form.external_auth_provider_id){
+      this.form.skip_email_confirmation = undefined;
+    }
   }
 }

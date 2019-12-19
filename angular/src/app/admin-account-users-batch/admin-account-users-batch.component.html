@@ -81,6 +81,24 @@
               <i class="icon trash"></i> Delete Users
             </button>
           </div>
+
+          <div class="ui divider horizontal">Invitation Options</div>
+          <form *ngIf="external_auth_providers" class="ui form">
+            <div class="field">
+              <label>Auth Provider</label>
+              <select name="external_auth_provider" [(ngModel)]="external_auth_provider_id" (change)="onChangeProvider()">
+                <option [ngValue]="undefined">Local</option>
+                <option [ngValue]="provider.id" *ngFor="let provider of external_auth_providers">{{provider.name}}</option>
+              </select>
+            </div>
+            <div class="field" *ngIf="external_auth_provider_id">
+              <div class="ui toggle checkbox">
+                <input type="checkbox" class="hidden" name="skip_email_confirmation"
+                       [(ngModel)]="skip_email_confirmation" #checkboxSkipEmailConfirmation>
+                <label (click)="checkboxSkipEmailConfirmation.click()">Skip Email Confirmation</label>
+              </div>
+            </div>
+          </form>
           <!--End of User Operations-->
         </div>
 

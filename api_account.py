@@ -1,14 +1,15 @@
 from flask import Blueprint, current_app as app, request, jsonify
 
+import utils.two_factor as two_factor
 from models import db
 from services.oauth import OAuthService, OAuthServiceError
 from services.user import UserService, UserServiceError
+from utils.external_auth.provider import get_provider, get_providers
 from utils.mail import send_email
+from utils.qr_code import build_qr_code, img_to_base64
 from utils.session import get_session_user, requires_login, clear_current_user, set_current_user, get_current_user, \
     start_two_factor, get_two_factor_user
 from utils.upload import handle_upload, handle_post_upload, UploadError
-import utils.two_factor as two_factor
-from utils.qr_code import build_qr_code, img_to_base64
 
 account = Blueprint('account', __name__)
 
@@ -81,7 +82,7 @@ def account_confirm_email():
             new_password = request.json.get('new_password')
             UserService.confirm_email(user, token, new_password)
             db.session.commit()
-            if not user.is_two_factor_enabled:
+            if not user.is_two_factor_enabled and not user.external_auth_provider_id:
                 set_current_user(user, False)  # auto login for better user experience
             return "", 204
     except UserServiceError as e:
@@ -95,10 +96,15 @@ def account_request_reset_password():
         name_or_email = _json.get('name_or_email')
 
         user = UserService.request_reset_password(name_or_email)
-        db.session.commit()
-
-        send_email(user.name, user.email, 'reset_password', user=user, site=app.config['SITE'])
-        return "", 204
+        if user.external_auth_provider_id:
+            provider = get_provider(user.external_auth_provider_id)
+            if provider is None:
+                return jsonify(msg='provider not found'), 500
+            return jsonify(provider.to_dict())
+        else:
+            db.session.commit()
+            send_email(user.name, user.email, 'reset_password', user=user, site=app.config['SITE'])
+            return "", 204
     except UserServiceError as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
 
@@ -357,5 +363,18 @@ def account_two_factor_disable_by_email():
     except UserServiceError as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
 
+
+@account.route('/external-auth-providers/<string:pid>')
+def get_external_auth_provider(pid: str):
+    provider = get_provider(pid)
+    if provider is None:
+        return jsonify(msg='provider not found'), 404
+    return jsonify(provider.to_dict())
+
+
+@account.route('/external-auth-providers')
+@requires_login
+def get_external_auth_providers():
+    return jsonify([provider.to_dict() for provider in get_providers()])
 
 # TODO reject weak passwords

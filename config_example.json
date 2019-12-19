@@ -48,5 +48,16 @@
       "host": "localhost",
       "port": 6391
     }
+  ],
+  "EXTERNAL_AUTH_PROVIDERS": [
+    {
+      "id": "provider",
+      "name": "Provider Name",
+      "type": "kerberos",
+      "endpoint_url": "krbtgt/EXAMPLE.COM",
+      "default_realm": "EXAMPLE.COM",
+      "update_password_url": "example.com/change-pass",
+      "reset_password_url": "example.com/reset-pass"
+    }
   ]
 }
