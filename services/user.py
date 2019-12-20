@@ -129,18 +129,19 @@ class UserService:
                     error_detail = 'Unknown external auth provider: %s' % user.external_auth_provider_id
                 else:
                     try:
-                        if not auth_provider.check(user.name, password):  # external auth failed
-                            if user.external_auth_enforced:  # external auth is enforced
-                                error = 'wrong password'
-                                error_detail = 'Please make sure that you are using your current password (%s). ' \
-                                               'If you forgot your password, please click the "Reset Password" ' \
-                                               'link below.' \
-                                               % auth_provider.name
-                            elif not pbkdf2_sha256.verify(password, user.password):  # check local password as fallback
-                                error = 'wrong password'
-                                error_detail = 'Both the local password and the external password (%s) of this ' \
-                                               'account failed to match your input. If you forgot your password, ' \
-                                               'please click the "Reset Password" link below.' % auth_provider.name
+                        if not user.external_auth_enforced:
+                            if not pbkdf2_sha256.verify(password, user.password):  # try local password first
+                                if not auth_provider.check(user.name, password):  # then try external auth
+                                    error = 'wrong password'
+                                    error_detail = 'Both the local password and the external password (%s) of this ' \
+                                                   'account failed to match your input. If you forgot your password, ' \
+                                                   'please click the "Reset Password" link below.' % auth_provider.name
+                        elif not auth_provider.check(user.name, password):  # try external auth only
+                            error = 'wrong password'
+                            error_detail = 'Please make sure that you are using your current password (%s). ' \
+                                           'If you forgot your password, please click the "Reset Password" ' \
+                                           'link below.' \
+                                           % auth_provider.name
                     except ExternalAuthError as e:
                         error = 'external auth error'
                         error_detail = e.msg
