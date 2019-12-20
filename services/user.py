@@ -336,6 +336,9 @@ class UserService:
         if token is None:
             raise UserServiceError('token is required')
         if not check_only and not user.external_auth_provider_id:
+            # To simplify the logic, regardless of whether the external auth is enforced or not, we do not require and
+            # ignore the new local password when external auth provider exists. In such case, the local password will
+            # remain random (as it was initialized when the user was created).
             if new_password is None:
                 raise UserServiceError('new password is required')
 

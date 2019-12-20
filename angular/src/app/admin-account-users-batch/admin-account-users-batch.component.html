@@ -84,14 +84,14 @@
 
           <div class="ui divider horizontal">Invitation Options</div>
           <form *ngIf="external_auth_providers" class="ui form">
-            <div class="field">
+            <div class="field" [class.disabled]="processing">
               <label>Auth Provider</label>
               <select name="external_auth_provider" [(ngModel)]="external_auth_provider_id" (change)="onChangeProvider()">
                 <option [ngValue]="undefined">Local</option>
                 <option [ngValue]="provider.id" *ngFor="let provider of external_auth_providers">{{provider.name}}</option>
               </select>
             </div>
-            <div class="field" *ngIf="external_auth_provider_id">
+            <div class="field" *ngIf="external_auth_provider_id" [class.disabled]="processing">
               <div class="ui toggle checkbox">
                 <input type="checkbox" class="hidden" name="skip_email_confirmation"
                        [(ngModel)]="skip_email_confirmation" #checkboxSkipEmailConfirmation>

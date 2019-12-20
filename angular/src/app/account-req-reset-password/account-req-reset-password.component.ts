@@ -4,7 +4,6 @@ import {AccountService} from "../account.service";
 import {NgForm} from "@angular/forms";
 import {finalize} from "rxjs/operators";
 import {TitleService} from "../title.service";
-import {Router} from "@angular/router";
 
 @Component({
   selector: 'app-account-req-reset-password',
@@ -21,8 +20,7 @@ export class AccountReqResetPasswordComponent implements OnInit {
 
   constructor(
     private accountService: AccountService,
-    private titleService: TitleService,
-    private router: Router
+    private titleService: TitleService
   ) {
   }
 
