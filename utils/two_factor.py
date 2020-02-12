@@ -9,8 +9,8 @@ from cryptography.hazmat.primitives.twofactor.totp import TOTP
 
 from error import BasicError
 from models import User
+from flask import current_app as app
 
-_issuer_name = 'UNSWKG'
 _token_length = 6
 _hash_method = SHA1
 _key_length = 20
@@ -79,7 +79,8 @@ def build_uri(user: User) -> str:
         raise TwoFactorError('user is required')
 
     otp = _get_otp(user)
-    return otp.get_provisioning_uri(user.name, _issuer_name)
+    issuer_name = app.config['SITE']['name']
+    return otp.get_provisioning_uri(user.name, issuer_name)
 
 
 def verify(user: User, token: str):
