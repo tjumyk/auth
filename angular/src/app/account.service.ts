@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {OAuthClient, TwoFactorSetupInfo, User} from "./models";
+import {ExternalAuthProvider, OAuthClient, TwoFactorSetupInfo, User} from "./models";
 import {HttpClient, HttpParams} from "@angular/common/http";
 import {Logger, LogService} from "./log.service";
 import {Observable, of} from "rxjs";
@@ -189,6 +189,18 @@ export class AccountService {
     let params = new HttpParams().append('uid', uid.toString()).append('token', token);
     return this.http.get(`${this.api}/two-factor/disable-by-email`, {params}).pipe(
       tap(() => this.logger.info(`Disabled two-factor authentication by Email`))
+    )
+  }
+
+  get_external_auth_provider(pid: string): Observable<ExternalAuthProvider>{
+    return this.http.get<ExternalAuthProvider>(`${this.api}/external-auth-providers/${pid}`).pipe(
+      tap((provider)=>this.logger.info(`Fetched external auth provider "${provider.name}"`))
+    )
+  }
+
+  get_external_auth_providers(): Observable<ExternalAuthProvider[]>{
+    return this.http.get<ExternalAuthProvider[]>(`${this.api}/external-auth-providers`).pipe(
+      tap((providers)=>this.logger.info(`Fetched ${providers.length} external auth providers`))
     )
   }
 }

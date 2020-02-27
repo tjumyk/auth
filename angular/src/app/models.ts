@@ -11,6 +11,8 @@ export class User {
   avatar: string;
   is_active: boolean;
   is_two_factor_enabled: boolean;
+  external_auth_provider_id?: string;
+  external_auth_enforced: boolean;
 
   groups?: Group[];
   group_ids?: number[];
@@ -99,6 +101,14 @@ export class ExternalUserInfoResult{
 
 export class TwoFactorSetupInfo{
   qr_code: string;
+}
+
+export class ExternalAuthProvider{
+  id: string;
+  name: string;
+  description?:string;
+  update_password_url?: string;
+  reset_password_url?: string;
 }
 
 export class SendEmailForm{

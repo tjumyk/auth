@@ -3,7 +3,7 @@ Hi {user.name},
 
 You are receiving this E-mail because you are either a new coursework student in COMP9318/COMP6714, a new group member, or any other people relevant to our group.
 
-We have created an account for you in our system to give you access to some of our internal web apps. Because this system is separated from the ones managed by the schools or the university, your zID and zPass will not work here. You need to confirm your E-mail address and set a password for your new account.
+We have created an account for you in our system to give you access to some of our internal web apps. You need to confirm your E-mail address before using your new account.
 
 Please use the following link to confirm your email.
 

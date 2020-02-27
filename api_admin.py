@@ -48,10 +48,13 @@ def admin_user_list():
             _json = request.json
             name = _json.get('name')
             email = _json.get('email')
-            user = UserService.invite(name, email)
+            external_auth_provider_id = _json.get('external_auth_provider_id')
+            skip_email_confirmation = _json.get('skip_email_confirmation', False)
+            user = UserService.invite(name, email, external_auth_provider_id, skip_email_confirmation)
             db.session.commit()
 
-            send_email(name, email, 'confirm_email', user=user, site=app.config['SITE'])
+            if not skip_email_confirmation:
+                send_email(name, email, 'confirm_email', user=user, site=app.config['SITE'])
             return jsonify(user.to_dict(with_advanced_fields=True)), 201
     except (UserServiceError, GroupServiceError) as e:
         return jsonify(msg=e.msg, detail=e.detail), 400

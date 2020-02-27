@@ -5,9 +5,10 @@ from secrets import token_urlsafe
 from passlib.hash import pbkdf2_sha256
 from sqlalchemy import or_, func
 
+import utils.two_factor as two_factor
 from error import BasicError
 from models import db, User
-import utils.two_factor as two_factor
+from utils.external_auth.provider import get_provider, ExternalAuthError
 
 
 class UserServiceError(BasicError):
@@ -120,11 +121,37 @@ class UserService:
             error_detail = 'Please find the E-mail Confirmation letter in your mailbox and click the link in the ' \
                            'letter to confirm your E-mail address. If you want us to resend the letter, please click ' \
                            'the "Re-confirm E-mail" link below.'
-        elif not pbkdf2_sha256.verify(password, user.password):
-            error = 'wrong password'
-            error_detail = 'ZPass is not supported. Please use the password that you set during the E-mail ' \
-                           'confirmation. If you forgot your password, please click the "Reset ' \
-                           'Password" link below.'
+        else:
+            if user.external_auth_provider_id is not None:
+                auth_provider = get_provider(user.external_auth_provider_id)
+                if auth_provider is None:
+                    error = 'unknown auth provider'
+                    error_detail = 'Unknown external auth provider: %s' % user.external_auth_provider_id
+                else:
+                    try:
+                        if not user.external_auth_enforced:
+                            if not pbkdf2_sha256.verify(password, user.password):  # try local password first
+                                if not auth_provider.check(user.name, password):  # then try external auth
+                                    error = 'wrong password'
+                                    error_detail = 'Both the local password and the external password (%s) of this ' \
+                                                   'account failed to match your input. If you forgot your password, ' \
+                                                   'please click the "Reset Password" link below.' % auth_provider.name
+                        elif not auth_provider.check(user.name, password):  # try external auth only
+                            error = 'wrong password'
+                            error_detail = 'Please make sure that you are using your current password (%s). ' \
+                                           'If you forgot your password, please click the "Reset Password" ' \
+                                           'link below.' \
+                                           % auth_provider.name
+                    except ExternalAuthError as e:
+                        error = 'external auth error'
+                        error_detail = e.msg
+                        if e.detail:
+                            error_detail += ': ' + e.detail
+            elif not pbkdf2_sha256.verify(password, user.password):
+                error = 'wrong password'
+                error_detail = 'Please use the password that you set during the E-mail ' \
+                               'confirmation. If you forgot your password, please click the "Reset ' \
+                               'Password" link below.'
 
         # two-factor authentication
         if error is None and user.is_two_factor_enabled:  # skip adding 'success' login record
@@ -184,7 +211,7 @@ class UserService:
                                    % recent_failures_minutes)
 
     @staticmethod
-    def invite(name, email):
+    def invite(name, email, external_auth_provider_id: str = None, skip_email_confirmation: bool = False):
         if name is None:
             raise UserServiceError('name is required')
         if email is None:
@@ -196,15 +223,36 @@ class UserService:
             raise UserServiceError('invalid email format')
         if len(email) > UserService.email_max_length:
             raise UserServiceError('email too long')
+
+        if external_auth_provider_id:
+            external_auth_enforced = True  # enforce external auth when external auth provider provided
+            provider = get_provider(external_auth_provider_id)
+            if provider is None:
+                raise UserServiceError('provider not found')
+        else:
+            external_auth_enforced = False
+            if skip_email_confirmation:
+                raise UserServiceError('cannot skip email confirmation',
+                                       'Skipping email confirmation is not allowed when no external auth provider is '
+                                       'selected.')
+
         if db.session.query(func.count()).filter(User.name == name).scalar():
             raise UserServiceError('duplicate name')
         if db.session.query(func.count()).filter(User.email == email).scalar():
             raise UserServiceError('duplicate email')
 
-        password = pbkdf2_sha256.hash(token_urlsafe(12))
-        user = User(name=name, password=password, email=email,
-                    is_email_confirmed=False, email_confirm_token=token_urlsafe(),
-                    email_confirm_token_expire_at=datetime.utcnow() + UserService.email_confirm_token_valid)
+        password = pbkdf2_sha256.hash(token_urlsafe(12))  # dummy initial password
+        user_args = dict(name=name, password=password, email=email,
+                         external_auth_provider_id=external_auth_provider_id,
+                         external_auth_enforced=external_auth_enforced)
+        if skip_email_confirmation:
+            user_args['is_email_confirmed'] = True
+            user_args['email_confirmed_at'] = datetime.utcnow()
+        else:
+            user_args['is_email_confirmed'] = False
+            user_args['email_confirm_token'] = token_urlsafe()
+            user_args['email_confirm_token_expire_at'] = datetime.utcnow() + UserService.email_confirm_token_valid
+        user = User(**user_args)
         db.session.add(user)
         return user
 
@@ -283,12 +331,15 @@ class UserService:
         user.email_confirmed_at = None
 
     @staticmethod
-    def confirm_email(user, token, new_password, check_only=False):
+    def confirm_email(user: User, token, new_password, check_only=False):
         if user is None:
             raise UserServiceError('user is required')
         if token is None:
             raise UserServiceError('token is required')
-        if not check_only:
+        if not check_only and not user.external_auth_provider_id:
+            # To simplify the logic, regardless of whether the external auth is enforced or not, we do not require and
+            # ignore the new local password when external auth provider exists. In such case, the local password will
+            # remain random (as it was initialized when the user was created).
             if new_password is None:
                 raise UserServiceError('new password is required')
 
@@ -304,9 +355,10 @@ class UserService:
             raise UserServiceError('token expired')
 
         if not check_only:
-            if not UserService.password_pattern.match(new_password):
-                raise UserServiceError('invalid password format')
-            user.password = pbkdf2_sha256.hash(new_password)
+            if not user.external_auth_provider_id:
+                if not UserService.password_pattern.match(new_password):
+                    raise UserServiceError('invalid password format')
+                user.password = pbkdf2_sha256.hash(new_password)
             user.email_confirm_token = None
             user.email_confirm_token_expire_at = None
             user.email_confirmed_at = datetime.utcnow()
@@ -366,6 +418,12 @@ class UserService:
             raise UserServiceError('user not found')
         if not user.is_active:
             raise UserServiceError('inactive user')
+
+        if user.external_auth_provider_id:
+            # To simplify the interactions, regardless of whether the external auth is enforced or not, we do not allow
+            # resetting local password as long as the external auth provider exists.
+            return user  # do nothing but returning the found user, let the api function do the rest.
+
         if user.email is None:
             raise UserServiceError('no email')
 

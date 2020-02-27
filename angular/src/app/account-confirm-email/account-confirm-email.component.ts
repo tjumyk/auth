@@ -1,5 +1,5 @@
-import { Component, OnInit } from '@angular/core';
-import {BasicError, User} from "../models";
+import {Component, OnInit} from '@angular/core';
+import {BasicError, ExternalAuthProvider, User} from "../models";
 import {ActivatedRoute, Router} from "@angular/router";
 import {AccountService} from "../account.service";
 import {NgForm} from "@angular/forms";
@@ -26,6 +26,8 @@ export class AccountConfirmEmailComponent implements OnInit {
   token:string;
   form: SetPasswordForm = new SetPasswordForm();
 
+  provider: ExternalAuthProvider;
+
   constructor(
     private accountService:AccountService,
     private route: ActivatedRoute,
@@ -45,7 +47,13 @@ export class AccountConfirmEmailComponent implements OnInit {
       finalize(()=>this.verifying=false)
     ).subscribe(
       (user:User)=>{
-        this.user = user
+        this.user = user;
+        if(user.external_auth_provider_id){
+          this.accountService.get_external_auth_provider(user.external_auth_provider_id).subscribe(
+            provider=>this.provider = provider,
+            error=>this.error = error.error
+          )
+        }
       },
       (error)=>this.error = error.error
     )

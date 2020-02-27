@@ -1,17 +1,13 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
-import {BasicError, GroupAdvanced, UserAdvanced} from "../models";
-import {AdminService} from "../admin.service";
+import {BasicError, ExternalAuthProvider, GroupAdvanced, UserAdvanced} from "../models";
+import {AdminService, InviteForm} from "../admin.service";
 import {debounceTime, finalize, switchMap} from "rxjs/operators";
 import {Observable, of, Subject} from "rxjs";
 import {TitleService} from "../title.service";
-
-export class InviteUserForm {
-  name: string;
-  email: string;
-}
+import {AccountService} from "../account.service";
 
 export class BatchedUserItem {
-  form: InviteUserForm;
+  form: InviteForm;
   clientError?: BasicError;
   serverError?: BasicError;
   success?: string;
@@ -73,7 +69,12 @@ export class AdminAccountUsersBatchComponent implements OnInit, OnDestroy {
   aborting: boolean;
   processDelay: number = 300;
 
+  external_auth_providers: ExternalAuthProvider[];
+  external_auth_provider_id: ExternalAuthProvider;
+  skip_email_confirmation: boolean;
+
   constructor(
+    private accountService:AccountService,
     private adminService: AdminService,
     private titleService: TitleService
   ) {
@@ -90,6 +91,11 @@ export class AdminAccountUsersBatchComponent implements OnInit, OnDestroy {
     ).subscribe(
       groups => this.groups = groups,
       error => this.error = error.error
+    );
+
+    this.accountService.get_external_auth_providers().subscribe(
+      providers=>this.external_auth_providers = providers,
+      error=>this.error =error.error
     );
 
     this.userListUpdated.pipe(
@@ -225,7 +231,12 @@ export class AdminAccountUsersBatchComponent implements OnInit, OnDestroy {
     this.processUsers(
       () => this.invitingUsers = true,
       () => this.invitingUsers = false,
-      (item) => this.adminService.invite_user(item.form.name, item.form.email),
+      (item) => {
+        // copy global invitation options to the current form
+        item.form.skip_email_confirmation = this.skip_email_confirmation;
+        item.form.external_auth_provider_id = this.external_auth_provider_id;
+        return this.adminService.invite_user(item.form)
+      },
       (item, user) => {
         item.user = user;
         item.success = 'Invited'
@@ -351,6 +362,12 @@ export class AdminAccountUsersBatchComponent implements OnInit, OnDestroy {
 
   groupCompareFn(g1: GroupAdvanced, g2: GroupAdvanced): boolean {
     return g1 && g2 ? g1.id === g2.id : g1 === g2
+  }
+
+  onChangeProvider() {
+    if(!this.external_auth_provider_id){
+      this.skip_email_confirmation = undefined;
+    }
   }
 
 }

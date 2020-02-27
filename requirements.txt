@@ -7,3 +7,4 @@ geoip2
 requests
 cryptography
 qrcode[pil]
+# kerberos # required for external Kerberos authentication. Need to install system packages 'libkrb5-dev' and 'krb5-config' first.
