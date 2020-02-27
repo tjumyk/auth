@@ -31,6 +31,7 @@ import {HomeComponent} from "./home/home.component";
 import {SettingsTwoFactorComponent} from "./settings-two-factor/settings-two-factor.component";
 import {AccountRequestDisableTwoFactorByEmailComponent} from "./account-request-disable-two-factor-by-email/account-request-disable-two-factor-by-email.component";
 import {AccountDisableTwoFactorByEmailComponent} from "./account-disable-two-factor-by-email/account-disable-two-factor-by-email.component";
+import {AdminEmailSendComponent} from "./admin-email-send/admin-email-send.component";
 
 const routes: Routes = [
   {path: '', pathMatch: 'full', canActivate: [AuthGuard], component: HomeComponent},
@@ -119,6 +120,13 @@ const routes: Routes = [
               }
             ]
           },
+          {
+            path: 'email',
+            children: [
+              {path: '', pathMatch: 'full', redirectTo: 'send'},
+              {path: 'send', component: AdminEmailSendComponent}
+            ]
+          }
         ]
       },
     ]

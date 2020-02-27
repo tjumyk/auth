@@ -9,8 +9,8 @@ from services.oauth import OAuthServiceError, OAuthService
 from services.user import UserService, UserServiceError
 from utils.external_user_info import get_external_user_info
 from utils.ip import get_ip_info
-from utils.mail import send_email
-from utils.session import requires_admin, set_current_user, get_session_user, clear_current_user
+from utils.mail import send_email, send_emails
+from utils.session import requires_admin, set_current_user, get_session_user, clear_current_user, get_current_user
 from utils.upload import handle_upload, handle_post_upload, UploadError
 
 admin = Blueprint('admin', __name__)
@@ -527,3 +527,61 @@ def lookup_ip_info(ip_addr):
         return jsonify(get_ip_info(ip_addr, resolve_hostname=resolve_hostname).to_dict())
     except ValueError as e:
         return jsonify(msg=str(e)), 400
+
+
+@admin.route('/send-email', methods=['POST'])
+@requires_admin
+def send_email_api():
+    try:
+        user = get_current_user()
+        params = request.json
+        subject = params.get('subject')
+        receivers = params.get('receivers')
+        receiver_groups = params.get('receiver_groups')
+        body = params.get('body')
+
+        if subject:
+            subject = subject.strip()
+        if receivers:
+            receivers = {r.strip() for r in receivers.strip().split(',')}
+        if receiver_groups:
+            receiver_groups = {r.strip() for r in receiver_groups.strip().split(',')}
+
+        if not subject:
+            return jsonify(msg='subject is required'), 400
+        if not receivers and not receiver_groups:
+            return jsonify(msg='receiver or receiver group is required'), 400
+        if not body:
+            return jsonify(msg='body is required'), 400
+
+        to_users = {}  # use a dict to avoid duplicates
+        if receivers:
+            for receiver in receivers:
+                _user = UserService.get_by_name(receiver)
+                if not _user:
+                    return jsonify(msg='receiver not found: %s' % receiver), 400
+                to_users[_user.id] = _user
+        if receiver_groups:
+            for receiver_group in receiver_groups:
+                group = GroupService.get_by_name(receiver_group)
+                if not group:
+                    return jsonify(msg='receiver group not found: %s' % receiver_group), 400
+                for _user in group.users:
+                    to_users[_user.id] = _user
+        if not to_users:
+            return jsonify(msg='empty receiver list'), 400
+
+        if len(to_users) == 1:
+            _user = list(to_users.values())[0]
+            send_email(_user.name, _user.email,
+                       template=None, subject=subject, body=body, sender=user,
+                       site=app.config['SITE'])
+        else:  # use bcc list if there are multiple recipients
+            send_emails([], [], [(u.name, u.email) for u in to_users.values()],
+                        template=None, subject=subject, body=body, sender=user,
+                        site=app.config['SITE'])
+        return jsonify(num_recipients=len(to_users))
+    except (UserServiceError, GroupServiceError, OAuthServiceError) as e:
+        return jsonify(msg=e.msg, detail=e.detail), 500
+    except Exception as e:
+        return jsonify(msg='failed to send email', detail=str(e)), 500

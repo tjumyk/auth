@@ -9,7 +9,9 @@ import {
   LoginRecord,
   OAuthAuthorization,
   OAuthClientAdvanced,
-  UserAdvanced
+  UserAdvanced,
+  SendEmailForm,
+  SendEmailResponse
 } from "./models";
 import {map, tap} from "rxjs/operators";
 
@@ -302,6 +304,12 @@ export class AdminService {
       params = params.append('resolve-hostname', 'true');
     return this.http.get(`${this.api}/ip-info/${ip_addr}`, {params:params}).pipe(
       tap(() => this.logger.info(`Fetched IP info of ${ip_addr}`))
+    )
+  }
+
+  send_email(form: SendEmailForm): Observable<SendEmailResponse>{
+    return this.http.post<SendEmailResponse>(`${this.api}/send-email`, form).pipe(
+      tap(resp=>this.logger.info(`Email sent to ${resp.num_recipients} recipients`))
     )
   }
 }

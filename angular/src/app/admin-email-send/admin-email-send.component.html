@@ -1,0 +1,31 @@
+<div class="ui error message" *ngIf="error">
+  <i class="close icon" (click)="error=undefined"></i>
+  <div class="header"><i class="times circle icon"></i> {{error.msg}}</div>
+  <p>{{error.detail}}</p>
+</div>
+<div class="ui success message" *ngIf="success">
+  <i class="close icon" (click)="success=undefined"></i>
+  <div class="header"><i class="times circle icon"></i> {{success}}</div>
+</div>
+
+<div class="ui segment">
+  <form class="ui form" (ngSubmit)="send(f)" #f="ngForm" [class.loading]="sending">
+    <div class="field">
+      <label>Subject</label>
+      <input type="text" [(ngModel)]="form.subject" name="subject">
+    </div>
+    <div class="field">
+      <label>Receivers</label>
+      <input type="text" [(ngModel)]="form.receivers" name="receivers">
+    </div>
+    <div class="field">
+      <label>Receiver Groups</label>
+      <input type="text" [(ngModel)]="form.receiver_groups" name="receiver_groups">
+    </div>
+    <div class="field">
+      <label>Body</label>
+      <textarea [(ngModel)]="form.body" name="body" cols="30" rows="10"></textarea>
+    </div>
+    <button class="ui button primary fluid">Send</button>
+  </form>
+</div>

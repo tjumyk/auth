@@ -100,3 +100,14 @@ export class ExternalUserInfoResult{
 export class TwoFactorSetupInfo{
   qr_code: string;
 }
+
+export class SendEmailForm{
+  subject: string;
+  receivers: string;
+  receiver_groups: string;
+  body: string;
+}
+
+export class SendEmailResponse{
+  num_recipients: number;
+}
