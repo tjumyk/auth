@@ -45,12 +45,11 @@
         <div *ngIf="clients">
           <div class="ui grid four column doubling centered">
             <div class="column" *ngFor="let client of clients">
-              <a class="ui icon header client-card" [href]="client.home_url">
+              <a class="ui icon header client-card" [href]="client.home_url" [title]="client.description || ''">
                 <img class="ui image icon" [src]="client.icon" *ngIf="client.icon; else defaultIcon">
                 <ng-template #defaultIcon><i class="icon window restore outline circular default-client-icon"></i></ng-template>
                 <div class="content">
                   {{client.name}}
-                  <div class="sub header" *ngIf="client.description">{{client.description}}</div>
                 </div>
               </a>
             </div>
