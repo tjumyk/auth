@@ -9,7 +9,7 @@ import {VersionInfo} from "../models";
   styleUrls: ['./admin-about.component.less']
 })
 export class AdminAboutComponent implements OnInit {
-  private version: VersionInfo;
+  version: VersionInfo;
 
   constructor(
     private titleService: TitleService,
