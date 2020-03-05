@@ -5,6 +5,7 @@ from flask import Flask, request, jsonify, send_from_directory
 from api_account import account
 from api_admin import admin
 from api_oauth import oauth
+from api_meta import meta
 from models import db
 from page_oauth import oauth_pages
 from services.group import GroupService
@@ -45,6 +46,7 @@ provider.init_app(app)
 app.register_blueprint(account, url_prefix='/api/account')
 app.register_blueprint(admin, url_prefix='/api/admin')
 app.register_blueprint(oauth, url_prefix='/api/oauth')
+app.register_blueprint(meta, url_prefix='/api/meta')
 app.register_blueprint(oauth_pages, url_prefix='/oauth')
 
 
