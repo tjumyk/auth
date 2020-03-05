@@ -121,3 +121,7 @@ export class SendEmailForm{
 export class SendEmailResponse{
   num_recipients: number;
 }
+
+export class VersionInfo{
+  commit: string;
+}
