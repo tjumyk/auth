@@ -45,7 +45,8 @@ class GroupService:
         if len(name) == 0:
             raise GroupServiceError('name must not be empty')
 
-        _filter = or_(Group.name.contains(name), Group.description.contains(name))
+        name_lower = name.lower()
+        _filter = or_(func.lower(Group.name).contains(name_lower), func.lower(Group.description).contains(name_lower))
         if limit is None:
             return Group.query.filter(_filter).all()
         else:
