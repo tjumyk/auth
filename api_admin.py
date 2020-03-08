@@ -120,7 +120,8 @@ def _admin_user(user):
         return jsonify(msg='user not found'), 404
 
     if request.method == 'GET':
-        return jsonify(user.to_dict(with_advanced_fields=True))
+        require_oauth_info = request.args.get('oauth-info') == 'true'
+        return jsonify(user.to_dict(with_authorizations=require_oauth_info, with_advanced_fields=True))
     elif request.method == 'DELETE':
         db.session.delete(user)
         db.session.commit()
@@ -240,7 +241,8 @@ def admin_group(gid):
             return jsonify(msg='group not found'), 404
 
         if request.method == 'GET':
-            return jsonify(group.to_dict(with_advanced_fields=True))
+            require_oauth_info = request.args.get('oauth-info') == 'true'
+            return jsonify(group.to_dict(with_allowed_clients=require_oauth_info, with_advanced_fields=True))
         elif request.method == 'DELETE':
             db.session.delete(group)
             db.session.commit()

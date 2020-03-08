@@ -16,6 +16,7 @@ export class User {
 
   groups?: Group[];
   group_ids?: number[];
+  authorizations?: OAuthAuthorization[];
 }
 
 export class UserAdvanced extends User {

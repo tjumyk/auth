@@ -195,6 +195,28 @@
           </div>
         </div>
       </div>
+
+      <div class="ui top attached segment">
+        <div class="ui header">
+          <i class="handshake outline icon"></i>
+          OAuth Authorizations
+        </div>
+      </div>
+      <table class="ui table celled very compact unstackable bottom attached">
+        <thead><tr><th>Client</th><th>Created At</th><th>Updated At</th></tr></thead>
+        <tbody>
+        <tr *ngFor="let record of user.authorizations; index as i">
+          <td>
+            <a routerLink="/admin/oauth/clients/c/{{record.client_id}}">
+              <img [src]="record.client.icon" *ngIf="record.client.icon" class="ui image client">
+              {{record.client.name}}
+            </a>
+          </td>
+          <td>{{record.created_at | date:'short'}}</td>
+          <td>{{record.modified_at | date:'short'}}</td>
+        </tr>
+        </tbody>
+      </table>
     </div>
 
   </div>

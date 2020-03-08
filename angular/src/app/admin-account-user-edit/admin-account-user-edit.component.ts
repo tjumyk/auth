@@ -80,7 +80,7 @@ export class AdminAccountUserEditComponent implements OnInit {
   private loadUser() {
     this.error = undefined;
     this.loading_user = true;
-    this.adminService.get_user(this.uid).pipe(
+    this.adminService.get_user(this.uid, true).pipe(
       finalize(() => this.loading_user = false)
     ).subscribe(
       (user) => this.setUser(user),

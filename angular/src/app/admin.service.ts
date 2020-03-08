@@ -76,8 +76,12 @@ export class AdminService {
     )
   }
 
-  get_user(uid: number): Observable<UserAdvanced> {
-    return this.http.get<UserAdvanced>(`${this.api}/users/${uid}`).pipe(
+  get_user(uid: number, oauth_info: boolean = false): Observable<UserAdvanced> {
+    let params = new HttpParams();
+    if (oauth_info) {
+      params = params.append('oauth-info', 'true');
+    }
+    return this.http.get<UserAdvanced>(`${this.api}/users/${uid}`, {params}).pipe(
       tap((user) => this.logger.info(`Fetched profile of user ${user.name}`))
     )
   }
@@ -164,8 +168,12 @@ export class AdminService {
     )
   }
 
-  get_group(gid: number): Observable<GroupAdvanced> {
-    return this.http.get<GroupAdvanced>(`${this.api}/groups/${gid}`).pipe(
+  get_group(gid: number, oauth_info: boolean = false): Observable<GroupAdvanced> {
+    let params = new HttpParams();
+    if (oauth_info) {
+      params = params.append('oauth-info', 'true');
+    }
+    return this.http.get<GroupAdvanced>(`${this.api}/groups/${gid}`, {params}).pipe(
       tap((group) => this.logger.info(`Fetched profile of group ${group.name}`))
     )
   }

@@ -77,7 +77,7 @@ export class AdminAccountGroupEditComponent implements OnInit {
     this.error = undefined;
 
     this.loading_group = true;
-    this.adminService.get_group(this.gid).pipe(
+    this.adminService.get_group(this.gid, true).pipe(
       finalize(() => this.loading_group = false)
     ).subscribe(
       (group) => this.setGroup(group),
