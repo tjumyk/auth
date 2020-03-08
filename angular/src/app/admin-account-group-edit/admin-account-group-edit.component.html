@@ -70,6 +70,18 @@
           </form>
         </div>
 
+        <div class="ui segment">
+          <h5 class="ui header">Accessible OAuth Clients</h5>
+          <div class="ui labels" *ngIf="group.allowed_clients?.length; else no_allowed_client">
+            <a *ngFor="let c of group.allowed_clients" routerLink="/admin/oauth/clients/c/{{c.id}}" class="ui label" [class.image]="c.icon">
+              <img [src]="c.icon" *ngIf="c.icon; else default_client_icon">
+              {{c.name}}
+            </a>
+          </div>
+          <ng-template #default_client_icon><i class="window restore outline icon"></i></ng-template>
+          <ng-template #no_allowed_client>(None)</ng-template>
+        </div>
+
       </div>
 
       <div class="ui segments">

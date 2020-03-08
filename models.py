@@ -47,7 +47,7 @@ class User(db.Model):
     authorizations = db.relationship('OAuthAuthorization', backref=db.backref('user', lazy=False),
                                      cascade="all, delete-orphan")
 
-    def to_dict(self, with_groups=True, with_group_ids=False, with_advanced_fields=False):
+    def to_dict(self, with_groups=True, with_group_ids=False, with_authorizations=False, with_advanced_fields=False):
         _dict = dict(id=self.id, name=self.name, email=self.email, nickname=self.nickname, avatar=self.avatar,
                      is_active=self.is_active, is_two_factor_enabled=self.is_two_factor_enabled,
                      external_auth_provider_id=self.external_auth_provider_id,
@@ -56,6 +56,8 @@ class User(db.Model):
             _dict['groups'] = [group.to_dict() for group in self.groups]
         if with_group_ids:
             _dict['group_ids'] = [group.id for group in self.groups]
+        if with_authorizations:
+            _dict['authorizations'] = [auth.to_dict(with_client=True, with_user=False) for auth in self.authorizations]
 
         if with_advanced_fields:
             _dict['created_at'] = self.created_at
