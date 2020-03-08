@@ -88,7 +88,8 @@ class UserService:
         if len(name) == 0:
             raise UserServiceError('name must not be empty')
 
-        _filter = or_(User.name.contains(name), User.nickname.contains(name))
+        name_lower = name.lower()
+        _filter = or_(func.lower(User.name).contains(name_lower), func.lower(User.nickname).contains(name_lower))
         if limit is None:
             return User.query.filter(_filter).all()
         else:
