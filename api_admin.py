@@ -8,7 +8,7 @@ from services.login_record import LoginRecordService
 from services.oauth import OAuthServiceError, OAuthService
 from services.user import UserService, UserServiceError
 from utils.external_user_info import get_external_user_info
-from utils.ip import get_ip_info
+from utils.ip import get_ip_info, get_ip_country_info
 from utils.mail import send_email, send_emails
 from utils.session import requires_admin, set_current_user, get_session_user, clear_current_user, get_current_user
 from utils.upload import handle_upload, handle_post_upload, UploadError
@@ -196,7 +196,19 @@ def admin_user_login_records(uid):
         if user is None:
             return jsonify(msg='user not found'), 404
 
-        return jsonify([r.to_dict() for r in LoginRecordService.get_for_user(user)])
+        require_country = request.args.get('country') == 'true'
+        country_info = {}
+
+        results = []
+        for r in LoginRecordService.get_for_user(user):
+            result = r.to_dict()
+            if require_country:
+                info = country_info.get(r.ip)
+                if not info:
+                    country_info[r.ip] = info = get_ip_country_info(r.ip)
+                result['country'] = info.to_dict()
+            results.append(result)
+        return jsonify(results)
     except UserServiceError as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
 

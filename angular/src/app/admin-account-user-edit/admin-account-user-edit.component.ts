@@ -8,6 +8,9 @@ import {ActivatedRoute, Router} from "@angular/router";
 import {AdminService} from "../admin.service";
 import {TitleService} from "../title.service";
 import {AccountService} from "../account.service";
+import {UAParser} from "ua-parser-js";
+import IBrowser = IUAParser.IBrowser;
+import IOS = IUAParser.IOS;
 
 
 class StatusForm {
@@ -59,6 +62,8 @@ export class AdminAccountUserEditComponent implements OnInit {
   form: ProfileForm = new ProfileForm();
   provider: ExternalAuthProvider;
 
+  private ua_parser = new UAParser();
+
   constructor(
     private accountService: AccountService,
     private adminService: AdminService,
@@ -90,12 +95,52 @@ export class AdminAccountUserEditComponent implements OnInit {
 
   private loadUserLoginRecords() {
     this.loading_login_records = true;
-    this.adminService.get_user_login_records(this.uid).pipe(
+    this.adminService.get_user_login_records(this.uid, true).pipe(
       finalize(() => this.loading_login_records = false)
     ).subscribe(
-      (records) => this.login_records = records,
+      (records) => {
+        let ua_parsed = {};
+        for (let r of records) {
+          let ua = ua_parsed[r.user_agent];
+          if (!ua) {
+            this.ua_parser.setUA(r.user_agent);
+            ua = ua_parsed[r.user_agent] = this.ua_parser.getResult()
+          }
+          r['_ua_os_icon'] = this.getOSIcon(ua.os);
+          r['_ua_browser_icon'] = this.getBrowserIcon(ua.browser);
+        }
+        this.login_records = records
+      },
       (error) => this.error = error.error
     )
+  }
+
+  private getOSIcon(os: IOS) {
+    switch (os.name) {
+      case  'Windows':
+      case 'Linux':
+      case 'Android':
+        return os.name.toLowerCase();
+      case 'Mac OS':
+      case 'iOS':
+        return 'apple';
+      default:
+        return 'question circle outline';
+    }
+  }
+
+  private getBrowserIcon(browser: IBrowser) {
+    switch (browser.name) {
+      case 'Chrome':
+      case 'Firefox':
+      case 'Opera':
+      case 'Safari':
+        return browser.name.toLowerCase();
+      case  'IE':
+        return 'internet explorer';
+      default:
+        return 'question circle outline';
+    }
   }
 
   private setUser(user: UserAdvanced) {

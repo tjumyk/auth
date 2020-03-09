@@ -148,8 +148,12 @@ export class AdminService {
     )
   }
 
-  get_user_login_records(uid: number): Observable<LoginRecord[]> {
-    return this.http.get<LoginRecord[]>(`${this.api}/users/${uid}/login-records`).pipe(
+  get_user_login_records(uid: number, require_country: boolean = false): Observable<LoginRecord[]> {
+    let params = new HttpParams();
+    if(require_country){
+      params = params.append('country', 'true');
+    }
+    return this.http.get<LoginRecord[]>(`${this.api}/users/${uid}/login-records`, {params}).pipe(
       tap((records: LoginRecord[]) => {
         this.logger.info(`Fetched login records of user (uid: ${uid}) (${records.length} records)`);
       })
