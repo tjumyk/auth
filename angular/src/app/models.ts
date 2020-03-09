@@ -50,6 +50,13 @@ export class LoginRecord {
   user_agent: string;
   success: boolean;
   reason: string;
+
+  country?: IPCountryInfo;
+}
+
+export class IPCountryInfo {
+  name: string;
+  iso_code: string;
 }
 
 export class OAuthClient {

@@ -4,10 +4,11 @@ from typing import Optional
 
 import geoip2.database
 from geoip2.errors import AddressNotFoundError
-from geoip2.models import City, ASN
+from geoip2.models import City, ASN, Country
 
 logger = logging.getLogger(__name__)
 
+_geo_country_db = None
 _geo_city_db = None
 _geo_asn_db = None
 
@@ -47,6 +48,31 @@ class IPInfo:
         return result
 
 
+class IPCountryInfo:
+    def __init__(self, country: Country):
+        self._country = country
+
+    def to_dict(self, locale: str = 'en-US'):
+        result = {}
+        if self._country:
+            country = self._country.country
+            result['name'] = country.names.get(locale) or country.name
+            result['iso_code'] = country.iso_code
+        return result
+
+
+def get_geo_country(ip_addr: str) -> Optional[Country]:
+    global _geo_country_db
+    if _geo_country_db is None:
+        logger.info('Loading GeoLite2 Country...')
+        _geo_country_db = geoip2.database.Reader('mmdb/GeoLite2-Country.mmdb')
+
+    try:
+        return _geo_country_db.country(ip_addr)
+    except AddressNotFoundError:
+        return None
+
+
 def get_geo_city(ip_addr: str) -> Optional[City]:
     global _geo_city_db
     if _geo_city_db is None:
@@ -79,3 +105,7 @@ def get_hostname(ip_addr: str) -> Optional[str]:
 
 def get_ip_info(ip_addr: str, resolve_hostname: bool = False) -> IPInfo:
     return IPInfo(get_geo_city(ip_addr), get_geo_asn(ip_addr), get_hostname(ip_addr) if resolve_hostname else None)
+
+
+def get_ip_country_info(ip_addr: str) -> IPCountryInfo:
+    return IPCountryInfo(get_geo_country(ip_addr))
