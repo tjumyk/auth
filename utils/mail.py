@@ -31,15 +31,24 @@ def send_emails(to_list, cc_list, bcc_list, template, **kwargs):
     from_user, from_domain = mail_config['from'].split('@', 1)
     from_name = mail_config['display_name']
 
+    reply_to = None  # a [name, email] tuple for Reply-To header
     sender = kwargs.get('sender')
-    if sender:  # if sender is specified, it's a personal email. Otherwise, it's a system email.
-        from_name = '%s via %s' % (sender.nickname or sender.name, from_name)
-    msg['From'] = Address(from_name, from_user, from_domain)
+    if sender:  # if sender is specified, it's a personal email.
+        sender_display_name = sender.nickname or sender.name
+        from_name = '%s via %s' % (sender_display_name, from_name)
+        if sender.email:
+            reply_to = sender_display_name, sender.email
+    else:  # Otherwise, it's a system email.
+        # check if a global 'Reply-To' is configured
+        reply_to_address = mail_config.get('reply_to')
+        if reply_to_address:
+            reply_to_name = mail_config.get('reply_to_name') or ''
+            reply_to = reply_to_name, reply_to_address
 
-    reply_to_address = mail_config.get('reply_to')
-    if reply_to_address:
+    msg['From'] = Address(from_name, from_user, from_domain)
+    if reply_to:
+        reply_to_name, reply_to_address = reply_to
         reply_to_user, reply_to_domain = reply_to_address.split('@', 1)
-        reply_to_name = mail_config.get('reply_to_name') or ''
         msg['Reply-To'] = Address(reply_to_name, reply_to_user, reply_to_domain)
 
     if to_list:
