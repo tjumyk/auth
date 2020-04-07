@@ -1,3 +1,4 @@
+import os
 import re
 
 from flask import Flask, request, jsonify, send_from_directory
@@ -66,6 +67,9 @@ def page_not_found(error):
             break
         if mime[0] == 'application/json':
             return jsonify(msg='wrong url', detail='You have accessed an unknown location'), 404
+    # in case we are building the front-end
+    if not os.path.exists(os.path.join(app.static_folder, 'index.html')):
+        return "Building front-end in progress", 503
     return app.send_static_file('index.html'), 404
 
 
