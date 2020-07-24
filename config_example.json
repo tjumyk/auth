@@ -5,7 +5,7 @@
   "MAX_CONTENT_LENGTH": 262144,
   "SESSION_COOKIE_NAME": "idm_session",
 
-  "ENABLE_CDN": false,
+  "DETECT_REQUEST_REGIONS": [],
 
   "MAIL": {
     "display_name": "UNSWKG Identity",

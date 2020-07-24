@@ -5,15 +5,15 @@ from flask import Flask, request, jsonify, send_from_directory
 
 from api_account import account
 from api_admin import admin
-from api_oauth import oauth
 from api_meta import meta
+from api_oauth import oauth
 from models import db
 from page_oauth import oauth_pages
 from services.group import GroupService
 from services.user import UserService
 from utils import upload
 from utils.external_auth import provider
-from utils.ip import get_ip_country_info
+from utils.ip import get_geo_country
 
 
 class MyFlask(Flask):
@@ -22,6 +22,9 @@ class MyFlask(Flask):
     _index_page_cache_timeout = 5 * 60  # 5 minutes
 
     def send_static_file(self, filename):
+        return self.send_region_static_file(filename, None)
+
+    def send_region_static_file(self, filename, region):
         """Identify hashed static files and send them with a longer cache timeout.
         For 'index.html', send it with a short cache timeout.
         For other static files, the default cache timeout is used.
@@ -34,25 +37,43 @@ class MyFlask(Flask):
             cache_timeout = self._hashed_static_file_cache_timeout
         else:
             cache_timeout = self.get_send_file_max_age(filename)
-        return send_from_directory(self._get_localized_static_folder(), filename,
-                                   cache_timeout=cache_timeout)
 
-    def _get_localized_static_folder(self):
-        if self.config['ENABLE_CDN']:
+        static_folder = self.get_region_static_folder(region)
+        return send_from_directory(static_folder, filename, cache_timeout=cache_timeout)
+
+    def get_region_static_folder(self, region):
+        if region:  # use the static folder for this region
+            static_folder = '%s_%s' % (self.static_folder, region)
+        else:  # use default static folder
+            static_folder = self.static_folder
+        return static_folder
+
+    def get_request_region(self):
+        detect_regions = self.config.get('DETECT_REQUEST_REGIONS')
+        if detect_regions:
             if self.config['SITE'].get('behind_proxy'):
                 ip = request.environ.get('HTTP_X_REAL_IP') or request.remote_addr
             else:
                 ip = request.remote_addr
-            country_code = get_ip_country_info(ip).to_dict().get('iso_code')
-            if country_code:
-                static_folder = 'static_%s' % country_code.lower()
-                if os.path.exists(static_folder):
-                    return static_folder
-        return self.static_folder  # default folder as fallback
+            country = get_geo_country(ip)
+            if country:
+                country_code = country.country.iso_code.lower()
+                if country_code in detect_regions:
+                    return country_code
+        return None
+
+    def init_region_routes(self):
+        for region in self.config.get('DETECT_REQUEST_REGIONS', []):
+            self.add_url_rule(
+                '%s_%s/<path:filename>' % (self.static_url_path, region),
+                endpoint='static_%s' % region,
+                view_func=lambda f: self.send_region_static_file(f, region)
+            )
 
 
 app = MyFlask(__name__)
 app.config.from_json('config.json')
+app.init_region_routes()
 
 db.init_app(app)
 upload.init_app(app)
@@ -71,7 +92,8 @@ app.register_blueprint(oauth_pages, url_prefix='/oauth')
 @app.route('/admin/<path:path>')
 @app.route('/oauth/<path:path>')
 def get_index_page(path=''):
-    return app.send_static_file('index.html')
+    region = app.get_request_region()
+    return app.send_region_static_file('index.html', region)
 
 
 @app.errorhandler(404)
@@ -81,10 +103,12 @@ def page_not_found(error):
             break
         if mime[0] == 'application/json':
             return jsonify(msg='wrong url', detail='You have accessed an unknown location'), 404
+
+    region = app.get_request_region()
     # in case we are building the front-end
-    if not os.path.exists(os.path.join(app.static_folder, 'index.html')):
+    if not os.path.exists(os.path.join(app.get_region_static_folder(region), 'index.html')):
         return "Building front-end in progress", 503
-    return app.send_static_file('index.html'), 404
+    return app.send_region_static_file('index.html', region), 404
 
 
 @app.cli.command()

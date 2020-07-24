@@ -89,7 +89,7 @@
               "extractLicenses": true,
               "vendorChunk": false,
               "buildOptimizer": true,
-              "deployUrl": "https://kgstatic.yukaimiao.cn/id/static/",
+              "deployUrl": "https://kgstatic.yukaimiao.cn/id/static_cn/",
               "outputPath": "../static_cn"
             }
           }
