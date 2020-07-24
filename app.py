@@ -34,10 +34,10 @@ class MyFlask(Flask):
             cache_timeout = self._hashed_static_file_cache_timeout
         else:
             cache_timeout = self.get_send_file_max_age(filename)
-        return send_from_directory(self.static_folder, filename,
+        return send_from_directory(self._get_localized_static_folder(), filename,
                                    cache_timeout=cache_timeout)
 
-    def send_index_page(self):
+    def _get_localized_static_folder(self):
         if self.config['ENABLE_CDN']:
             if self.config['SITE'].get('behind_proxy'):
                 ip = request.environ.get('HTTP_X_REAL_IP') or request.remote_addr
@@ -47,9 +47,8 @@ class MyFlask(Flask):
             if country_code:
                 static_folder = 'static_%s' % country_code.lower()
                 if os.path.exists(static_folder):
-                    return send_from_directory(static_folder, 'index.html',
-                                               cache_timeout=self._index_page_cache_timeout)
-        return self.send_static_file('index.html')
+                    return static_folder
+        return self.static_folder  # default folder as fallback
 
 
 app = MyFlask(__name__)
@@ -72,7 +71,7 @@ app.register_blueprint(oauth_pages, url_prefix='/oauth')
 @app.route('/admin/<path:path>')
 @app.route('/oauth/<path:path>')
 def get_index_page(path=''):
-    return app.send_index_page()
+    return app.send_static_file('index.html')
 
 
 @app.errorhandler(404)
