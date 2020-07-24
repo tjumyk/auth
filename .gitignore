@@ -6,5 +6,6 @@ __pycache__
 config.json
 test.db
 static/
+static_cn/
 mailbox/
 upload/

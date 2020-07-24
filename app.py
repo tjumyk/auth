@@ -13,6 +13,7 @@ from services.group import GroupService
 from services.user import UserService
 from utils import upload
 from utils.external_auth import provider
+from utils.ip import get_ip_country_info
 
 
 class MyFlask(Flask):
@@ -36,6 +37,20 @@ class MyFlask(Flask):
         return send_from_directory(self.static_folder, filename,
                                    cache_timeout=cache_timeout)
 
+    def send_index_page(self):
+        if self.config['ENABLE_CDN']:
+            if self.config['SITE'].get('behind_proxy'):
+                ip = request.environ.get('HTTP_X_REAL_IP') or request.remote_addr
+            else:
+                ip = request.remote_addr
+            country_code = get_ip_country_info(ip).to_dict().get('iso_code')
+            if country_code:
+                static_folder = 'static_%s' % country_code.lower()
+                if os.path.exists(static_folder):
+                    return send_from_directory(static_folder, 'index.html',
+                                               cache_timeout=self._index_page_cache_timeout)
+        return self.send_static_file('index.html')
+
 
 app = MyFlask(__name__)
 app.config.from_json('config.json')
@@ -57,7 +72,7 @@ app.register_blueprint(oauth_pages, url_prefix='/oauth')
 @app.route('/admin/<path:path>')
 @app.route('/oauth/<path:path>')
 def get_index_page(path=''):
-    return app.send_static_file('index.html')
+    return app.send_index_page()
 
 
 @app.errorhandler(404)
