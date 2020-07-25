@@ -21,6 +21,14 @@ class MyFlask(Flask):
     _hashed_static_file_cache_timeout = 365 * 24 * 60 * 60  # 1 year
     _index_page_cache_timeout = 5 * 60  # 5 minutes
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.add_url_rule(
+            self.static_url_path + '_<string:region>/<path:filename>',
+            endpoint='region_static',
+            view_func=self.send_region_static_file
+        )
+
     def send_static_file(self, filename):
         return self.send_region_static_file(filename, None)
 
@@ -62,18 +70,9 @@ class MyFlask(Flask):
                     return country_code
         return None
 
-    def init_region_routes(self):
-        for region in self.config.get('DETECT_REQUEST_REGIONS', []):
-            self.add_url_rule(
-                '%s_%s/<path:filename>' % (self.static_url_path, region),
-                endpoint='static_%s' % region,
-                view_func=lambda f: self.send_region_static_file(f, region)
-            )
-
 
 app = MyFlask(__name__)
 app.config.from_json('config.json')
-app.init_region_routes()
 
 db.init_app(app)
 upload.init_app(app)
