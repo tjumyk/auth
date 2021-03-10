@@ -12,7 +12,7 @@
           <h2>Hi {{user.name}},</h2>
         </mj-text>
         <mj-text padding-bottom="10px">
-          You are receiving this E-mail because you are either a new coursework student in COMP9318/COMP6714, a new group member, or any other people relevant to our group.
+          You are receiving this E-mail because you are either a new student of a course provided by our group, a new group member, or any other people relevant to our group.
         </mj-text>
         <mj-text padding-bottom="10px">
           We have created an account for you in our system to give you access to some of our internal web apps. You need to confirm your E-mail address before using your new account.

@@ -1,0 +1,20 @@
+@charset "utf-8";
+
+/*!
+// ===========================================================
+// Web Font Generator 1.2.0
+// By [https://github.com/tjumyk]
+// ===========================================================
+*/
+
+@font-face {
+    font-family: 'liukai';
+    src: url('liukai.eot'); /* IE9 Compat Modes */
+    src: url('liukai.eot?#iefix') format('embedded-opentype'),  /* IE6-IE8 */
+         url('liukai.woff') format('woff'), /* Modern Browsers */
+         url('liukai.ttf') format('truetype'), /* Safari, Android, iOS */
+         url('liukai.svg#liukai') format('svg'); /* Legacy iOS */
+    font-weight: normal;
+    font-style: normal;
+}
+

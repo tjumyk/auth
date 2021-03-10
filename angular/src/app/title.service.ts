@@ -6,7 +6,7 @@ import {Title} from "@angular/platform-browser";
 })
 export class TitleService {
   private readonly splitter = ' - ';
-  private readonly appTitle = 'UNSWKG Identity';
+  private readonly appTitle = '深圳大学数据科学与工程研究组';
 
   constructor(
     private title: Title

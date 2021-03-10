@@ -1,7 +1,0 @@
-@font-face {
-  font-family: 'Sommet';
-  src: url('Sommet.eot?#iefix') format('embedded-opentype'),  url('Sommet.otf')  format('opentype'),
-	     url('Sommet.woff') format('woff'), url('Sommet.ttf')  format('truetype'), url('Sommet.svg#Sommet') format('svg');
-  font-weight: normal;
-  font-style: normal;
-}

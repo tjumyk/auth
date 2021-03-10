@@ -49,7 +49,7 @@
             ],
             "styles": [
               "src/lib/semantic/semantic.min.css",
-              "src/fonts/styles.css",
+              "src/fonts/build/styles.css",
               "src/styles.less"
             ],
             "scripts": [],
