@@ -6,7 +6,7 @@
 
 <div class="ui stackable two column grid">
   <div class="column">
-    <div class="ui large centered active inline text loader" *ngIf="loading_user">Loading user profile...</div>
+    <div class="ui large centered active inline text loader" *ngIf="loading_user" i18n>Loading user profile...</div>
 
     <div *ngIf="!loading_user && user">
       <div class="ui segments">
@@ -24,7 +24,7 @@
               {{user.id}}
             </div>
             <div class="item">
-              <div class="header">Name</div>
+              <div class="header" i18n>Name</div>
               {{user.name}}
             </div>
             <div class="item">
@@ -34,31 +34,31 @@
               <i class="icon yellow question circle" *ngIf="!user.is_email_confirmed" title="Not yet confirmed"></i>
             </div>
             <div class="item">
-              <div class="header">Status</div>
-              <span *ngIf="user.is_active" class="text success">Active</span>
-              <span *ngIf="!user.is_active" class="text error">Inactive</span>
+              <div class="header" i18n>Status</div>
+              <span *ngIf="user.is_active" class="text success" i18n>Active</span>
+              <span *ngIf="!user.is_active" class="text error" i18n>Inactive</span>
             </div>
             <div class="item">
-              <div class="header">Groups</div>
+              <div class="header" i18n>Groups</div>
               <div class="ui small labels">
                 <a class="ui basic label" *ngFor="let group of user.groups" routerLink="../../../groups/g/{{group.id}}" title="{{group.description}}" >{{group.name}}</a>
               </div>
-              <span *ngIf="user.groups.length==0" class="text muted">(None)</span>
+              <span *ngIf="user.groups.length==0" class="text muted" i18n>(None)</span>
             </div>
             <div class="item">
-              <div class="header">Auth Provider</div>
+              <div class="header" i18n>Auth Provider</div>
               <ng-container *ngIf="user.external_auth_provider_id; else localProvider">
                 <span *ngIf="provider; else noProviderInfo">{{provider.name}}</span>
                 <ng-template #noProviderInfo>{{user.external_auth_provider_id}}</ng-template>
-                <span *ngIf="!user.external_auth_enforced"> / Local</span>
+                <span *ngIf="!user.external_auth_enforced"> / <ng-container i18n>Local</ng-container></span>
               </ng-container>
-              <ng-template #localProvider>Local</ng-template>
+              <ng-template #localProvider><ng-container i18n>Local</ng-container></ng-template>
             </div>
             <div class="item">
-              <div class="header">Two-Factor Authentication</div>
-              <span *ngIf="user.is_two_factor_enabled; else no2FA" class="text success">Enabled</span>
+              <div class="header" i18n>Two-Factor Authentication</div>
+              <span *ngIf="user.is_two_factor_enabled; else no2FA" class="text success" i18n>Enabled</span>
               <ng-template #no2FA>
-                <span class="text muted">Disabled</span>
+                <span class="text muted" i18n>Disabled</span>
               </ng-template>
             </div>
           </div>
@@ -67,23 +67,23 @@
         <div class="ui segment">
           <div class="ui list">
             <div class="item">
-              <div class="header">Created At</div>
+              <div class="header" i18n>Created At</div>
               {{user.created_at | date:'medium'}}
             </div>
             <div class="item">
-              <div class="header">Modified At</div>
+              <div class="header" i18n>Modified At</div>
               {{user.modified_at | date:'medium'}}
             </div>
             <div class="item">
-              <div class="header">E-mail Confirmed At</div>
+              <div class="header" i18n>E-mail Confirmed At</div>
               <span *ngIf="user.email_confirmed_at">{{user.email_confirmed_at | date:'medium'}}</span>
-              <span class="text muted" *ngIf="!user.email_confirmed_at">(Not yet confirmed)</span>
+              <span class="text muted" *ngIf="!user.email_confirmed_at" i18n>(Not yet confirmed)</span>
             </div>
           </div>
         </div>
 
         <div class="ui segment" *ngIf="getting_external_info">
-          <div class="ui centered active inline text loader">Loading external user info...</div>
+          <div class="ui centered active inline text loader" i18n>Loading external user info...</div>
         </div>
 
         <ng-container *ngFor="let source of external_info">
@@ -97,15 +97,15 @@
               <ng-container *ngIf="source.type=='pwd_agent'">
                 <div class="ui list">
                   <div class="item">
-                    <div class="header">Full Name</div>
+                    <div class="header" i18n>Full Name</div>
                     {{source.result.full_name}}
                   </div>
                   <div class="item">
-                    <div class="header">Expired?</div>
+                    <div class="header" i18n>Expired?</div>
                     {{source.result.expired}}
                   </div>
                   <div class="item" *ngIf="source.result.details.length">
-                    <div class="header">Details</div>
+                    <div class="header" i18n>Details</div>
                     <ul>
                       <li *ngFor="let detail of source.result.details">{{detail}}</li>
                     </ul>
@@ -114,7 +114,7 @@
               </ng-container>
             </ng-container>
             <ng-template #noExternalInfoResult>
-              <div *ngIf="!source.error">(No result)</div>
+              <div *ngIf="!source.error" i18n>(No result)</div>
             </ng-template>
           </div>
         </ng-container>
@@ -127,26 +127,26 @@
           </div>
 
           <p *ngIf="!user.is_email_confirmed">
-            <a class="ui button" [ngClass]="{'loading disabled': requesting_reconfirm_email}" (click)="reconfirmEmail()">Reconfirm E-mail</a>
+            <a class="ui button" [ngClass]="{'loading disabled': requesting_reconfirm_email}" (click)="reconfirmEmail()" i18n>Reconfirm E-mail</a>
           </p>
           <p>
             <a class="ui red button" [hidden]="!user.is_active" [ngClass]="{'loading disabled': setting_active}" (click)="setActive(false)">
-              <i class="dont icon"></i> Set as Inactive
+              <i class="dont icon"></i> <ng-container i18n>Set as Inactive</ng-container>
             </a>
             <a class="ui green button" [hidden]="user.is_active" [ngClass]="{'loading disabled': setting_active}"  (click)="setActive(true)">
-              <i class="redo icon"></i> Set as Active
+              <i class="redo icon"></i> <ng-container i18n>Set as Active</ng-container>
             </a>
-            <a class="ui red button" (click)="deleteUser()" [ngClass]="{'loading disabled': deleting}"><i class="trash icon"></i>Delete User</a>
+            <a class="ui red button" (click)="deleteUser()" [ngClass]="{'loading disabled': deleting}"><i class="trash icon"></i><ng-container i18n>Delete User</ng-container></a>
           </p>
           <p>
-            <a class="ui button" (click)="impersonateUser()" [ngClass]="{'loading disabled': impersonating}"><i class="icon user secret"></i> Impersonate User</a>
+            <a class="ui button" (click)="impersonateUser()" [ngClass]="{'loading disabled': impersonating}"><i class="icon user secret"></i> <ng-container i18n>Impersonate User</ng-container></a>
           </p>
         </div>
 
         <div class="ui segment">
           <div class="ui success message" *ngIf="update_profile_success">
             <i class="close icon" (click)="update_profile_success=undefined"></i>
-            <div class="header"><i class="check circle icon"></i> Profile updated successfully</div>
+            <div class="header"><i class="check circle icon"></i> <ng-container i18n>Profile updated successfully</ng-container></div>
           </div>
           <div class="ui error message" *ngIf="update_profile_error">
             <i class="close icon" (click)="update_profile_error=undefined"></i>
@@ -155,7 +155,7 @@
           </div>
           <form #f="ngForm" class="ui form" (ngSubmit)="updateProfile(f)" [ngClass]="{'loading': updating_profile}">
             <div class="field" [ngClass]="{'error': nickname_model.invalid && (f.submitted || nickname_model.dirty || nickname_model.touched)}">
-              <label>Nickname</label>
+              <label i18n>Nickname</label>
               <input type="text" placeholder="alphanumeric, space or dash, 3-16 characters"
                      minlength="3" maxlength="16" pattern="^[ \w\-]{3,16}$"
                      [(ngModel)]="form.nickname" name="nickname" #nickname_model="ngModel">
@@ -165,14 +165,14 @@
                 <label *ngIf="nickname_model.errors.pattern"><i class="times icon"></i>Invalid format</label>
               </div>
             </div>
-            <button class="ui primary fluid submit button" type="submit">Update Profile</button>
+            <button class="ui primary fluid submit button" type="submit" i18n>Update Profile</button>
           </form>
         </div>
 
         <div class="ui segment">
           <div class="ui success message" *ngIf="update_avatar_success">
             <i class="close icon" (click)="update_avatar_success=undefined"></i>
-            <div class="header"><i class="check circle icon"></i> Avatar updated successfully</div>
+            <div class="header"><i class="check circle icon"></i> <ng-container i18n>Avatar updated successfully</ng-container></div>
           </div>
           <div class="ui error message" *ngIf="update_avatar_error">
             <i class="close icon" (click)="update_avatar_error=undefined"></i>
@@ -183,12 +183,12 @@
             <div class="column">
               <form class="ui form" [ngClass]="{'loading': updating_avatar}">
                 <div class="field">
-                  <label>Avatar</label>
+                  <label i18n>Avatar</label>
                   <input type="file" hidden name="avatar" #avatar_input [accept]="avatar_validator.filter.accept.join(',')" (change)="uploadAvatar(avatar_input)">
                   <img class="ui small centered image" [src]="user.avatar" *ngIf="user.avatar">
-                  <div class="text muted" *ngIf="!user.avatar">(No avatar)</div>
+                  <div class="text muted" *ngIf="!user.avatar" i18n>(No avatar)</div>
                 </div>
-                <button class="ui primary button" type="button" (click)="avatar_input.click()">Upload Avatar</button>
+                <button class="ui primary button" type="button" (click)="avatar_input.click()" i18n>Upload Avatar</button>
                 <p>Max size: {{avatar_validator.filter.size_limit/1024 | number}}KB, squared image only</p>
               </form>
             </div>
@@ -199,11 +199,11 @@
       <div class="ui top attached segment">
         <div class="ui header">
           <i class="handshake outline icon"></i>
-          OAuth Authorizations
+          <ng-container i18n>OAuth Authorizations</ng-container>
         </div>
       </div>
       <table class="ui table celled very compact unstackable bottom attached">
-        <thead><tr><th>Client</th><th>Created At</th><th>Updated At</th></tr></thead>
+        <thead><tr><th i18n>Client</th><th i18n>Created At</th><th i18n>Updated At</th></tr></thead>
         <tbody>
         <tr *ngFor="let record of user.authorizations; index as i">
           <td>
@@ -222,17 +222,17 @@
   </div>
 
   <div class="column">
-    <div class="ui large centered active inline text loader" *ngIf="loading_login_records">Loading user login records...</div>
+    <div class="ui large centered active inline text loader" *ngIf="loading_login_records" i18n>Loading user login records...</div>
 
     <div *ngIf="!loading_login_records && login_records">
       <div class="ui top attached segment">
         <div class="ui header">
           <i class="sign in icon"></i>
-          Sign In Records
+          <ng-container i18n>Sign In Records</ng-container>
         </div>
       </div>
       <table class="ui table celled very compact unstackable bottom attached">
-        <thead><tr><th>ID</th><th>Time</th><th>IP</th><th>UA</th><th>Result</th></tr></thead>
+        <thead><tr><th>ID</th><th i18n>Time</th><th>IP</th><th i18n>UA</th><th i18n>Result</th></tr></thead>
         <tbody>
         <tr *ngFor="let record of login_records; index as i" [ngClass]="{'error': !record.success}">
           <td>{{record.id}}</td>

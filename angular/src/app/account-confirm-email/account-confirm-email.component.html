@@ -5,14 +5,14 @@
 </div>
 
 <div class="ui padded raised segment" *ngIf="verifying">
-  <div class="ui large centered text inline loader active">Verifying token...</div>
+  <div class="ui large centered text inline loader active" i18n>Verifying token...</div>
 </div>
 
 <div *ngIf="!verifying && user">
   <form class="ui large form" #f="ngForm" (ngSubmit)="start_confirm(f)" [ngClass]="{'loading': requesting}">
     <div class="ui raised segment">
       <div class="field">
-        <label>Username</label>
+        <label i18n>Username</label>
         <input type="text" name="name" [(ngModel)]="user.name" readonly="">
       </div>
       <div class="field">
@@ -22,13 +22,13 @@
 
       <ng-container *ngIf="user.external_auth_provider_id; else setupLocalPassword">
         <div class="field" *ngIf="provider">
-          <label>Password</label>
+          <label i18n>Password</label>
           <div>Please use your existing password ({{provider.name}}).</div>
         </div>
       </ng-container>
       <ng-template #setupLocalPassword>
         <div class="field" [ngClass]="{'error': (f.submitted || new_pass_model.touched || new_pass_model.dirty) && new_pass_model.invalid}">
-          <label>New password</label>
+          <label i18n>New password</label>
           <input type="password" name="new_password" placeholder="8-20 characters"
                  required minlength="8" maxlength="20" appStrongPassword
                  [(ngModel)]="form.new_password" #new_pass_model="ngModel">
@@ -40,7 +40,7 @@
           </div>
         </div>
         <div class="field" [ngClass]="{'error': (f.submitted || repeat_new_pass_model.touched || repeat_new_pass_model.dirty) && repeat_new_pass_model.invalid}">
-          <label>Repeat new password</label>
+          <label i18n>Repeat new password</label>
           <input type="password" name="repeat_new_password" placeholder="repeat the new password"
                  required minlength="8" maxlength="20" appSameAs="{{form.new_password}}"
                  [(ngModel)]="form.repeat_new_password" #repeat_new_pass_model="ngModel">
@@ -53,11 +53,11 @@
         </div>
       </ng-template>
 
-      <button class="ui fluid large primary submit button" type="submit">Finish</button>
+      <button class="ui fluid large primary submit button" type="submit" i18n>Finish</button>
     </div>
   </form>
 </div>
 
 <div class="ui center aligned message">
-  Token expired? <a routerLink="../request-reconfirm-email">Reconfirm E-mail</a>
+  <ng-container i18n>Token expired?</ng-container> <a routerLink="../request-reconfirm-email" i18n>Reconfirm E-mail</a>
 </div>

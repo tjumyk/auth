@@ -3,41 +3,41 @@
     <div class="ui vertical fluid large menu">
       <a routerLink="/" class="item">
         <i class="icon home"></i>
-        Home
+        <ng-container i18n>Home</ng-container>
       </a>
       <div class="item">
-        Account
+        <ng-container i18n>Account</ng-container>
         <div class="menu">
-          <a routerLink="account/users" routerLinkActive="active" class="item"><i class="icon user"></i> Users</a>
-          <a routerLink="account/groups" routerLinkActive="active" class="item"><i class="icon users"></i> Groups</a>
+          <a routerLink="account/users" routerLinkActive="active" class="item"><i class="icon user"></i> <ng-container i18n>Users</ng-container></a>
+          <a routerLink="account/groups" routerLinkActive="active" class="item"><i class="icon users"></i> <ng-container i18n>Groups</ng-container></a>
         </div>
       </div>
       <div class="item">
         OAuth
         <div class="menu">
-          <a routerLink="oauth/clients" routerLinkActive="active" class="item"><i class="icon window restore outline"></i> Clients</a>
+          <a routerLink="oauth/clients" routerLinkActive="active" class="item"><i class="icon window restore outline"></i> <ng-container i18n>Clients</ng-container></a>
         </div>
       </div>
       <div class="item">
         Email
         <div class="menu">
-          <a routerLink="email/send" routerLinkActive="active" class="item"><i class="icon envelope"></i> Send Email</a>
+          <a routerLink="email/send" routerLinkActive="active" class="item"><i class="icon envelope"></i> <ng-container i18n>Send Email</ng-container></a>
         </div>
       </div>
       <a class="item" routerLink="about" routerLinkActive="active">
         <i class="icon info"></i>
-        About
+        <ng-container i18n>About</ng-container>
       </a>
     </div>
 
     <div class="ui vertical fluid buttons">
       <button class="ui button" routerLink="/settings">
         <i class="icon cog"></i>
-        My Settings
+        <ng-container i18n>My Settings</ng-container>
       </button>
       <button class="ui teal button" routerLink="/account/logout">
         <i class="icon sign out"></i>
-        Sign Out
+        <ng-container i18n>Sign Out</ng-container>
       </button>
     </div>
   </div>

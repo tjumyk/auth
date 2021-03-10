@@ -5,16 +5,14 @@
 </div>
 
 <div class="ui padded raised segment" *ngIf="disabling">
-  <div class="ui centered large text inline loader active">Disabling Two-Factor Authentication...</div>
+  <div class="ui centered large text inline loader active" i18n>Disabling Two-Factor Authentication...</div>
 </div>
 
 <div class="ui padded raised segment" *ngIf="success">
   <div class="ui center aligned fluid header">
     <div class="content">
-      <i class="check circle green icon"></i> Disabled Two-Factor Authentication
-      <div class="sub header">
-        Now you should be able to sign in without the Two-Factor Authentication.
-      </div>
+      <i class="check circle green icon"></i> <ng-container i18n>Disabled Two-Factor Authentication</ng-container>
+      <div class="sub header" i18n>Now you should be able to sign in without the Two-Factor Authentication.</div>
     </div>
   </div>
 </div>

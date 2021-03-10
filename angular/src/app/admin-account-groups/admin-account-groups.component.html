@@ -4,16 +4,16 @@
   <p>{{error.detail}}</p>
 </div>
 
-<div class="ui centered active large inline text loader" *ngIf="loading_group_list">Loading group list...</div>
+<div class="ui centered active large inline text loader" *ngIf="loading_group_list" i18n>Loading group list...</div>
 
 <div *ngIf="!loading_group_list">
   <p>
-    <a class="ui small button primary" routerLink="new"><i class="icon users add"></i> New Group</a>
+    <a class="ui small button primary" routerLink="new"><i class="icon users add"></i> <ng-container i18n>New Group</ng-container></a>
   </p>
 
   <div class="table-responsive">
     <table class="ui unstackable celled compact table very compact">
-      <thead><tr><th>#</th><th>ID</th><th>Name</th><th>Description</th><th class="collapsing">Ops</th></tr></thead>
+      <thead><tr><th>#</th><th>ID</th><th i18n>Name</th><th i18n>Description</th><th class="collapsing" i18n>Ops</th></tr></thead>
       <tbody>
       <tr *ngFor="let group of group_list; index as i">
         <td>{{i+1}}</td>

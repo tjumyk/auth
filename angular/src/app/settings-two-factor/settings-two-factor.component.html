@@ -8,29 +8,29 @@
   <div class="ui segment">
     <div class="ui header">
       <i class="icon shield alternate"></i>
-      Two-Factor Authentication
+      <ng-container i18n>Two-Factor Authentication</ng-container>
     </div>
   </div>
   <div class="ui segment">
     <ng-container *ngIf="user">
       <ng-container *ngIf="user.is_two_factor_enabled; else no2FA">
-        <p><i class="icon green check circle"></i> Two-factor authentication has been enabled.</p>
+        <p><i class="icon green check circle"></i> <ng-container i18n>Two-factor authentication has been enabled.</ng-container></p>
 
         <div class="disable-start" *ngIf="!show_disable_form; else disable_form">
-          <button class="ui button red" (click)="show_disable_form=true">Disable Two-Factor Authentication</button>
+          <button class="ui button red" (click)="show_disable_form=true" i18n>Disable Two-Factor Authentication</button>
         </div>
 
         <ng-template #disable_form>
           <form class="ui form" [ngClass]="{'loading': disabling}" #f="ngForm" (ngSubmit)="disable(f)">
             <div class="field" [ngClass]="{'error': (f.submitted || token_model.touched || token_model.dirty) && token_model.invalid}">
-              <label>Token</label>
+              <label i18n>Token</label>
               <input type="text" name="token" maxlength="6" placeholder="Please enter the 6-digit token shown in your Authenticator app" required
                      [(ngModel)]="disable_token" #token_model="ngModel" autocomplete="off">
               <div class="errors" *ngIf="token_model.errors">
                 <label *ngIf="token_model.errors.required"><i class="icon times"></i> Token is required</label>
               </div>
             </div>
-            <button class="ui red fluid button" type="submit">Verify & Disable</button>
+            <button class="ui red fluid button" type="submit" i18n>Verify & Disable</button>
           </form>
           <p>If you have accidentally uninstalled your Authenticator app or lost your mobile phone, please <a routerLink="/account/request-disable-two-factor-by-email">request disabling two-factor authentication by Email</a>.</p>
         </ng-template>
@@ -42,28 +42,28 @@
             <img class="ui image large centered" [src]="setup_info.qr_code" alt="qr_code">
             <div class="expired" *ngIf="setup_info_expired">
               <div>
-                <h3>QR code has been expired</h3>
-                <button class="ui button" (click)="setup()" [ngClass]="{'loading disabled': setting_up}"><i class="icon repeat"></i> Re-generate QR code</button>
+                <h3 i18n>QR code has been expired</h3>
+                <button class="ui button" (click)="setup()" [ngClass]="{'loading disabled': setting_up}"><i class="icon repeat"></i> <ng-container i18n>Re-generate QR code</ng-container></button>
               </div>
             </div>
           </div>
 
           <form class="ui form" [ngClass]="{'loading': confirming}" #f="ngForm" (ngSubmit)="confirmSetup(f)">
             <div class="field" [ngClass]="{'error': (f.submitted || token_model.touched || token_model.dirty) && token_model.invalid, 'disabled': setup_info_expired}">
-              <label>Token</label>
+              <label i18n>Token</label>
               <input type="text" name="token" maxlength="6" placeholder="Please enter the 6-digit token shown in your Authenticator app" required
                      [(ngModel)]="confirm_token" #token_model="ngModel" autocomplete="off">
               <div class="errors" *ngIf="token_model.errors">
                 <label *ngIf="token_model.errors.required"><i class="icon times"></i> Token is required</label>
               </div>
             </div>
-            <button class="ui primary fluid button" [ngClass]="{'disabled': setup_info_expired}" type="submit">Verify & Enable</button>
+            <button class="ui primary fluid button" [ngClass]="{'disabled': setup_info_expired}" type="submit" i18n>Verify & Enable</button>
           </form>
         </div>
 
         <ng-template #setup_start>
           <div class="setup-start">
-            <h4 class="ui header">How to enable Two-Factor Authentication?</h4>
+            <h4 class="ui header" i18n>How to enable Two-Factor Authentication?</h4>
             <ol class="ui list">
               <li class="item">
                 <div class="content">
@@ -92,7 +92,7 @@
                 <div class="content">Click 'Verify & Enable' to finish the process.</div>
               </li>
             </ol>
-            <button class="ui button primary" (click)="setup()" [ngClass]="{'loading disabled': setting_up}">Enable Two-Factor Authentication</button>
+            <button class="ui button primary" (click)="setup()" [ngClass]="{'loading disabled': setting_up}" i18n>Enable Two-Factor Authentication</button>
           </div>
         </ng-template>
 

@@ -6,7 +6,7 @@
 
 <div class="ui stackable two column grid">
   <div class="column">
-    <div class="ui large centered active inline text loader" *ngIf="loading_client">Loading client profile...</div>
+    <div class="ui large centered active inline text loader" *ngIf="loading_client" i18n>Loading client profile...</div>
 
     <div *ngIf="!loading_client && client">
       <div class="ui segments">
@@ -24,16 +24,16 @@
               {{client.id}}
             </div>
             <div class="item">
-              <div class="header">Name</div>
+              <div class="header" i18n>Name</div>
               {{client.name}}
             </div>
             <div class="item">
-              <div class="header">Access Control</div>
-              <span *ngIf="client.is_public" class="text warning"><i class="icon lock open"></i> Public</span>
+              <div class="header" i18n>Access Control</div>
+              <span *ngIf="client.is_public" class="text warning"><i class="icon lock open"></i> <ng-container i18n>Public</ng-container></span>
               <div *ngIf="!client.is_public">
-                <span *ngIf="client.allowed_groups.length" class="text success"><i class="icon lock"></i> Only members of allowed groups</span>
+                <span *ngIf="client.allowed_groups.length" class="text success"><i class="icon lock"></i> <ng-container i18n>Only members of allowed groups</ng-container></span>
                 <div *ngIf="!client.allowed_groups.length" class="text error">
-                  <i class="red icon lock"></i> No one can access this client
+                  <i class="red icon lock"></i> <ng-container i18n>No one can access this client</ng-container>
                 </div>
               </div>
             </div>
@@ -43,15 +43,15 @@
         <div class="ui segment">
           <div class="ui list">
             <div class="item">
-              <div class="header">Secret</div>
+              <div class="header" i18n>Secret</div>
               {{client.secret}}
             </div>
             <div class="item">
-              <div class="header">Created At</div>
+              <div class="header" i18n>Created At</div>
               {{client.created_at | date:'medium'}}
             </div>
             <div class="item">
-              <div class="header">Modified At</div>
+              <div class="header" i18n>Modified At</div>
               {{client.modified_at | date:'medium'}}
             </div>
           </div>
@@ -66,27 +66,27 @@
 
           <p>
             <a class="ui primary button" [hidden]="!client.is_public" [ngClass]="{'loading disabled': setting_public}" (click)="setPublic(false)">
-              <i class="lock icon"></i> Disable Public Access
+              <i class="lock icon"></i> <ng-container i18n>Disable Public Access</ng-container>
             </a>
             <a class="ui yellow button" [hidden]="client.is_public" [ngClass]="{'loading disabled': setting_public}"  (click)="setPublic(true)">
-              <i class="lock open icon"></i> Enable Public Access
+              <i class="lock open icon"></i> <ng-container i18n>Enable Public Access</ng-container>
             </a>
           </p>
 
           <p>
-            <a class="ui yellow button" [ngClass]="{'loading disabled': regenerating_secret}" (click)="regenerateSecret()"><i class="repeat icon"></i> Regenerate Secret</a>
-            <a class="ui red button" (click)="deleteClient()" [ngClass]="{'loading disabled': deleting}"><i class="trash icon"></i>Delete Client</a>
+            <a class="ui yellow button" [ngClass]="{'loading disabled': regenerating_secret}" (click)="regenerateSecret()"><i class="repeat icon"></i> <ng-container i18n>Regenerate Secret</ng-container></a>
+            <a class="ui red button" (click)="deleteClient()" [ngClass]="{'loading disabled': deleting}"><i class="trash icon"></i> <ng-container i18n>Delete Client</ng-container></a>
           </p>
 
           <p>
-            <a class="ui green button fluid" href="api/admin/clients/{{cid}}/generate-config-file"><i class="download icon"></i> Download Client Configuration File</a>
+            <a class="ui green button fluid" href="api/admin/clients/{{cid}}/generate-config-file"><i class="download icon"></i> <ng-container i18n>Download Client Configuration File</ng-container></a>
           </p>
         </div>
 
         <div class="ui segment">
           <div class="ui success message" *ngIf="update_profile_success">
             <i class="close icon" (click)="update_profile_success=undefined"></i>
-            <div class="header"><i class="check circle icon"></i> Profile updated successfully</div>
+            <div class="header"><i class="check circle icon"></i> <ng-container i18n>Profile updated successfully</ng-container></div>
           </div>
           <div class="ui error message" *ngIf="update_profile_error">
             <i class="close icon" (click)="update_profile_error=undefined"></i>
@@ -97,7 +97,7 @@
           <form #f="ngForm" class="ui form" (ngSubmit)="updateProfile(f)" [ngClass]="{'loading': updating_profile}">
             <div class="field"
                  [ngClass]="{'error': (f.submitted || redirect_url_model.touched || redirect_url_model.dirty) && redirect_url_model.invalid}">
-              <label>Redirect URL</label>
+              <label i18n>Redirect URL</label>
               <input type="text" name="redirect_url" placeholder="at most 128 characters"
                      required maxlength="128"
                      [(ngModel)]="form.redirect_url" #redirect_url_model="ngModel">
@@ -108,7 +108,7 @@
             </div>
             <div class="field"
                  [ngClass]="{'error': (f.submitted || home_url_model.touched || home_url_model.dirty) && home_url_model.invalid}">
-              <label>Home URL</label>
+              <label i18n>Home URL</label>
               <input type="text"  name="home_url" placeholder="at most 128 characters"
                      required maxlength="128"
                      [(ngModel)]="form.home_url" #home_url_model="ngModel">
@@ -119,7 +119,7 @@
             </div>
             <div class="field"
                  [ngClass]="{'error': (f.submitted || desc_model.touched || desc_model.dirty) && desc_model.invalid}">
-              <label>Description (Optional)</label>
+              <label i18n>Description (Optional)</label>
               <textarea  name="description" placeholder="at most 256 characters" rows="5"
                          maxlength="256"
                          [(ngModel)]="form.description" #desc_model="ngModel"></textarea>
@@ -128,14 +128,14 @@
               </div>
             </div>
 
-            <button class="ui primary fluid submit button" type="submit">Update Profile</button>
+            <button class="ui primary fluid submit button" type="submit" i18n>Update Profile</button>
           </form>
         </div>
 
         <div class="ui segment">
           <div class="ui success message" *ngIf="update_icon_success">
             <i class="close icon" (click)="update_icon_success=undefined"></i>
-            <div class="header"><i class="check circle icon"></i> Icon updated successfully</div>
+            <div class="header"><i class="check circle icon"></i> <ng-container i18n>Icon updated successfully</ng-container></div>
           </div>
           <div class="ui error message" *ngIf="update_icon_error">
             <i class="close icon" (click)="update_icon_error=undefined"></i>
@@ -147,12 +147,12 @@
             <div class="column">
               <form class="ui form" [ngClass]="{'loading': updating_icon}">
                 <div class="field">
-                  <label>Icon</label>
+                  <label i18n>Icon</label>
                   <input type="file" hidden name="icon" #icon_input [accept]="icon_validator.filter.accept.join(',')" (change)="uploadIcon(icon_input)">
                   <img class="ui small centered image" [src]="client.icon" *ngIf="client.icon">
-                  <div class="text muted" *ngIf="!client.icon">(No icon)</div>
+                  <div class="text muted" *ngIf="!client.icon" i18n>(No icon)</div>
                 </div>
-                <button class="ui primary button" type="button" (click)="icon_input.click()">Upload Icon</button>
+                <button class="ui primary button" type="button" (click)="icon_input.click()" i18n>Upload Icon</button>
                 <p>Max size: {{icon_validator.filter.size_limit/1024 | number}}KB, squared image only</p>
               </form>
             </div>
@@ -172,7 +172,7 @@
       <div class="ui segment top attached">
         <div class="ui header">
           <i class="icon users"></i>
-          Allowed Groups
+          <ng-container i18n>Allowed Groups</ng-container>
         </div>
       </div>
 
@@ -190,7 +190,7 @@
       </div>
 
       <table class="ui bottom attached table celled unstackable compact">
-        <thead><tr><th>ID</th><th>Name</th><th>Description</th><th class="collapsing">Ops</th></tr></thead>
+        <thead><tr><th>ID</th><th i18n>Name</th><th i18n>Description</th><th class="collapsing" i18n>Ops</th></tr></thead>
         <tbody>
         <tr *ngFor="let group of client.allowed_groups; index as i">
           <td>{{group.id}}</td>
@@ -209,7 +209,7 @@
       <div class="ui segment top attached">
         <div class="ui header">
           <i class="icon plus"></i>
-          Add New Allowed Group
+          <ng-container i18n>Add New Allowed Group</ng-container>
         </div>
       </div>
 
@@ -234,7 +234,7 @@
       </div>
 
       <table class="ui table unstackable compact celled bottom attached" [hidden]="!group_search_results || group_search_results.length==0">
-        <thead><tr><th>ID</th><th>Name</th><th>Description</th><th class="collapsing">Ops</th></tr></thead>
+        <thead><tr><th>ID</th><th i18n>Name</th><th i18n>Description</th><th class="collapsing" i18n>Ops</th></tr></thead>
         <tbody>
         <tr *ngFor="let group of group_search_results; index as i">
           <td>{{group.id}}</td>
@@ -254,7 +254,7 @@
 
     </div>
 
-    <div class="ui large centered active inline text loader" *ngIf="loading_authorizations">Loading authorizations...</div>
+    <div class="ui large centered active inline text loader" *ngIf="loading_authorizations" i18n>Loading authorizations...</div>
 
     <div *ngIf="!loading_authorizations && authorizationPages">
       <div class="ui top attached segment clearing">
@@ -264,11 +264,11 @@
         </div>
         <div class="ui header left floated">
           <i class="handshake outline icon"></i>
-          Authorizations
+          <ng-container i18n>Authorizations</ng-container>
         </div>
       </div>
       <table class="ui table celled very compact unstackable attached">
-        <thead><tr><th>#</th><th>User ID</th><th>User Name</th><th>Created At</th><th>Updated At</th></tr></thead>
+        <thead><tr><th>#</th><th i18n>User ID</th><th i18n>User Name</th><th i18n>Created At</th><th i18n>Updated At</th></tr></thead>
         <tbody>
         <tr *ngFor="let record of authorizationPages.pageItems; index as i">
           <td>{{i+authorizationPages.startRow}}</td>
@@ -287,7 +287,7 @@
           <div class="item">
             <form class="ui form">
               <div class="inline field">
-                <label>Rows Per Page</label>
+                <label i18n>Rows Per Page</label>
                 <select name="itemsPerPage" [(ngModel)]="authorizationPages.itemsPerPage">
                   <option [value]="num" *ngFor="let num of authorizationPages.itemsPerPageOptions">{{num}}</option>
                 </select>

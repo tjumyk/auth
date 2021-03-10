@@ -9,7 +9,7 @@
     <!--Users Input-->
     <form class="ui form">
       <div class="field" [ngClass]="{'disabled': processing}">
-        <label>User List Format</label>
+        <label i18n>User List Format</label>
         <select name="format" [(ngModel)]="format" (change)="reloadUserList()">
           <option value="csv">CSV</option>
           <option value="tsv">TSV</option>
@@ -17,7 +17,7 @@
         </select>
       </div>
       <div class="ui message info">
-        <div class="header">Format Requirements</div>
+        <div class="header" i18n>Format Requirements</div>
         <ul *ngIf="format=='csv' || format=='tsv'" class="list">
           <li>Each line corresponds to a user record.</li>
           <li>Any lines that contain only whitespace characters will be skipped.</li>
@@ -41,16 +41,16 @@
         </ul>
       </div>
       <div class="field" [ngClass]="{'disabled': processing}">
-        <label>User List</label>
+        <label i18n>User List</label>
         <textarea name="user_list" rows="20" [(ngModel)]="userRawList" (keyup)="updateUserList()"
                   placeholder="{{examples[format]}}"></textarea>
       </div>
       <div class="field" [ngClass]="{'disabled': processing}">
-        <label>Email Prefix</label>
+        <label i18n>Email Prefix</label>
         <input type="text" name="email_prefix" [(ngModel)]="emailPrefix" (keyup)="updateUserList()" placeholder="Prefix for auto-generated email">
       </div>
       <div class="field" [ngClass]="{'disabled': processing}">
-        <label>Email Suffix</label>
+        <label i18n>Email Suffix</label>
         <input type="text" name="email_suffix" [(ngModel)]="emailSuffix" (keyup)="updateUserList()" placeholder="Suffix for auto-generated email">
       </div>
     </form>
@@ -65,29 +65,29 @@
           <!--User Operations-->
           <h4 class="ui header">
             <i class="icon user"></i>
-            Users
+            <ng-container i18n>Users</ng-container>
           </h4>
           <div class="ui fluid buttons vertical">
             <button class="ui button" (click)="findUsers()"
                     [ngClass]="{'loading': findingUsers, 'disabled': processing}">
-              <i class="icon search"></i> Find Users
+              <i class="icon search"></i> <ng-container i18n>Find Users</ng-container>
             </button>
             <button class="ui green button" (click)="inviteUsers()"
                     [ngClass]="{'loading': invitingUsers, 'disabled': processing}">
-              <i class="icon plus"></i> Invite Users
+              <i class="icon plus"></i> <ng-container i18n>Invite Users</ng-container>
             </button>
             <button class="ui red button" (click)="deleteUsers()"
                     [ngClass]="{'loading': deletingUsers, 'disabled': processing}">
-              <i class="icon trash"></i> Delete Users
+              <i class="icon trash"></i> <ng-container i18n>Delete Users</ng-container>
             </button>
           </div>
 
-          <div class="ui divider horizontal">Invitation Options</div>
+          <div class="ui divider horizontal" i18n>Invitation Options</div>
           <form *ngIf="external_auth_providers" class="ui form">
             <div class="field" [class.disabled]="processing">
-              <label>Auth Provider</label>
+              <label i18n>Auth Provider</label>
               <select name="external_auth_provider" [(ngModel)]="external_auth_provider_id" (change)="onChangeProvider()">
-                <option [ngValue]="undefined">Local</option>
+                <option [ngValue]="undefined" i18n>Local</option>
                 <option [ngValue]="provider.id" *ngFor="let provider of external_auth_providers">{{provider.name}}</option>
               </select>
             </div>
@@ -95,7 +95,7 @@
               <div class="ui toggle checkbox">
                 <input type="checkbox" class="hidden" name="skip_email_confirmation"
                        [(ngModel)]="skip_email_confirmation" #checkboxSkipEmailConfirmation>
-                <label (click)="checkboxSkipEmailConfirmation.click()">Skip Email Confirmation</label>
+                <label (click)="checkboxSkipEmailConfirmation.click()" i18n>Skip Email Confirmation</label>
               </div>
             </div>
           </form>
@@ -106,12 +106,12 @@
           <!--Group Operations-->
           <h4 class="ui header">
             <i class="icon users"></i>
-            Group Associations
+            <ng-container i18n>Group Associations</ng-container>
           </h4>
           <div *ngIf="loadingGroups">Loading groups... <i class="icon loading notched circle"></i></div>
           <form class="ui form">
             <div class="field" *ngIf="groups" [ngClass]="{'disabled': processing}">
-              <label>Group</label>
+              <label i18n>Group</label>
               <select name="group_id" [(ngModel)]="selectedGroup" [compareWith]="groupCompareFn">
                 <option *ngFor="let group of groups" class="item" [ngValue]="group">
                   {{group.name}}
@@ -121,11 +121,11 @@
             <div class="ui buttons vertical fluid">
               <button class="ui button green" type="button" (click)="addUsersToGroup()"
                       [ngClass]="{'loading': addingUsersToGroup, 'disabled': processing}">
-                <i class="icon plus"></i> Add Users To Group
+                <i class="icon plus"></i> <ng-container i18n>Add Users To Group</ng-container>
               </button>
               <button class="ui button red" type="button" (click)="removeUsersFromGroup()"
                       [ngClass]="{'loading': removingUsersFromGroup, 'disabled': processing}">
-                <i class="icon minus"></i> Remove Users From Group
+                <i class="icon minus"></i> <ng-container i18n>Remove Users From Group</ng-container>
               </button>
             </div>
           </form>
@@ -142,9 +142,9 @@
           <div class="progress">{{processed/userItems.length|percent}}</div>
         </div>
         <div class="label">
-          <span *ngIf="findingUsers">Finding users</span>
-          <span *ngIf="invitingUsers">Inviting users</span>
-          <span *ngIf="deletingUsers">Deleting users</span>
+          <span *ngIf="findingUsers" i18n>Finding users</span>
+          <span *ngIf="invitingUsers" i18n>Inviting users</span>
+          <span *ngIf="deletingUsers" i18n>Deleting users</span>
           <span *ngIf="addingUsersToGroup">Adding users to group "{{selectedGroup.name}}"</span>
           <span *ngIf="removingUsersFromGroup">Removing users from group "{{selectedGroup.name}}"</span>
           ({{processed}}/{{userItems.length}})
@@ -152,7 +152,7 @@
       </div>
       <p class="abort-processing">
         <button class="ui button secondary small" (click)="aborting=true" [ngClass]="{'loading disabled': aborting}">
-          <i class="icon times"></i> Abort
+          <i class="icon times"></i> <ng-container i18n>Abort</ng-container>
         </button>
       </p>
     </div>
@@ -160,7 +160,7 @@
 
     <!--Users Table -->
     <table class="ui table celled unstackable very compact">
-      <thead><tr><th>#</th><th>Name</th><th>Email</th><th>Status</th></tr></thead>
+      <thead><tr><th>#</th><th i18n>Name</th><th>Email</th><th i18n>Status</th></tr></thead>
       <tbody>
       <tr *ngFor="let item of userItems; index as i" [ngClass]="{'error': item.clientError, 'active': item.processing || item.waiting}">
         <td>{{i+1}}</td>

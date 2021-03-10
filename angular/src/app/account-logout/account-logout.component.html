@@ -5,10 +5,10 @@
 </div>
 
 <div class="ui padded raised segment">
-  <div class="ui centered large text inline loader active" *ngIf="logging_out">Signing out...</div>
+  <div class="ui centered large text inline loader active" *ngIf="logging_out" i18n>Signing out...</div>
   <div class="ui center aligned fluid header" *ngIf="success">
     <div class="content">
-      <i class="check circle green icon"></i> Sign out successfully
+      <i class="check circle green icon"></i> <ng-container i18n>Sign out successfully</ng-container>
       <div class="sub header">
         Please close this window or <a routerLink="../login">sign in</a> again
       </div>

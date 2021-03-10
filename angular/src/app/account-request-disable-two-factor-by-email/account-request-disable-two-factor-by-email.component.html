@@ -4,15 +4,13 @@
   <p>{{error.detail}}</p>
 </div>
 
-<button class="ui button primary fluid" [ngClass]="{'loading disabled': requesting}" (click)="start_request()" *ngIf="!success">Request Disabling Two-Factor Authentication</button>
+<button class="ui button primary fluid" [ngClass]="{'loading disabled': requesting}" (click)="start_request()" *ngIf="!success" i18n>Request Disabling Two-Factor Authentication</button>
 
 <div class="ui padded raised segment" *ngIf="success">
   <div class="ui center aligned fluid header">
     <div class="content">
-      <i class="check circle green icon"></i> Disabling Two-Factor Authentication requested
-      <div class="sub header">
-        Please check your mailbox and find the reset link
-      </div>
+      <i class="check circle green icon"></i> <ng-container i18n>Disabling Two-Factor Authentication requested</ng-container>
+      <div class="sub header" i18n>Please check your mailbox and find the reset link</div>
     </div>
   </div>
 </div>

@@ -1,20 +1,20 @@
 <div class="ui centered stackable grid">
   <div class="three wide column">
     <div class="ui vertical pointing fluid menu">
-      <a routerLink="/" class="item"><i class="icon home"></i> Home</a>
-      <a routerLink="profile" routerLinkActive="active" class="item"><i class="icon user"></i> Profile</a>
-      <a routerLink="password" routerLinkActive="active" class="item"><i class="icon key"></i> Password</a>
-      <a routerLink="two-factor" routerLinkActive="active" class="item"><i class="icon shield alternate"></i> Two-Factor Authentication</a>
+      <a routerLink="/" class="item"><i class="icon home"></i> <ng-container i18n>Home</ng-container></a>
+      <a routerLink="profile" routerLinkActive="active" class="item"><i class="icon user"></i> <ng-container i18n>Profile</ng-container></a>
+      <a routerLink="password" routerLinkActive="active" class="item"><i class="icon key"></i> <ng-container i18n>Password</ng-container></a>
+      <a routerLink="two-factor" routerLinkActive="active" class="item"><i class="icon shield alternate"></i> <ng-container i18n>Two-Factor Authentication</ng-container></a>
     </div>
 
     <div class="ui vertical fluid buttons">
       <button class="ui violet button" routerLink="/admin" *ngIf="is_admin">
         <i class="icon cogs"></i>
-        Management
+        <ng-container i18n>Management</ng-container>
       </button>
       <button class="ui teal button" routerLink="/account/logout">
         <i class="icon sign out"></i>
-        Sign Out
+        <ng-container i18n>Sign Out</ng-container>
       </button>
     </div>
   </div>

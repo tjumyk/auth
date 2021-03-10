@@ -4,20 +4,20 @@
   <p>{{error.detail}}</p>
 </div>
 
-<div class="ui large centered active inline text loader" *ngIf="loading_user">Refreshing user profile...</div>
+<div class="ui large centered active inline text loader" *ngIf="loading_user" i18n>Refreshing user profile...</div>
 
 <div *ngIf="!loading_user && user">
   <div class="ui raised segments">
     <div class="ui segment">
       <div class="ui header">
         <i class="user icon"></i>
-        Profile
+        <ng-container i18n>Profile</ng-container>
       </div>
     </div>
     <div class="ui segment">
       <div class="ui relaxed horizontal list">
         <div class="item">
-          <div class="header">Name</div>
+          <div class="header" i18n>Name</div>
           {{user.name}}
         </div>
         <div class="item">
@@ -25,16 +25,16 @@
           {{user.email}}
         </div>
         <div class="item">
-          <div class="header">Status</div>
-          <span *ngIf="user.is_active" class="text success">Active</span>
-          <span *ngIf="!user.is_active" class="text error">Inactive</span>
+          <div class="header" i18n>Status</div>
+          <span *ngIf="user.is_active" class="text success" i18n>Active</span>
+          <span *ngIf="!user.is_active" class="text error" i18n>Inactive</span>
         </div>
         <div class="item">
-          <div class="header">Groups</div>
+          <div class="header" i18n>Groups</div>
           <div class="ui small labels">
             <div class="ui basic label" *ngFor="let group of user.groups" title="{{group.description}}">{{group.name}}</div>
           </div>
-          <span *ngIf="user.groups.length==0" class="text muted">(None)</span>
+          <span *ngIf="user.groups.length==0" class="text muted" i18n>(None)</span>
         </div>
       </div>
     </div>
@@ -42,7 +42,7 @@
     <div class="ui segment">
       <div class="ui success message" *ngIf="update_profile_success">
         <i class="close icon" (click)="update_profile_success=undefined"></i>
-        <div class="header"><i class="check circle icon"></i> Profile updated successfully</div>
+        <div class="header"><i class="check circle icon"></i> <ng-container i18n>Profile updated successfully</ng-container></div>
       </div>
       <div class="ui error message" *ngIf="update_profile_error">
         <i class="close icon" (click)="update_profile_error=undefined"></i>
@@ -51,7 +51,7 @@
       </div>
       <form #f="ngForm" class="ui form" (ngSubmit)="updateProfile(f)" [ngClass]="{'loading': updating_profile}">
         <div class="field" [ngClass]="{'error': nickname_model.invalid && (f.submitted || nickname_model.dirty || nickname_model.touched)}">
-          <label>Nickname</label>
+          <label i18n>Nickname</label>
           <input type="text" placeholder="alphanumeric, space or dash, 3-16 characters"
                  minlength="3" maxlength="16" pattern="^[ \w\-]{3,16}$"
                  [(ngModel)]="form.nickname" name="nickname" #nickname_model="ngModel">
@@ -61,14 +61,14 @@
             <label *ngIf="nickname_model.errors.pattern"><i class="times icon"></i>Invalid format</label>
           </div>
         </div>
-        <button class="ui primary fluid submit button" type="submit">Update Profile</button>
+        <button class="ui primary fluid submit button" type="submit" i18n>Update Profile</button>
       </form>
     </div>
 
     <div class="ui segment">
       <div class="ui success message" *ngIf="update_avatar_success">
         <i class="close icon" (click)="update_avatar_success=undefined"></i>
-        <div class="header"><i class="check circle icon"></i> Avatar updated successfully</div>
+        <div class="header"><i class="check circle icon"></i> <ng-container i18n>Avatar updated successfully</ng-container></div>
       </div>
       <div class="ui error message" *ngIf="update_avatar_error">
         <i class="close icon" (click)="update_avatar_error=undefined"></i>
@@ -79,12 +79,12 @@
         <div class="column">
           <form class="ui form" [ngClass]="{'loading': updating_avatar}">
             <div class="field">
-              <label>Avatar</label>
+              <label i18n>Avatar</label>
               <input type="file" hidden name="avatar" #avatar_input [accept]="avatar_validator.filter.accept.join(',')" (change)="uploadAvatar(avatar_input)">
               <img class="ui small centered image" [src]="user.avatar" *ngIf="user.avatar">
-              <div class="text muted" *ngIf="!user.avatar">(No avatar)</div>
+              <div class="text muted" *ngIf="!user.avatar" i18n>(No avatar)</div>
             </div>
-            <button class="ui primary button" type="button" (click)="avatar_input.click()">Upload Avatar</button>
+            <button class="ui primary button" type="button" (click)="avatar_input.click()" i18n>Upload Avatar</button>
             <p>Max size: {{avatar_validator.filter.size_limit/1024 | number}}KB, squared image only</p>
           </form>
         </div>

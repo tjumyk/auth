@@ -1,0 +1,1641 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
+  <file source-language="en" datatype="plaintext" original="ng2.template">
+    <body>
+      <trans-unit id="655371c40b429411928764bdffd8846992c2d835" datatype="html">
+        <source>Checking user status...</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/account-login/account-login.component.html</context>
+          <context context-type="linenumber">8</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/oauth-login/oauth-login.component.html</context>
+          <context context-type="linenumber">8</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="2d3b0cd90b75f0a6e3a8c25baaaa985a7e32b7b2" datatype="html">
+        <source>Username or E-mail address is required</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/account-login/account-login.component.html</context>
+          <context context-type="linenumber">28</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/account-req-reset-password/account-req-reset-password.component.html</context>
+          <context context-type="linenumber">17</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/oauth-login/oauth-login.component.html</context>
+          <context context-type="linenumber">56</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/account-req-reconfirm-email/account-req-reconfirm-email.component.html</context>
+          <context context-type="linenumber">17</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="1e20f8b8a4706526c9024cc2f39d568345d100dc" datatype="html">
+        <source>Password is required</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/account-login/account-login.component.html</context>
+          <context context-type="linenumber">39</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/oauth-login/oauth-login.component.html</context>
+          <context context-type="linenumber">67</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="6511301d6af86149cac968fcaa7c93f128c9ab77" datatype="html">
+        <source>Remember Me</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/account-login/account-login.component.html</context>
+          <context context-type="linenumber">45</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/oauth-login/oauth-login.component.html</context>
+          <context context-type="linenumber">73</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="ba4f24bf9bf3dc4db3d6bc1b8b63339295f0b806" datatype="html">
+        <source>Sign In</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/account-login/account-login.component.html</context>
+          <context context-type="linenumber">48</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/oauth-login/oauth-login.component.html</context>
+          <context context-type="linenumber">76</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="5bdd16b75aa1cd135b1cfe8fe8051902cc6ae0c4" datatype="html">
+        <source>Re-confirm E-mail</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/account-login/account-login.component.html</context>
+          <context context-type="linenumber">54</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/oauth-login/oauth-login.component.html</context>
+          <context context-type="linenumber">83</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="34557152cff7bc7db72a2a8706794d7fba4bac86" datatype="html">
+        <source>Reset Password</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/account-login/account-login.component.html</context>
+          <context context-type="linenumber">55</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/oauth-login/oauth-login.component.html</context>
+          <context context-type="linenumber">84</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="03354b2489337882c5a4fd033fec9b9f4b8d109f" datatype="html">
+        <source>Page Not Found</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/not-found/not-found.component.html</context>
+          <context context-type="linenumber">5</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="c25fd5081035773555bea2c982a4290ebd0697d3" datatype="html">
+        <source>Signing out...</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/account-logout/account-logout.component.html</context>
+          <context context-type="linenumber">8</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="56326392e01bfabfe55eeaa6f36e4c41dd6fb10b" datatype="html">
+        <source>Sign out successfully</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/account-logout/account-logout.component.html</context>
+          <context context-type="linenumber">11</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="65348691348176e0b91b7dc57b4322d0b649ce9a" datatype="html">
+        <source>Permission Denied</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/forbidden/forbidden.component.html</context>
+          <context context-type="linenumber">5</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="7083cffe104dfb04e99d682fbfe90cd2c2b49c80" datatype="html">
+        <source>Request Password Reset</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/account-req-reset-password/account-req-reset-password.component.html</context>
+          <context context-type="linenumber">20</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="dfcd2316d1fc821df0d374c33ce60dbb371f78e4" datatype="html">
+        <source>Password reset requested</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/account-req-reset-password/account-req-reset-password.component.html</context>
+          <context context-type="linenumber">27</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="17b0901577ec2e60abe7c21649e131518c3f7303" datatype="html">
+        <source>Please check your mailbox and find the reset link</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/account-req-reset-password/account-req-reset-password.component.html</context>
+          <context context-type="linenumber">28</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/account-request-disable-two-factor-by-email/account-request-disable-two-factor-by-email.component.html</context>
+          <context context-type="linenumber">13</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="02ef43cf11ee9fa2bd55c75a63bfce3714969e5f" datatype="html">
+        <source>Refreshing user profile...</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/settings-profile/settings-profile.component.html</context>
+          <context context-type="linenumber">7</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="994363f08f9fbfa3b3994ff7b35c6904fdff18d8" datatype="html">
+        <source>Profile</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/settings-profile/settings-profile.component.html</context>
+          <context context-type="linenumber">14</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/settings/settings.component.html</context>
+          <context context-type="linenumber">5</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="cff1428d10d59d14e45edec3c735a27b5482db59" datatype="html">
+        <source>Name</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/settings-profile/settings-profile.component.html</context>
+          <context context-type="linenumber">20</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-account-users/admin-account-users.component.html</context>
+          <context context-type="linenumber">33</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-oauth-clients/admin-oauth-clients.component.html</context>
+          <context context-type="linenumber">16</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-account-groups/admin-account-groups.component.html</context>
+          <context context-type="linenumber">16</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-account-user-edit/admin-account-user-edit.component.html</context>
+          <context context-type="linenumber">27</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-account-user-invite/admin-account-user-invite.component.html</context>
+          <context context-type="linenumber">22</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-account-user-invite/admin-account-user-invite.component.html</context>
+          <context context-type="linenumber">76</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-oauth-client-edit/admin-oauth-client-edit.component.html</context>
+          <context context-type="linenumber">27</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-oauth-client-edit/admin-oauth-client-edit.component.html</context>
+          <context context-type="linenumber">193</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-oauth-client-edit/admin-oauth-client-edit.component.html</context>
+          <context context-type="linenumber">237</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-oauth-client-new/admin-oauth-client-new.component.html</context>
+          <context context-type="linenumber">22</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-account-group-edit/admin-account-group-edit.component.html</context>
+          <context context-type="linenumber">26</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-account-group-edit/admin-account-group-edit.component.html</context>
+          <context context-type="linenumber">116</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-account-group-edit/admin-account-group-edit.component.html</context>
+          <context context-type="linenumber">164</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-account-group-new/admin-account-group-new.component.html</context>
+          <context context-type="linenumber">22</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-account-users-batch/admin-account-users-batch.component.html</context>
+          <context context-type="linenumber">163</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="81b97b8ea996ad1e4f9fca8415021850214884b1" datatype="html">
+        <source>Status</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/settings-profile/settings-profile.component.html</context>
+          <context context-type="linenumber">28</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-account-users/admin-account-users.component.html</context>
+          <context context-type="linenumber">36</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-account-user-edit/admin-account-user-edit.component.html</context>
+          <context context-type="linenumber">37</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-account-users-batch/admin-account-users-batch.component.html</context>
+          <context context-type="linenumber">163</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="b36e1450940b7f6028d8587568c7d669b53f7a06" datatype="html">
+        <source>Active</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/settings-profile/settings-profile.component.html</context>
+          <context context-type="linenumber">29</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-account-users/admin-account-users.component.html</context>
+          <context context-type="linenumber">58</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-account-user-edit/admin-account-user-edit.component.html</context>
+          <context context-type="linenumber">38</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="43c4133c7a0263d2e33dd4c2e74d40784b2e4b1c" datatype="html">
+        <source>Inactive</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/settings-profile/settings-profile.component.html</context>
+          <context context-type="linenumber">30</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-account-users/admin-account-users.component.html</context>
+          <context context-type="linenumber">60</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-account-user-edit/admin-account-user-edit.component.html</context>
+          <context context-type="linenumber">39</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="c22ba03540aa3217da059f45e7eab138b51a96e2" datatype="html">
+        <source>Groups</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/settings-profile/settings-profile.component.html</context>
+          <context context-type="linenumber">33</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin/admin.component.html</context>
+          <context context-type="linenumber">12</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-account-users/admin-account-users.component.html</context>
+          <context context-type="linenumber">37</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-account-user-edit/admin-account-user-edit.component.html</context>
+          <context context-type="linenumber">42</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="310b6ade177e4fb8a9f30579b05696c0122f08a6" datatype="html">
+        <source>(None)</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/settings-profile/settings-profile.component.html</context>
+          <context context-type="linenumber">37</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-account-user-edit/admin-account-user-edit.component.html</context>
+          <context context-type="linenumber">46</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-account-group-edit/admin-account-group-edit.component.html</context>
+          <context context-type="linenumber">82</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="522cba9d1db349a1fd083c22fa4e957d864fea6d" datatype="html">
+        <source>Profile updated successfully</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/settings-profile/settings-profile.component.html</context>
+          <context context-type="linenumber">45</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-account-user-edit/admin-account-user-edit.component.html</context>
+          <context context-type="linenumber">149</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-oauth-client-edit/admin-oauth-client-edit.component.html</context>
+          <context context-type="linenumber">89</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-account-group-edit/admin-account-group-edit.component.html</context>
+          <context context-type="linenumber">57</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="ad40282684357d3d79d14d036fcf26d3cef8278d" datatype="html">
+        <source>Nickname</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/settings-profile/settings-profile.component.html</context>
+          <context context-type="linenumber">54</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-account-users/admin-account-users.component.html</context>
+          <context context-type="linenumber">35</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-account-user-edit/admin-account-user-edit.component.html</context>
+          <context context-type="linenumber">158</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-account-group-edit/admin-account-group-edit.component.html</context>
+          <context context-type="linenumber">116</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-account-group-edit/admin-account-group-edit.component.html</context>
+          <context context-type="linenumber">164</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="db2b3475df5dcfd6efbc44ed7151efce777d7774" datatype="html">
+        <source>Update Profile</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/settings-profile/settings-profile.component.html</context>
+          <context context-type="linenumber">64</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-account-user-edit/admin-account-user-edit.component.html</context>
+          <context context-type="linenumber">168</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-oauth-client-edit/admin-oauth-client-edit.component.html</context>
+          <context context-type="linenumber">131</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-account-group-edit/admin-account-group-edit.component.html</context>
+          <context context-type="linenumber">69</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="ffeaba5688e624f7cbb7b548fd1d9a955d7ddbcb" datatype="html">
+        <source>Avatar updated successfully</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/settings-profile/settings-profile.component.html</context>
+          <context context-type="linenumber">71</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-account-user-edit/admin-account-user-edit.component.html</context>
+          <context context-type="linenumber">175</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="cebb7f27b5028c62b4426da3bb3e3bd3f4a3443b" datatype="html">
+        <source>Avatar</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/settings-profile/settings-profile.component.html</context>
+          <context context-type="linenumber">82</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-account-user-edit/admin-account-user-edit.component.html</context>
+          <context context-type="linenumber">186</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="4f57be48578653cd59eba50c0e2c1cdbb1f626af" datatype="html">
+        <source>(No avatar)</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/settings-profile/settings-profile.component.html</context>
+          <context context-type="linenumber">85</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-account-user-edit/admin-account-user-edit.component.html</context>
+          <context context-type="linenumber">189</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="5515d4586d3b6683e31808bedab9fa19945ee22c" datatype="html">
+        <source>Upload Avatar</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/settings-profile/settings-profile.component.html</context>
+          <context context-type="linenumber">87</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-account-user-edit/admin-account-user-edit.component.html</context>
+          <context context-type="linenumber">191</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="f44eb177772116f4d30058395cfb5b701489d1c7" datatype="html">
+        <source>Verifying token...</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/account-reset-password/account-reset-password.component.html</context>
+          <context context-type="linenumber">8</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/account-confirm-email/account-confirm-email.component.html</context>
+          <context context-type="linenumber">8</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="96a44fda4eb6de4f39ea38b6f8769657f3a3e063" datatype="html">
+        <source>Password reset successfully</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/account-reset-password/account-reset-password.component.html</context>
+          <context context-type="linenumber">14</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="2b042e4cb7b765d9cd74b808176fdb88b5957e69" datatype="html">
+        <source>Starting authorization...</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/oauth-login/oauth-login.component.html</context>
+          <context context-type="linenumber">12</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="47f1ce2209820e327596b86b408a6de0a9de5da8" datatype="html">
+        <source>Loading client info...</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/oauth-login/oauth-login.component.html</context>
+          <context context-type="linenumber">31</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="92eee6be6de0b11c924e3ab27db30257159c0a7c" datatype="html">
+        <source>Home</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/settings/settings.component.html</context>
+          <context context-type="linenumber">4</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin/admin.component.html</context>
+          <context context-type="linenumber">6</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="c32ef07f8803a223a83ed17024b38e8d82292407" datatype="html">
+        <source>Password</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/settings/settings.component.html</context>
+          <context context-type="linenumber">6</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/account-confirm-email/account-confirm-email.component.html</context>
+          <context context-type="linenumber">25</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/settings-password/settings-password.component.html</context>
+          <context context-type="linenumber">16</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="9cad7d3da39b6b9c31f9dbdc2352e0faadbef46f" datatype="html">
+        <source>Two-Factor Authentication</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/settings/settings.component.html</context>
+          <context context-type="linenumber">7</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-account-user-edit/admin-account-user-edit.component.html</context>
+          <context context-type="linenumber">58</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/settings-two-factor/settings-two-factor.component.html</context>
+          <context context-type="linenumber">11</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/two-factor-login-box/two-factor-login-box.component.html</context>
+          <context context-type="linenumber">6</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="01bbcfc78a5595d74ff42d1a19f2fc0c88356edf" datatype="html">
+        <source>Management</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/settings/settings.component.html</context>
+          <context context-type="linenumber">13</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/home/home.component.html</context>
+          <context context-type="linenumber">56</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="640eec093c685babaa3265137215e3cc92ad704d" datatype="html">
+        <source>Sign Out</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/settings/settings.component.html</context>
+          <context context-type="linenumber">17</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin/admin.component.html</context>
+          <context context-type="linenumber">40</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="29881a45dafbe5aa05cd9d0441a4c0c2fb06df92" datatype="html">
+        <source>Account</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin/admin.component.html</context>
+          <context context-type="linenumber">9</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="4d13a9cd5ed3dcee0eab22cb25198d43886942be" datatype="html">
+        <source>Users</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin/admin.component.html</context>
+          <context context-type="linenumber">11</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-account-users-batch/admin-account-users-batch.component.html</context>
+          <context context-type="linenumber">68</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="7ffe39df9d88c972792bd8688b215392deb8313d" datatype="html">
+        <source>Clients</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin/admin.component.html</context>
+          <context context-type="linenumber">18</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eee326152fb235c6c6696fcc6e9fbcd61a23667e" datatype="html">
+        <source>Send Email</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin/admin.component.html</context>
+          <context context-type="linenumber">24</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="004b222ff9ef9dd4771b777950ca1d0e4cd4348a" datatype="html">
+        <source>About</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin/admin.component.html</context>
+          <context context-type="linenumber">29</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="2f20d9b412afbe60f7c1021dd61774c8c066241b" datatype="html">
+        <source>My Settings</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin/admin.component.html</context>
+          <context context-type="linenumber">36</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="08c74dc9762957593b91f6eb5d65efdfc975bf48" datatype="html">
+        <source>Username</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/account-confirm-email/account-confirm-email.component.html</context>
+          <context context-type="linenumber">15</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="e70e209561583f360b1e9cefd2cbb1fe434b6229" datatype="html">
+        <source>New password</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/account-confirm-email/account-confirm-email.component.html</context>
+          <context context-type="linenumber">31</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/settings-password/settings-password.component.html</context>
+          <context context-type="linenumber">31</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="96b633a0ed88be0cd49c41fc797bb4dde50f61c4" datatype="html">
+        <source>Repeat new password</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/account-confirm-email/account-confirm-email.component.html</context>
+          <context context-type="linenumber">43</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/settings-password/settings-password.component.html</context>
+          <context context-type="linenumber">43</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="3ea51cf415feffef55e82c7b60e9486055837661" datatype="html">
+        <source>Finish</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/account-confirm-email/account-confirm-email.component.html</context>
+          <context context-type="linenumber">56</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="d566bf8e753c441d4e4929c7dde18c306be8b281" datatype="html">
+        <source>Token expired?</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/account-confirm-email/account-confirm-email.component.html</context>
+          <context context-type="linenumber">62</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="7da14b08afeb98d5def91a81f3db7e8f097a5806" datatype="html">
+        <source>Reconfirm E-mail</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/account-confirm-email/account-confirm-email.component.html</context>
+          <context context-type="linenumber">62</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-account-user-edit/admin-account-user-edit.component.html</context>
+          <context context-type="linenumber">130</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/account-req-reconfirm-email/account-req-reconfirm-email.component.html</context>
+          <context context-type="linenumber">20</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="d6f4af067528375700cd50e8d3d904944c39efbf" datatype="html">
+        <source>Updated password successfully</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/settings-password/settings-password.component.html</context>
+          <context context-type="linenumber">9</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="0eb15f32b2b92d7f3103ef3ff032621888a8dc32" datatype="html">
+        <source>Old password</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/settings-password/settings-password.component.html</context>
+          <context context-type="linenumber">22</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="7568a255bae416b6fc4c485336ae0f2ec07272c0" datatype="html">
+        <source>Update Password</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/settings-password/settings-password.component.html</context>
+          <context context-type="linenumber">54</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="59976d452f7814519aa7493665dce04616e80bd8" datatype="html">
+        <source>Loading user list...</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-account-users/admin-account-users.component.html</context>
+          <context context-type="linenumber">7</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="3d243a75c1a16642d9d887827bdaa8e97a8e6e5c" datatype="html">
+        <source>Invite</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-account-users/admin-account-users.component.html</context>
+          <context context-type="linenumber">12</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-account-user-invite/admin-account-user-invite.component.html</context>
+          <context context-type="linenumber">61</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="5b44adfb32d250c22659c0ee13dba0e97ea895ce" datatype="html">
+        <source>Batch Operations</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-account-users/admin-account-users.component.html</context>
+          <context context-type="linenumber">15</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="548a772aeb0a609c27b2a5356c613d5b37e73f34" datatype="html">
+        <source>Ops</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-account-users/admin-account-users.component.html</context>
+          <context context-type="linenumber">38</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-oauth-clients/admin-oauth-clients.component.html</context>
+          <context context-type="linenumber">16</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-account-groups/admin-account-groups.component.html</context>
+          <context context-type="linenumber">16</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-account-user-invite/admin-account-user-invite.component.html</context>
+          <context context-type="linenumber">76</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-oauth-client-edit/admin-oauth-client-edit.component.html</context>
+          <context context-type="linenumber">193</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-oauth-client-edit/admin-oauth-client-edit.component.html</context>
+          <context context-type="linenumber">237</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-account-group-edit/admin-account-group-edit.component.html</context>
+          <context context-type="linenumber">116</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-account-group-edit/admin-account-group-edit.component.html</context>
+          <context context-type="linenumber">164</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="b967f5d0486b95c3be688e484f3af4873fab9e53" datatype="html">
+        <source>Rows Per Page</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-account-users/admin-account-users.component.html</context>
+          <context context-type="linenumber">94</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-oauth-client-edit/admin-oauth-client-edit.component.html</context>
+          <context context-type="linenumber">290</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="6d6f952173ccd7da442fe2731ad9436d20b0c104" datatype="html">
+        <source>Loading client list...</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-oauth-clients/admin-oauth-clients.component.html</context>
+          <context context-type="linenumber">7</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="bb29113cc3f4fa97e39407c3b47bf429095d1352" datatype="html">
+        <source>New Client</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-oauth-clients/admin-oauth-clients.component.html</context>
+          <context context-type="linenumber">11</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="6d84fa539b20914a51403b2eba814ef4b03417bf" datatype="html">
+        <source>Home URL</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-oauth-clients/admin-oauth-clients.component.html</context>
+          <context context-type="linenumber">16</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-oauth-client-edit/admin-oauth-client-edit.component.html</context>
+          <context context-type="linenumber">111</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-oauth-client-new/admin-oauth-client-new.component.html</context>
+          <context context-type="linenumber">46</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eec715de352a6b114713b30b640d319fa78207a0" datatype="html">
+        <source>Description</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-oauth-clients/admin-oauth-clients.component.html</context>
+          <context context-type="linenumber">16</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-account-groups/admin-account-groups.component.html</context>
+          <context context-type="linenumber">16</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-oauth-client-edit/admin-oauth-client-edit.component.html</context>
+          <context context-type="linenumber">193</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-oauth-client-edit/admin-oauth-client-edit.component.html</context>
+          <context context-type="linenumber">237</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-account-group-edit/admin-account-group-edit.component.html</context>
+          <context context-type="linenumber">61</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="5c6045daf544bdad844619af3fdcc0565555a1dd" datatype="html">
+        <source>Access Control</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-oauth-clients/admin-oauth-clients.component.html</context>
+          <context context-type="linenumber">16</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-oauth-client-edit/admin-oauth-client-edit.component.html</context>
+          <context context-type="linenumber">31</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="3c4c080864b313cfdff5fdea6aae5da276246d99" datatype="html">
+        <source>Public</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-oauth-clients/admin-oauth-clients.component.html</context>
+          <context context-type="linenumber">25</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-oauth-client-edit/admin-oauth-client-edit.component.html</context>
+          <context context-type="linenumber">32</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="cd282040969492c6cb8d99613620e54238b868a6" datatype="html">
+        <source>No one can access this client</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-oauth-clients/admin-oauth-clients.component.html</context>
+          <context context-type="linenumber">33</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-oauth-client-edit/admin-oauth-client-edit.component.html</context>
+          <context context-type="linenumber">36</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="bdc8548fedf88d248bf823ab878c6a6654375e0d" datatype="html">
+        <source>Loading group list...</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-account-groups/admin-account-groups.component.html</context>
+          <context context-type="linenumber">7</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="653539a38f21a5bf189859ce97c43e722585bcc9" datatype="html">
+        <source>New Group</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-account-groups/admin-account-groups.component.html</context>
+          <context context-type="linenumber">11</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="d457eab4b70d566e61aff0c31a7d123a778f6f33" datatype="html">
+        <source>Loading user profile...</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-account-user-edit/admin-account-user-edit.component.html</context>
+          <context context-type="linenumber">9</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="5b11820eac24201335e8acbbb02de1bca8cac533" datatype="html">
+        <source>Auth Provider</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-account-user-edit/admin-account-user-edit.component.html</context>
+          <context context-type="linenumber">49</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-account-user-invite/admin-account-user-invite.component.html</context>
+          <context context-type="linenumber">47</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-account-users-batch/admin-account-users-batch.component.html</context>
+          <context context-type="linenumber">88</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eadc17c3df80143992e2d9028dead3199ae6d79d" datatype="html">
+        <source>Local</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-account-user-edit/admin-account-user-edit.component.html</context>
+          <context context-type="linenumber">53</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-account-user-edit/admin-account-user-edit.component.html</context>
+          <context context-type="linenumber">55</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-account-user-invite/admin-account-user-invite.component.html</context>
+          <context context-type="linenumber">49</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-account-users-batch/admin-account-users-batch.component.html</context>
+          <context context-type="linenumber">90</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="f50a33d3c339f8f4a465141f8caa5d2d8c005251" datatype="html">
+        <source>Enabled</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-account-user-edit/admin-account-user-edit.component.html</context>
+          <context context-type="linenumber">59</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="f39256070bfc0714020dfee08895421fc1527014" datatype="html">
+        <source>Disabled</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-account-user-edit/admin-account-user-edit.component.html</context>
+          <context context-type="linenumber">61</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="dbb73cfc9375112c8ed02c3925ccee9899cf33d2" datatype="html">
+        <source>Created At</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-account-user-edit/admin-account-user-edit.component.html</context>
+          <context context-type="linenumber">70</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-account-user-edit/admin-account-user-edit.component.html</context>
+          <context context-type="linenumber">206</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-account-user-invite/admin-account-user-invite.component.html</context>
+          <context context-type="linenumber">76</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-oauth-client-edit/admin-oauth-client-edit.component.html</context>
+          <context context-type="linenumber">50</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-oauth-client-edit/admin-oauth-client-edit.component.html</context>
+          <context context-type="linenumber">271</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-account-group-edit/admin-account-group-edit.component.html</context>
+          <context context-type="linenumber">35</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="8f1ad7843f4b560d9b60de643e5aa85ba7789a08" datatype="html">
+        <source>Modified At</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-account-user-edit/admin-account-user-edit.component.html</context>
+          <context context-type="linenumber">74</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-oauth-client-edit/admin-oauth-client-edit.component.html</context>
+          <context context-type="linenumber">54</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-account-group-edit/admin-account-group-edit.component.html</context>
+          <context context-type="linenumber">39</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="e12cdce6ce880646521f98865a604ee47447ff79" datatype="html">
+        <source>E-mail Confirmed At</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-account-user-edit/admin-account-user-edit.component.html</context>
+          <context context-type="linenumber">78</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="271a002f6630320c60fc32ce3420eae4653254a1" datatype="html">
+        <source>(Not yet confirmed)</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-account-user-edit/admin-account-user-edit.component.html</context>
+          <context context-type="linenumber">80</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="a9d5c5ec74d98a5f61b913f5751eff2381abf88d" datatype="html">
+        <source>Loading external user info...</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-account-user-edit/admin-account-user-edit.component.html</context>
+          <context context-type="linenumber">86</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="484b0e541230d60ddb5fbd771a34a5c8d90e7a57" datatype="html">
+        <source>Full Name</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-account-user-edit/admin-account-user-edit.component.html</context>
+          <context context-type="linenumber">100</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="dc85ad91663d19922d7ee4521b4a897a6ce92abb" datatype="html">
+        <source>Expired?</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-account-user-edit/admin-account-user-edit.component.html</context>
+          <context context-type="linenumber">104</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="4f8b2bb476981727ab34ed40fde1218361f92c45" datatype="html">
+        <source>Details</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-account-user-edit/admin-account-user-edit.component.html</context>
+          <context context-type="linenumber">108</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="e85af8bb5bca4f178775ede3fcc0b999388222f1" datatype="html">
+        <source>(No result)</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-account-user-edit/admin-account-user-edit.component.html</context>
+          <context context-type="linenumber">117</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="1ba2fde2d42a5bb53a5b7e3a252489545ed23a6c" datatype="html">
+        <source>Set as Inactive</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-account-user-edit/admin-account-user-edit.component.html</context>
+          <context context-type="linenumber">134</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="bb019bcda260ddf58380d2d24e24bce039dc9e63" datatype="html">
+        <source>Set as Active</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-account-user-edit/admin-account-user-edit.component.html</context>
+          <context context-type="linenumber">137</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="3c32a07710e402b2c056bd346e7c42f6015334a6" datatype="html">
+        <source>Delete User</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-account-user-edit/admin-account-user-edit.component.html</context>
+          <context context-type="linenumber">139</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="f8ff0eb5c040edbffded4b792c0ba85d3b12fe1a" datatype="html">
+        <source>Impersonate User</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-account-user-edit/admin-account-user-edit.component.html</context>
+          <context context-type="linenumber">142</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="11f7842945ee42a309c9e4549ebcff257d626d5e" datatype="html">
+        <source>OAuth Authorizations</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-account-user-edit/admin-account-user-edit.component.html</context>
+          <context context-type="linenumber">202</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="0a0511872194dafdb11ba2c44f1f03d78cb6a820" datatype="html">
+        <source>Client</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-account-user-edit/admin-account-user-edit.component.html</context>
+          <context context-type="linenumber">206</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="88e3c6c4c5fd7d30bfa2a9a8c2f9f2d56ee639a4" datatype="html">
+        <source>Updated At</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-account-user-edit/admin-account-user-edit.component.html</context>
+          <context context-type="linenumber">206</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-oauth-client-edit/admin-oauth-client-edit.component.html</context>
+          <context context-type="linenumber">271</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="a1ae20839c3e3b1cf0d779f80a0974f43dc413a2" datatype="html">
+        <source>Loading user login records...</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-account-user-edit/admin-account-user-edit.component.html</context>
+          <context context-type="linenumber">225</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="27e3987c7e148c6d911b80bda8dce2081255ff84" datatype="html">
+        <source>Sign In Records</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-account-user-edit/admin-account-user-edit.component.html</context>
+          <context context-type="linenumber">231</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="b24f1cd32cbc1ec9537af28c4fe1b8204097714b" datatype="html">
+        <source>Time</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-account-user-edit/admin-account-user-edit.component.html</context>
+          <context context-type="linenumber">235</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="0c4d11d1d265391c6201bfa1a8e10fd81773fde0" datatype="html">
+        <source>UA</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-account-user-edit/admin-account-user-edit.component.html</context>
+          <context context-type="linenumber">235</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="80ebb1b82fed892345531fff2ba095160972dd86" datatype="html">
+        <source>Result</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-account-user-edit/admin-account-user-edit.component.html</context>
+          <context context-type="linenumber">235</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="a098ea0bc20c5688bf2a0447bf03e8824094c3d5" datatype="html">
+        <source>Invite New User</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-account-user-invite/admin-account-user-invite.component.html</context>
+          <context context-type="linenumber">14</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="1be2d53974c28a43be251c4a2e6883440834f03e" datatype="html">
+        <source>Skip Email Confirmation</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-account-user-invite/admin-account-user-invite.component.html</context>
+          <context context-type="linenumber">57</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-account-users-batch/admin-account-users-batch.component.html</context>
+          <context context-type="linenumber">98</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="8c4cfd77b7b3d7917de13bec98a8a74890f95618" datatype="html">
+        <source>New Users</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-account-user-invite/admin-account-user-invite.component.html</context>
+          <context context-type="linenumber">72</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="2c3a636c0fa533d449933bca2f6853e6edd773ce" datatype="html">
+        <source>Loading client profile...</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-oauth-client-edit/admin-oauth-client-edit.component.html</context>
+          <context context-type="linenumber">9</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="f9a22e3d53c4a80577ee28377e08d9917abddf7d" datatype="html">
+        <source>Only members of allowed groups</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-oauth-client-edit/admin-oauth-client-edit.component.html</context>
+          <context context-type="linenumber">34</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="124424c2379dec595edaef370b2554b2f86ea105" datatype="html">
+        <source>Secret</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-oauth-client-edit/admin-oauth-client-edit.component.html</context>
+          <context context-type="linenumber">46</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="bdb5afe1a6a696489c5be5c4d0b1d75bc99b451e" datatype="html">
+        <source>Disable Public Access</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-oauth-client-edit/admin-oauth-client-edit.component.html</context>
+          <context context-type="linenumber">69</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="71447fbaf3ffebc09f7ef96679009c7756906d7d" datatype="html">
+        <source>Enable Public Access</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-oauth-client-edit/admin-oauth-client-edit.component.html</context>
+          <context context-type="linenumber">72</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="b158e81fe702255757d8010f1d242c9b4d20e786" datatype="html">
+        <source>Regenerate Secret</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-oauth-client-edit/admin-oauth-client-edit.component.html</context>
+          <context context-type="linenumber">77</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="007e2a67d819b6293f5c234d5581e3f753b5c4dc" datatype="html">
+        <source>Delete Client</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-oauth-client-edit/admin-oauth-client-edit.component.html</context>
+          <context context-type="linenumber">78</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="756cdafa44d9d7411f92513ba8dae1f9e9b8fa1c" datatype="html">
+        <source>Download Client Configuration File</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-oauth-client-edit/admin-oauth-client-edit.component.html</context>
+          <context context-type="linenumber">82</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="27cee417dff3329b8f0da96d98b4d53cec1b1384" datatype="html">
+        <source>Redirect URL</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-oauth-client-edit/admin-oauth-client-edit.component.html</context>
+          <context context-type="linenumber">100</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-oauth-client-new/admin-oauth-client-new.component.html</context>
+          <context context-type="linenumber">35</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="a08b5b21d569205f64953ed617917b2e10eda9ca" datatype="html">
+        <source>Description (Optional)</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-oauth-client-edit/admin-oauth-client-edit.component.html</context>
+          <context context-type="linenumber">122</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-oauth-client-new/admin-oauth-client-new.component.html</context>
+          <context context-type="linenumber">57</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-account-group-new/admin-account-group-new.component.html</context>
+          <context context-type="linenumber">35</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="77a5a07e3c0cf3b54fefb23599eb9f845a93af76" datatype="html">
+        <source>Icon updated successfully</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-oauth-client-edit/admin-oauth-client-edit.component.html</context>
+          <context context-type="linenumber">138</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="14688213d67b2f0e553d66f8255281db245502fb" datatype="html">
+        <source>Icon</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-oauth-client-edit/admin-oauth-client-edit.component.html</context>
+          <context context-type="linenumber">150</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="8f04e282e9efb860740bf93b3a5c728d738aed63" datatype="html">
+        <source>(No icon)</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-oauth-client-edit/admin-oauth-client-edit.component.html</context>
+          <context context-type="linenumber">153</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="cd24e51691951aa169a07817ef613e6cfdde9198" datatype="html">
+        <source>Upload Icon</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-oauth-client-edit/admin-oauth-client-edit.component.html</context>
+          <context context-type="linenumber">155</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="7307bbc05d6341986c4b0199d2c0ed20d8ca4d18" datatype="html">
+        <source>Allowed Groups</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-oauth-client-edit/admin-oauth-client-edit.component.html</context>
+          <context context-type="linenumber">175</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="071663b86c22b014adab022e6e052cdcf7ce6d5c" datatype="html">
+        <source>Add New Allowed Group</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-oauth-client-edit/admin-oauth-client-edit.component.html</context>
+          <context context-type="linenumber">212</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="6c9852bc9cc667711179f336bac6866ead2951d8" datatype="html">
+        <source>Loading authorizations...</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-oauth-client-edit/admin-oauth-client-edit.component.html</context>
+          <context context-type="linenumber">257</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="d90790b67aca7b58d2f8d550a348f46cd8193cbe" datatype="html">
+        <source>Authorizations</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-oauth-client-edit/admin-oauth-client-edit.component.html</context>
+          <context context-type="linenumber">267</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="83c4d4d764d2e2725ab8e919ec16ac400e1f290a" datatype="html">
+        <source>User ID</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-oauth-client-edit/admin-oauth-client-edit.component.html</context>
+          <context context-type="linenumber">271</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="4fcb6dbd1b656de4f606e061af0ed606d3fdc547" datatype="html">
+        <source>User Name</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-oauth-client-edit/admin-oauth-client-edit.component.html</context>
+          <context context-type="linenumber">271</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="3f603bbe3642d6540cb9fb1b9ad861597aaaba23" datatype="html">
+        <source>Add New OAuth Client</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-oauth-client-new/admin-oauth-client-new.component.html</context>
+          <context context-type="linenumber">14</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="f6755cff4957d5c3c89bafce5651f1b6fa2b1fd9" datatype="html">
+        <source>Add</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-oauth-client-new/admin-oauth-client-new.component.html</context>
+          <context context-type="linenumber">65</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-account-group-new/admin-account-group-new.component.html</context>
+          <context context-type="linenumber">43</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="475b5d9e4bdf330bc93ef9e9045d1a5b0cd738e6" datatype="html">
+        <source>Loading group profile...</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-account-group-edit/admin-account-group-edit.component.html</context>
+          <context context-type="linenumber">9</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="a8fe0a5366bedda97c9bb96e85ecade25eb9f59a" datatype="html">
+        <source>Delete Group</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-account-group-edit/admin-account-group-edit.component.html</context>
+          <context context-type="linenumber">46</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="fb6306c227ed77d8b9063686b12e78ef8c1b4a74" datatype="html">
+        <source>Accessible OAuth Clients</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-account-group-edit/admin-account-group-edit.component.html</context>
+          <context context-type="linenumber">74</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="ed697e1cb465e43d9b6aaf144752bec31664adf8" datatype="html">
+        <source>Add New Member</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-account-group-edit/admin-account-group-edit.component.html</context>
+          <context context-type="linenumber">91</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="e4e28b371f8453e22779db590cb0fe67f2a080e8" datatype="html">
+        <source>No results</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-account-group-edit/admin-account-group-edit.component.html</context>
+          <context context-type="linenumber">112</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="d236b3c241c8dc1ecacea80eefd0d50b6ab15ec5" datatype="html">
+        <source>Loading group member list...</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-account-group-edit/admin-account-group-edit.component.html</context>
+          <context context-type="linenumber">140</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="80fa90ce67552f3f8a824f756a94327e41d3fc49" datatype="html">
+        <source>Members</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-account-group-edit/admin-account-group-edit.component.html</context>
+          <context context-type="linenumber">146</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="037626e082de3006696e54e693ad5c8989ca9543" datatype="html">
+        <source>Add New Group</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-account-group-new/admin-account-group-new.component.html</context>
+          <context context-type="linenumber">14</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="7ea1f081569938534b0582d9b9dbfca97ddded08" datatype="html">
+        <source>Requested E-mail reconfirmation</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/account-req-reconfirm-email/account-req-reconfirm-email.component.html</context>
+          <context context-type="linenumber">27</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="058a2fd5e738e47be1dffd05d9c296db53e170e0" datatype="html">
+        <source>Please check your mailbox and find the confirmation link</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/account-req-reconfirm-email/account-req-reconfirm-email.component.html</context>
+          <context context-type="linenumber">28</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="1241c41e6f828e97bf948a44914b6e10dc0d5cfc" datatype="html">
+        <source>User List Format</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-account-users-batch/admin-account-users-batch.component.html</context>
+          <context context-type="linenumber">12</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="b92d407e80091eea54e128d3c80381de5619b163" datatype="html">
+        <source>Format Requirements</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-account-users-batch/admin-account-users-batch.component.html</context>
+          <context context-type="linenumber">20</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="59becb003553a2ba309a76e0283ff658f77f8d9c" datatype="html">
+        <source>User List</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-account-users-batch/admin-account-users-batch.component.html</context>
+          <context context-type="linenumber">44</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="055c1600f24ce272d70044bdd0c7aa0b57ce9a32" datatype="html">
+        <source>Email Prefix</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-account-users-batch/admin-account-users-batch.component.html</context>
+          <context context-type="linenumber">49</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="4bc15b31cebab5d901b0db6e4e8bfcc2ebe87c1d" datatype="html">
+        <source>Email Suffix</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-account-users-batch/admin-account-users-batch.component.html</context>
+          <context context-type="linenumber">53</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="96bb6f798829bfb2b5ea13a9ca77729a9fb868b3" datatype="html">
+        <source>Find Users</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-account-users-batch/admin-account-users-batch.component.html</context>
+          <context context-type="linenumber">73</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="e72dfb660f13a42608ef246d858812392fed4061" datatype="html">
+        <source>Invite Users</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-account-users-batch/admin-account-users-batch.component.html</context>
+          <context context-type="linenumber">77</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="07159fc8bb744b27c7bc7db3e5e3968be80157a7" datatype="html">
+        <source>Delete Users</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-account-users-batch/admin-account-users-batch.component.html</context>
+          <context context-type="linenumber">81</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="8e219c3d681b3b4fae6baf2fc1b3dfffde1afc60" datatype="html">
+        <source>Invitation Options</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-account-users-batch/admin-account-users-batch.component.html</context>
+          <context context-type="linenumber">85</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="40e7951527c028e9170de8e0c6d8795da30c98ef" datatype="html">
+        <source>Group Associations</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-account-users-batch/admin-account-users-batch.component.html</context>
+          <context context-type="linenumber">109</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="4c90059afafb7e160384d9f512797c95bb95c6dc" datatype="html">
+        <source>Group</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-account-users-batch/admin-account-users-batch.component.html</context>
+          <context context-type="linenumber">114</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="012870a57e3bd08f107ec7e8b57a9e1b7e69caae" datatype="html">
+        <source>Add Users To Group</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-account-users-batch/admin-account-users-batch.component.html</context>
+          <context context-type="linenumber">124</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="562ec93a7fc191f5bf2694357005ff29322b1ad0" datatype="html">
+        <source>Remove Users From Group</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-account-users-batch/admin-account-users-batch.component.html</context>
+          <context context-type="linenumber">128</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="502dc141afd0c5a92c6a6b114ff4c77921c7bd8c" datatype="html">
+        <source>Finding users</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-account-users-batch/admin-account-users-batch.component.html</context>
+          <context context-type="linenumber">145</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="d109b88f5c29d9e44b83edec1351d6b21a1c9da8" datatype="html">
+        <source>Inviting users</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-account-users-batch/admin-account-users-batch.component.html</context>
+          <context context-type="linenumber">146</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="72ebadc8ffa166eb232ee32ce9f4dc99d1301c5e" datatype="html">
+        <source>Deleting users</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-account-users-batch/admin-account-users-batch.component.html</context>
+          <context context-type="linenumber">147</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="896458a165a1aede12e3b6ce0db7a9f0274b2f55" datatype="html">
+        <source>Abort</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-account-users-batch/admin-account-users-batch.component.html</context>
+          <context context-type="linenumber">155</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="7211b9c1844b7acdd35cc6a6712667326ba549f6" datatype="html">
+        <source>Please enable the Two-Factor Authentication!</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/home/home.component.html</context>
+          <context context-type="linenumber">18</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="5c0e1d742eb08e717dadd74984ff06e383171318" datatype="html">
+        <source>Enable it Now!</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/home/home.component.html</context>
+          <context context-type="linenumber">20</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="70fdd741399f7bbf37af6f2c3592ee107227f69e" datatype="html">
+        <source>My Apps</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/home/home.component.html</context>
+          <context context-type="linenumber">30</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="3345027e92bf501a4cb0e31c88d465face77d234" datatype="html">
+        <source>Loading app list...</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/home/home.component.html</context>
+          <context context-type="linenumber">31</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="34a4b8f2bbc06f38aca234734c9900ff7cdfcd51" datatype="html">
+        <source>You have no access to any apps right now</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/home/home.component.html</context>
+          <context context-type="linenumber">35</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="cae68af4a6ff332dd8af7299f9affc22075f8ef9" datatype="html">
+        <source>Two-factor authentication has been enabled.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/settings-two-factor/settings-two-factor.component.html</context>
+          <context context-type="linenumber">17</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="037dbf7784d46369a64d95fdda116484e5175146" datatype="html">
+        <source>Disable Two-Factor Authentication</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/settings-two-factor/settings-two-factor.component.html</context>
+          <context context-type="linenumber">20</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="1edc1fc6cfbbb22353050ad6788508b3ed584f53" datatype="html">
+        <source>Token</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/settings-two-factor/settings-two-factor.component.html</context>
+          <context context-type="linenumber">26</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/settings-two-factor/settings-two-factor.component.html</context>
+          <context context-type="linenumber">53</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/two-factor-login-box/two-factor-login-box.component.html</context>
+          <context context-type="linenumber">12</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="7dd98848aa3a61caca2a3a6ef9dbee847d7cc01e" datatype="html">
+        <source>Verify &amp; Disable</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/settings-two-factor/settings-two-factor.component.html</context>
+          <context context-type="linenumber">33</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="145ce74994da33ace1e8ea71b7a3dd05c87a8f8d" datatype="html">
+        <source>QR code has been expired</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/settings-two-factor/settings-two-factor.component.html</context>
+          <context context-type="linenumber">45</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="bcb2ded477dee963f6976c7ce2e7bcb1eefec257" datatype="html">
+        <source>Re-generate QR code</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/settings-two-factor/settings-two-factor.component.html</context>
+          <context context-type="linenumber">46</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="3ab6e70e599059dbc5ba7b8961e34b54473a099e" datatype="html">
+        <source>Verify &amp; Enable</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/settings-two-factor/settings-two-factor.component.html</context>
+          <context context-type="linenumber">60</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="fc961c4d8637f0729b66e647090b24fc485f3468" datatype="html">
+        <source>How to enable Two-Factor Authentication?</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/settings-two-factor/settings-two-factor.component.html</context>
+          <context context-type="linenumber">66</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="45b5b2681f9968322c0504b9210790120a542639" datatype="html">
+        <source>Enable Two-Factor Authentication</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/settings-two-factor/settings-two-factor.component.html</context>
+          <context context-type="linenumber">95</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="6ea7b107dc6f41273fbf971a0505b1e9aaab5610" datatype="html">
+        <source>Please enter the token shown in your Authenticator app</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/two-factor-login-box/two-factor-login-box.component.html</context>
+          <context context-type="linenumber">7</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="cda31dbd724cf5f4fa7a4274d9120651490c8a8c" datatype="html">
+        <source>Back</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/two-factor-login-box/two-factor-login-box.component.html</context>
+          <context context-type="linenumber">21</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="27c7bfba7033cc8dbf4caf42b40b6b3c87197838" datatype="html">
+        <source>Verify</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/two-factor-login-box/two-factor-login-box.component.html</context>
+          <context context-type="linenumber">22</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="a487651b9843e47befc1fcd6cc33a188c1064775" datatype="html">
+        <source>Request Disabling Two-Factor Authentication</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/account-request-disable-two-factor-by-email/account-request-disable-two-factor-by-email.component.html</context>
+          <context context-type="linenumber">7</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="d8c9d355cd7e77d2a98c62368f5da4194a04698b" datatype="html">
+        <source>Disabling Two-Factor Authentication requested</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/account-request-disable-two-factor-by-email/account-request-disable-two-factor-by-email.component.html</context>
+          <context context-type="linenumber">12</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="c734627bfe25eec52ce8740624a7fe27dcb7a19a" datatype="html">
+        <source>Disabling Two-Factor Authentication...</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/account-disable-two-factor-by-email/account-disable-two-factor-by-email.component.html</context>
+          <context context-type="linenumber">8</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="71f793b129a315a3cc7f8789cc9bf4ae72a9b921" datatype="html">
+        <source>Disabled Two-Factor Authentication</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/account-disable-two-factor-by-email/account-disable-two-factor-by-email.component.html</context>
+          <context context-type="linenumber">14</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="68770648aa10e6afcfa09555c90a01d768b1ba93" datatype="html">
+        <source>Now you should be able to sign in without the Two-Factor Authentication.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/account-disable-two-factor-by-email/account-disable-two-factor-by-email.component.html</context>
+          <context context-type="linenumber">15</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="4b0ca852bafa5037c4e64c7b18f9cd1e14b799de" datatype="html">
+        <source>Subject</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-email-send/admin-email-send.component.html</context>
+          <context context-type="linenumber">14</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="c6ea2cc31d3b280067609d5b3b6a621d00e48f57" datatype="html">
+        <source>Receivers</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-email-send/admin-email-send.component.html</context>
+          <context context-type="linenumber">18</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="b17dc913faa39e644ae14b12b3b7e03e6ad03575" datatype="html">
+        <source>Receiver Groups</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-email-send/admin-email-send.component.html</context>
+          <context context-type="linenumber">22</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="db43e3e3a76a0aa08894372030a2c21b7b5acbc7" datatype="html">
+        <source>Body</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-email-send/admin-email-send.component.html</context>
+          <context context-type="linenumber">26</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="2c5ff8fa9c9aaec93f97e37c9a0edcd797194573" datatype="html">
+        <source>Send</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-email-send/admin-email-send.component.html</context>
+          <context context-type="linenumber">29</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="8fe73a4787b8068b2ba61f54ab7e0f9af2ea1fc9" datatype="html">
+        <source>Version</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-about/admin-about.component.html</context>
+          <context context-type="linenumber">6</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="d7293b61e9088c66421df2e367e0ccc00346cf9f" datatype="html">
+        <source>Author</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/admin-about/admin-about.component.html</context>
+          <context context-type="linenumber">7</context>
+        </context-group>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>

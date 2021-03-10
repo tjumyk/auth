@@ -5,7 +5,7 @@
 </div>
 
 <div class="ui padded raised segment" *ngIf="verifying_logged_in">
-  <div class="ui large centered text inline loader active">Checking user status...</div>
+  <div class="ui large centered text inline loader active" i18n>Checking user status...</div>
 </div>
 
 <div [hidden]="verifying_logged_in">
@@ -25,7 +25,7 @@
                    [(ngModel)]="form.name_or_email" name="name_or_email" #name_or_email="ngModel">
           </div>
           <div *ngIf="name_or_email.errors" class="errors">
-            <label *ngIf="name_or_email.errors.required"><i class="times icon"></i> Username or E-mail address is required </label>
+            <label *ngIf="name_or_email.errors.required"><i class="times icon"></i> <ng-container i18n>Username or E-mail address is required</ng-container> </label>
           </div>
         </div>
         <div class="field" [ngClass]="{'error': password.invalid && (f.submitted || password.dirty || password.touched)}">
@@ -36,23 +36,23 @@
                    [(ngModel)]="form.password" name="password" #password="ngModel">
           </div>
           <div *ngIf="password.errors" class="errors">
-            <label *ngIf="password.errors.required"><i class="times icon"></i> Password is required </label>
+            <label *ngIf="password.errors.required"><i class="times icon"></i> <ng-container i18n>Password is required</ng-container> </label>
           </div>
         </div>
         <div class="ui field">
           <div class="ui checkbox" (click)="checkbox_remember.click()">
             <input type="checkbox" tabindex="0" class="hidden" [(ngModel)]="form.remember" name="remember" #checkbox_remember>
-            <label>Remember Me</label>
+            <label i18n>Remember Me</label>
           </div>
         </div>
-        <button class="ui fluid large primary button" type="submit">Sign In</button>
+        <button class="ui fluid large primary button" type="submit" i18n>Sign In</button>
       </div>
     </form>
 
     <div class="footer">
       <div class="ui horizontal bulleted link list">
-        <a class="item" routerLink="../request-reconfirm-email">Re-confirm E-mail</a>
-        <a class="item" routerLink="../request-reset-password">Reset Password</a>
+        <a class="item" routerLink="../request-reconfirm-email" i18n>Re-confirm E-mail</a>
+        <a class="item" routerLink="../request-reset-password" i18n>Reset Password</a>
       </div>
     </div>
   </ng-template>

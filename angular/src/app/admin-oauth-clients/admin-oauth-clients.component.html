@@ -4,16 +4,16 @@
   <p>{{error.detail}}</p>
 </div>
 
-<div class="ui centered active large inline text loader" *ngIf="loading_client_list">Loading client list...</div>
+<div class="ui centered active large inline text loader" *ngIf="loading_client_list" i18n>Loading client list...</div>
 
 <div *ngIf="!loading_client_list">
   <p>
-    <a class="ui small button primary" routerLink="new"><i class="icon plus"></i> New Client</a>
+    <a class="ui small button primary" routerLink="new"><i class="icon plus"></i> <ng-container i18n>New Client</ng-container></a>
   </p>
 
   <div class="table-responsive">
     <table class="ui unstackable celled very compact table">
-      <thead><tr><th>#</th><th>ID</th><th>Name</th><th>Home URL</th><th>Description</th><th>Access Control</th><th class="collapsing">Ops</th></tr></thead>
+      <thead><tr><th>#</th><th>ID</th><th i18n>Name</th><th i18n>Home URL</th><th i18n>Description</th><th i18n>Access Control</th><th class="collapsing" i18n>Ops</th></tr></thead>
       <tbody>
       <tr *ngFor="let client of client_list; index as i">
         <td>{{i+1}}</td>
@@ -22,7 +22,7 @@
         <td><a target="_blank" [href]="client.home_url">{{client.home_url}}</a></td>
         <td>{{client.description}}</td>
         <td>
-          <span *ngIf="client.is_public" class="text warning"><i class="icon lock open"></i> Public</span>
+          <span *ngIf="client.is_public" class="text warning"><i class="icon lock open"></i> <ng-container i18n>Public</ng-container></span>
           <div *ngIf="!client.is_public">
             <div *ngIf="client.allowed_groups.length" class="ui labels small">
               <i class="green icon lock"></i>
@@ -30,7 +30,7 @@
                  title="{{group.description}}">{{group.name}}</a>
             </div>
             <div *ngIf="!client.allowed_groups.length" class="text error">
-              <i class="red icon lock"></i> No one can access this client
+              <i class="red icon lock"></i> <ng-container i18n>No one can access this client</ng-container>
             </div>
           </div>
         </td>

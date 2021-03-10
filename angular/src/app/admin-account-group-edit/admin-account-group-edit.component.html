@@ -6,7 +6,7 @@
 
 <div class="ui two column stackable grid">
   <div class="column">
-    <div class="ui large centered active inline text loader" *ngIf="loading_group">Loading group profile...</div>
+    <div class="ui large centered active inline text loader" *ngIf="loading_group" i18n>Loading group profile...</div>
 
     <div *ngIf="!loading_group && group">
       <div class="ui segments">
@@ -23,7 +23,7 @@
               {{group.id}}
             </div>
             <div class="item">
-              <div class="header">Name</div>
+              <div class="header" i18n>Name</div>
               {{group.name}}
             </div>
           </div>
@@ -32,18 +32,18 @@
         <div class="ui segment">
           <div class="ui list">
             <div class="item">
-              <div class="header">Created At</div>
+              <div class="header" i18n>Created At</div>
               {{group.created_at | date: 'medium'}}
             </div>
             <div class="item">
-              <div class="header">Modified At</div>
+              <div class="header" i18n>Modified At</div>
               {{group.modified_at | date: 'medium'}}
             </div>
           </div>
         </div>
 
         <div class="ui segment">
-          <button class="ui red button" (click)="deleteGroup()"><i class="icon trash"></i>Delete Group</button>
+          <button class="ui red button" (click)="deleteGroup()"><i class="icon trash"></i><ng-container i18n>Delete Group</ng-container></button>
         </div>
 
         <div class="ui segment">
@@ -54,11 +54,11 @@
           </div>
           <div class="ui success message" *ngIf="update_profile_success">
             <i class="close icon" (click)="update_profile_success=undefined"></i>
-            <div class="header"><i class="check circle icon"></i> Profile updated successfully</div>
+            <div class="header"><i class="check circle icon"></i> <ng-container i18n>Profile updated successfully</ng-container></div>
           </div>
           <form #f="ngForm" class="ui form" (ngSubmit)="updateProfile(f)" [ngClass]="{'loading': updating_profile}">
             <div class="field" [ngClass]="{'error': (f.submitted || desc_model.dirty || desc_model.touched) && desc_model.invalid}">
-              <label>Description</label>
+              <label i18n>Description</label>
               <textarea placeholder="at most 256 characters" rows="5"
                         maxlength="256"
                         [(ngModel)]="form.description" name="description" #desc_model="ngModel"></textarea>
@@ -66,12 +66,12 @@
                 <label *ngIf="desc_model.errors.maxlength">At most 256 characters</label>
               </div>
             </div>
-            <button class="ui primary fluid submit button" type="submit">Update Profile</button>
+            <button class="ui primary fluid submit button" type="submit" i18n>Update Profile</button>
           </form>
         </div>
 
         <div class="ui segment">
-          <h5 class="ui header">Accessible OAuth Clients</h5>
+          <h5 class="ui header" i18n>Accessible OAuth Clients</h5>
           <div class="ui labels" *ngIf="group.allowed_clients?.length; else no_allowed_client">
             <a *ngFor="let c of group.allowed_clients" routerLink="/admin/oauth/clients/c/{{c.id}}" class="ui label client" [class.image]="c.icon">
               <img [src]="c.icon" *ngIf="c.icon; else default_client_icon">
@@ -79,7 +79,7 @@
             </a>
           </div>
           <ng-template #default_client_icon><i class="window restore outline icon"></i></ng-template>
-          <ng-template #no_allowed_client>(None)</ng-template>
+          <ng-template #no_allowed_client><ng-container i18n>(None)</ng-container></ng-template>
         </div>
 
       </div>
@@ -88,7 +88,7 @@
         <div class="ui segment top attached">
           <div class="ui header">
             <i class="icon user plus"></i>
-            Add New Member
+            <ng-container i18n>Add New Member</ng-container>
           </div>
         </div>
 
@@ -109,11 +109,11 @@
                    (keyup)="searchUser(searchInput.value)" #searchInput>
             <i class="icon search"></i>
           </div>
-          <p class="text muted" [hidden]="!user_search_results || user_search_results.length > 0"><i class="info circle icon"></i> No results</p>
+          <p class="text muted" [hidden]="!user_search_results || user_search_results.length > 0"><i class="info circle icon"></i> <ng-container i18n>No results</ng-container></p>
         </div>
 
         <table class="ui table unstackable compact celled bottom attached" [hidden]="!user_search_results || user_search_results.length==0">
-          <thead><tr><th>ID</th><th>Name</th><th>Nickname</th><th class="collapsing">Ops</th></tr></thead>
+          <thead><tr><th>ID</th><th i18n>Name</th><th i18n>Nickname</th><th class="collapsing" i18n>Ops</th></tr></thead>
           <tbody>
           <tr *ngFor="let user of user_search_results; index as i">
             <td>{{user.id}}</td>
@@ -137,13 +137,13 @@
   </div>
 
   <div class="column">
-    <div class="ui large centered active inline text loader" *ngIf="loading_group_members">Loading group member list...</div>
+    <div class="ui large centered active inline text loader" *ngIf="loading_group_members" i18n>Loading group member list...</div>
 
     <div *ngIf="!loading_group_members && members">
       <div class="ui segment top attached">
         <div class="ui header">
           <i class="icon users"></i>
-          Members
+          <ng-container i18n>Members</ng-container>
         </div>
       </div>
 
@@ -161,7 +161,7 @@
       </div>
 
       <table class="ui bottom attached table celled unstackable very compact">
-        <thead><tr><th>#</th><th>ID</th><th>Name</th><th>Nickname</th><th class="collapsing">Ops</th></tr></thead>
+        <thead><tr><th>#</th><th>ID</th><th i18n>Name</th><th i18n>Nickname</th><th class="collapsing" i18n>Ops</th></tr></thead>
         <tbody>
         <tr *ngFor="let user of members; index as i">
           <td>{{i+1}}</td>

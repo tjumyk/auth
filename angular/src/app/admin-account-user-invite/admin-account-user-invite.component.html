@@ -11,7 +11,7 @@
       <div class="ui segment">
         <div class="ui header">
           <i class="icon user add"></i>
-          Invite New User
+          <ng-container i18n>Invite New User</ng-container>
         </div>
       </div>
 
@@ -19,7 +19,7 @@
         <form #f="ngForm" class="ui form" (ngSubmit)="invite(f)" [ngClass]="{'loading': requesting}">
           <div class="field"
                [ngClass]="{'error': (f.submitted || name_model.touched || name_model.dirty) && name_model.invalid}">
-            <label>Name</label>
+            <label i18n>Name</label>
             <input type="text" name="name" placeholder="alphanumeric, 3-16 characters"
                    required minlength="3" maxlength="16" pattern="^[\w]{3,16}$"
                    [(ngModel)]="form.name" #name_model="ngModel">
@@ -44,9 +44,9 @@
           </div>
           <ng-container *ngIf="providers">
             <div class="field">
-              <label>Auth Provider</label>
+              <label i18n>Auth Provider</label>
               <select name="external_auth_provider" [(ngModel)]="form.external_auth_provider_id" (change)="onChangeProvider()">
-                <option [ngValue]="undefined">Local</option>
+                <option [ngValue]="undefined" i18n>Local</option>
                 <option [ngValue]="provider.id" *ngFor="let provider of providers">{{provider.name}}</option>
               </select>
             </div>
@@ -54,11 +54,11 @@
               <div class="ui toggle checkbox">
                 <input type="checkbox" class="hidden" name="skip_email_confirmation"
                        [(ngModel)]="form.skip_email_confirmation" #checkboxSkipEmailConfirmation>
-                <label (click)="checkboxSkipEmailConfirmation.click()">Skip Email Confirmation</label>
+                <label (click)="checkboxSkipEmailConfirmation.click()" i18n>Skip Email Confirmation</label>
               </div>
             </div>
           </ng-container>
-          <button type="submit" class="ui primary fluid button">Invite</button>
+          <button type="submit" class="ui primary fluid button" i18n>Invite</button>
         </form>
       </div>
     </div>
@@ -69,11 +69,11 @@
     <div class="ui segment top attached">
       <div class="ui header">
         <i class="icon clipboard outline"></i>
-        New Users
+        <ng-container i18n>New Users</ng-container>
       </div>
     </div>
     <table class="ui table unstackable bottom attached celled compact">
-      <thead><tr><th>ID</th><th>Name</th><th>Created At</th><th class="collapsing">Ops</th></tr></thead>
+      <thead><tr><th>ID</th><th i18n>Name</th><th i18n>Created At</th><th class="collapsing" i18n>Ops</th></tr></thead>
       <tbody>
       <tr *ngFor="let user of new_users">
         <td>{{user.id}}</td>

@@ -1,5 +1,3 @@
-<div class="background"></div>
-
 <div class="ui container">
   <div class="ui middle aligned centered padded stackable grid">
     <div class="column">
@@ -17,9 +15,9 @@
         </h2>
 
         <div class="ui warning message" *ngIf="isAdmin && !user.is_two_factor_enabled">
-          <div class="header"><i class="exclamation triangle icon"></i> Please enable the Two-Factor Authentication!</div>
+          <div class="header"><i class="exclamation triangle icon"></i> <ng-container i18n>Please enable the Two-Factor Authentication!</ng-container></div>
           <p>Since admins have superpowers, we strongly suggest you enabling the Two-Factor Authentication to protect both your account and the systems.</p>
-          <a class="ui button tiny" routerLink="/settings/two-factor">Enable it Now!</a>
+          <a class="ui button tiny" routerLink="/settings/two-factor" i18n>Enable it Now!</a>
         </div>
 
         <div class="ui error message" *ngIf="error">
@@ -29,14 +27,12 @@
         </div>
 
 
-        <div class="ui divider horizontal">My Apps</div>
-        <div class="ui text loader inline active centered" *ngIf="loadingClients">Loading app list...</div>
+        <div class="ui divider horizontal" i18n>My Apps</div>
+        <div class="ui text loader inline active centered" *ngIf="loadingClients" i18n>Loading app list...</div>
         <div *ngIf="clients && clients.length==0" class="no-clients">
           <div class="ui center aligned icon disabled header">
             <i class="times circle outline icon"></i>
-            <div class="content">
-              You have no access to any apps right now
-            </div>
+            <div class="content" i18n>You have no access to any apps right now</div>
           </div>
         </div>
         <div *ngIf="clients">
@@ -57,7 +53,7 @@
         <div class="ui grid center aligned">
           <div class="column">
             <p *ngIf="isAdmin">
-              <a class="ui button basic violet" routerLink="/admin"><i class="icon cogs"></i> Management</a>
+              <a class="ui button basic violet" routerLink="/admin"><i class="icon cogs"></i> <ng-container i18n>Management</ng-container></a>
             </p>
             <p>
               <a class="ui button basic" routerLink="/settings">

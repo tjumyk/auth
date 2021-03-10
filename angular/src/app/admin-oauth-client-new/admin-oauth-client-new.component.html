@@ -11,7 +11,7 @@
       <div class="ui segment">
         <div class="ui header">
           <i class="icon users add"></i>
-          Add New OAuth Client
+          <ng-container i18n>Add New OAuth Client</ng-container>
         </div>
       </div>
 
@@ -19,7 +19,7 @@
         <form #f="ngForm" class="ui form" (ngSubmit)="newClient(f)" [ngClass]="{'loading': requesting}">
           <div class="field"
                [ngClass]="{'error': (f.submitted || name_model.touched || name_model.dirty) && name_model.invalid}">
-            <label>Name</label>
+            <label i18n>Name</label>
             <input type="text" name="name" placeholder="alphanumeric, 3-16 characters"
                    required minlength="3" maxlength="16" pattern="^[\w]{3,16}$"
                    [(ngModel)]="form.name" #name_model="ngModel">
@@ -32,7 +32,7 @@
           </div>
           <div class="field"
                [ngClass]="{'error': (f.submitted || redirect_url_model.touched || redirect_url_model.dirty) && redirect_url_model.invalid}">
-            <label>Redirect URL</label>
+            <label i18n>Redirect URL</label>
             <input type="text" name="redirect_url" placeholder="at most 128 characters"
                    required maxlength="128"
                    [(ngModel)]="form.redirect_url" #redirect_url_model="ngModel">
@@ -43,7 +43,7 @@
           </div>
           <div class="field"
                [ngClass]="{'error': (f.submitted || home_url_model.touched || home_url_model.dirty) && home_url_model.invalid}">
-            <label>Home URL</label>
+            <label i18n>Home URL</label>
             <input type="text"  name="home_url" placeholder="at most 128 characters"
                        required maxlength="128"
                        [(ngModel)]="form.home_url" #home_url_model="ngModel">
@@ -54,7 +54,7 @@
           </div>
           <div class="field"
                [ngClass]="{'error': (f.submitted || desc_model.touched || desc_model.dirty) && desc_model.invalid}">
-            <label>Description (Optional)</label>
+            <label i18n>Description (Optional)</label>
             <textarea  name="description" placeholder="at most 256 characters" rows="5"
                        maxlength="256"
                        [(ngModel)]="form.description" #desc_model="ngModel"></textarea>
@@ -62,7 +62,7 @@
               <label *ngIf="desc_model.errors.maxlength"><i class="times icon"></i> At most 256 characters</label>
             </div>
           </div>
-          <button type="submit" class="ui primary fluid button">Add</button>
+          <button type="submit" class="ui primary fluid button" i18n>Add</button>
         </form>
       </div>
 

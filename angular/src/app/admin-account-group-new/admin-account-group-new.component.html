@@ -11,7 +11,7 @@
       <div class="ui segment">
         <div class="ui header">
           <i class="icon users add"></i>
-          Add New Group
+          <ng-container i18n>Add New Group</ng-container>
         </div>
       </div>
 
@@ -19,7 +19,7 @@
         <form #f="ngForm" class="ui form" (ngSubmit)="newGroup(f)" [ngClass]="{'loading': requesting}">
           <div class="field"
                [ngClass]="{'error': (f.submitted || name_model.touched || name_model.dirty) && name_model.invalid}">
-            <label>Name</label>
+            <label i18n>Name</label>
             <input type="text" name="name" placeholder="alphanumeric, 3-24 characters"
                    required minlength="3" maxlength="24" pattern="^[\w]{3,24}$"
                    [(ngModel)]="form.name" #name_model="ngModel">
@@ -32,7 +32,7 @@
           </div>
           <div class="field"
                [ngClass]="{'error': (f.submitted || desc_model.touched || desc_model.dirty) && desc_model.invalid}">
-            <label>Description (Optional)</label>
+            <label i18n>Description (Optional)</label>
             <textarea  name="description" placeholder="at most 256 characters" rows="5"
                        maxlength="256"
                        [(ngModel)]="form.description" #desc_model="ngModel"></textarea>
@@ -40,7 +40,7 @@
               <label *ngIf="desc_model.errors.maxlength"><i class="times icon"></i> At most 256 characters</label>
             </div>
           </div>
-          <button type="submit" class="ui primary fluid button">Add</button>
+          <button type="submit" class="ui primary fluid button" i18n>Add</button>
         </form>
       </div>
 

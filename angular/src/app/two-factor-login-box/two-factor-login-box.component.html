@@ -3,15 +3,13 @@
     <div class="ui center aligned icon header">
       <i class="icon green shield alternate"></i>
       <div class="content">
-        Two-Factor Authentication
-        <div class="sub header">
-          Please enter the token shown in your Authenticator app
-        </div>
+        <ng-container i18n>Two-Factor Authentication</ng-container>
+        <div class="sub header" i18n>Please enter the token shown in your Authenticator app</div>
       </div>
     </div>
 
     <div class="field" [ngClass]="{'error': (f.submitted || token_model.touched || token_model.dirty) && token_model.invalid}">
-      <label>Token</label>
+      <label i18n>Token</label>
       <input type="text" name="token" maxlength="6" placeholder="Please enter the 6-digit token" required
              [(ngModel)]="token" #token_model="ngModel" autocomplete="off">
       <div class="errors" *ngIf="token_model.errors">
@@ -20,8 +18,8 @@
     </div>
 
     <div class="ui two buttons fluid">
-      <button class="ui button" type="button" (click)="back.emit()"><i class="icon chevron left"></i> Back</button>
-      <button class="ui primary button" type="submit"><i class="icon check"></i> Verify</button>
+      <button class="ui button" type="button" (click)="back.emit()"><i class="icon chevron left"></i> <ng-container i18n>Back</ng-container></button>
+      <button class="ui primary button" type="submit"><i class="icon check"></i> <ng-container i18n>Verify</ng-container></button>
     </div>
   </div>
 </form>
