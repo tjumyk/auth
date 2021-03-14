@@ -12,16 +12,16 @@
           <h2>Hi {{user.name}},</h2>
         </mj-text>
         <mj-text padding-bottom="10px">
-          You are receiving this E-mail because you are either a new student of a course provided by our group, a new group member, or any other people relevant to our group.
+          您收到这封邮件是因为您是我们组开设的课程的新学生、我们组的新成员、或其他与我们组相关的人士。
         </mj-text>
         <mj-text padding-bottom="10px">
-          We have created an account for you in our system to give you access to some of our internal web apps. You need to confirm your E-mail address before using your new account.
+          我们已在我们的系统中为您创建了新的账户，以方便您访问我们的内部网络应用。您需要在使用您的新账户前确认您的E-mail。
         </mj-text>
-        <mj-text  padding-bottom="10px">Please click the following button to confirm your email.</mj-text>
-        <mj-button href='{{site[root_url]}}{{site[base_url]}}account/confirm-email?uid={{user.id}}&token={{user.email_confirm_token}}'>Confirm E-mail</mj-button>
+        <mj-text  padding-bottom="10px">请点击下方按钮确认您的E-mail。</mj-text>
+        <mj-button href='{{site[root_url]}}{{site[base_url]}}account/confirm-email?uid={{user.id}}&token={{user.email_confirm_token}}'>确认E-mail</mj-button>
         <mj-divider/>
         <mj-text>
-          If you find any problem, please contact the system administrators immediately.
+          如果您遇到任何问题，请立即联系系统管理员。
         </mj-text>
       </mj-column>
     </mj-section>

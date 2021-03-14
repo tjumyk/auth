@@ -11,11 +11,11 @@
         <mj-text>
           <h2>Hi {{user.name}},</h2>
         </mj-text>
-        <mj-text padding-bottom="10px">Please click the following button to disable the Two-Factor Authentication for your account.</mj-text>
-        <mj-button href='{{site[root_url]}}{{site[base_url]}}account/disable-two-factor-by-email?uid={{user.id}}&token={{user.two_factor_disable_token}}'>Disable Two-Factor Authentication</mj-button>
+        <mj-text padding-bottom="10px">请点击下方按钮禁用您的账户的两步验证。</mj-text>
+        <mj-button href='{{site[root_url]}}{{site[base_url]}}account/disable-two-factor-by-email?uid={{user.id}}&token={{user.two_factor_disable_token}}'>禁用两步验证</mj-button>
         <mj-divider/>
         <mj-text>
-          If you find any problem, please contact the system administrators immediately.
+          如果您遇到任何问题，请立即联系系统管理员。
         </mj-text>
       </mj-column>
     </mj-section>
