@@ -482,7 +482,7 @@ def oauth_client_generate_config_file(cid):
         # use flask internal json apis to enforce key-order-preserving pretty-print on output json.
         rv = current_app.response_class(
             json.dumps(client_config, indent=2, separators=(', ', ': '), sort_keys=False) + '\n',
-            mimetype=current_app.config['JSONIFY_MIMETYPE'],
+            mimetype='application/json',
             headers={
                 'Content-Disposition': 'attachment; filename="%s"' % client_config_file_name
             }

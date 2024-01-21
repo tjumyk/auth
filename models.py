@@ -34,7 +34,7 @@ class User(db.Model):
     is_active = db.Column(db.Boolean, nullable=False, default=True)
     is_email_confirmed = db.Column(db.Boolean, nullable=False, default=False)
 
-    two_factor_key = db.Column(db.Binary)
+    two_factor_key = db.Column(db.LargeBinary)
     two_factor_setup_expire_at = db.Column(db.DateTime)
     is_two_factor_enabled = db.Column(db.Boolean, nullable=False, default=False)
     two_factor_disable_token = db.Column(db.String(64))

@@ -9,8 +9,8 @@ import {AdminService} from "../admin.service";
 import {TitleService} from "../title.service";
 import {AccountService} from "../account.service";
 import {UAParser} from "ua-parser-js";
-import IBrowser = IUAParser.IBrowser;
-import IOS = IUAParser.IOS;
+import IBrowser = UAParser.IBrowser;
+import IOS = UAParser.IOS;
 
 
 class StatusForm {
