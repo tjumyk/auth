@@ -201,7 +201,7 @@ class OAuthService:
         if len(access_token) == 0:
             raise OAuthServiceError('access_token can not be empty')
 
-        auth = OAuthAuthorization.query.filter_by(access_token=access_token).options(joinedload('client')).first()
+        auth = OAuthAuthorization.query.filter_by(access_token=access_token).options(joinedload(OAuthAuthorization.client)).first()
         if auth is None:
             raise OAuthServiceError('invalid access_token')
 
