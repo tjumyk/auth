@@ -96,6 +96,12 @@ RestartSec=1min
 WantedBy=multi-user.target
 ```
 
+Then, start and enable the service:
+```bash
+sudo systemctl start idm.service
+sudo systemctl enable idm.service
+```
+
 (option 2) install `supervisor` and add a configuration in `/etc/supervisor/conf.d`, e.g. `idm.conf`:
 ```
 [program:idm]
@@ -104,4 +110,9 @@ command=/home/kelvin/miniconda3/envs/idm/bin/gunicorn -w 4 -b '127.0.0.1:8077' a
 directory=/home/kelvin/projects/idm
 autostart=true
 autorestart=true
+```
+
+Then, enable the service with supervisor controller:
+```bash
+sudo supervisorctl update
 ```
