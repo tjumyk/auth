@@ -40,9 +40,18 @@ createuser auth -P
 createdb auth -O auth
 ```
 
-5. Download GeoLite data files
+5. download GeoLite data files
 
 Please refer to [this repo](https://github.com/P3TERX/GeoLite.mmdb) to download `GeoLite2-ASN.mmdb`, `GeoLite2-City.mmdb` and `GeoLite2-Country.mmdb`, and save them in `mmdb` folder under the project root.
+
+6. build email templates
+
+```bash
+cd mail_templates/mjml
+npm i
+npm run build
+cd ../..
+```
 
 ## Configuration
 
