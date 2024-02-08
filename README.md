@@ -32,7 +32,9 @@ npm run build
 cd ..
 ```
 
-4. setup database
+**Note:** the above commands only build the development package. You may replace `npm run build` with `npm run build-prod` to build the production (minimized) package. 
+
+3. setup database
 ```bash
 createuser auth -P
 # put a new password when prompt
@@ -40,11 +42,11 @@ createuser auth -P
 createdb auth -O auth
 ```
 
-5. download GeoLite data files
+4. download GeoLite data files
 
 Please refer to [this repo](https://github.com/P3TERX/GeoLite.mmdb) to download `GeoLite2-ASN.mmdb`, `GeoLite2-City.mmdb` and `GeoLite2-Country.mmdb`, and save them in `mmdb` folder under the project root.
 
-6. build email templates
+5. build email templates
 
 ```bash
 cd mail_templates/mjml
@@ -55,12 +57,15 @@ cd ../..
 
 ## Configuration
 
+### 1. Create server configuration file `config.json`
+
+First, you may copy the example file to obtain a default configuration file.
+
 ```bash
 cp config.example.json config.json
-# edit config.json
 ```
 
-### Edit `config.json`
+Then, please update the following settings.
 
 1. Update `SECRET_KEY` with a good random string, e.g. using the following script to generate one:
 ```bash
@@ -72,6 +77,45 @@ python3 -c 'import secrets; print(secrets.token_urlsafe(8))'
 4. Update `ADMIN` with real username, email address and password for admin.
 5. Delete `mail_catcher` in `MAIL`, edit other fields according to real setup
 6. Edit `SITE` according to real setup
+
+### 2. Edit front-end environment variables
+
+Update the variables (except `production`) in the following environment files.
+
+1. [angular/src/environments/environment.ts](angular/src/environments/environment.ts) (for debugging) 
+2. [angular/src/environments/environment.prod.ts](angular/src/environments/environment.prod.ts) (for production)
+
+**Note:** After any update, you must re-build the front-end to apply the changes.
+
+### 3. Update static title of front-end (optional)
+
+The titles of the webpages are updated according to the environment variables mentioned above, but this update is done at runtime, requiring running the Javascript.
+For SEO purpose, you need to ensure the **static** HTML title is also the correct one. To achieve this, please update the `<title>` tag in [angular/src/index.html](angular/src/index.html).
+
+**Note:** After any update, you must re-build the front-end to apply the changes.
+
+### 4. Replace the default image assets (optional)
+
+Replace the following image/icon files according to your need.
+
+1. [angular/src/assets/images/banner.png](angular/src/assets/images/banner.png)
+2. [angular/src/assets/images/logo-64.png](angular/src/assets/images/logo-64.png)
+3. [angular/src/assets/images/logo-128.png](angular/src/assets/images/logo-128.png)
+4. [angular/src/assets/images/logo-256.png](angular/src/assets/images/logo-256.png)
+5. [angular/src/favicon.ico](angular/src/favicon.ico)
+
+**Note:** After any update, you must re-build the front-end to apply the changes.
+
+### 5. Update contents in email templates
+
+Update the contents of the following files according to your need.
+
+1. [mail_templates/confirm_email.txt](mail_templates/confirm_email.txt)
+2. [mail_templates/mjml/src/confirm_email.mjml](mail_templates/mjml/src/confirm_email.mjml)
+3. [mail_templates/mjml/src/include/header.mjml](mail_templates/mjml/src/include/header.mjml)
+4. [mail_templates/mjml/src/include/footer.mjml](mail_templates/mjml/src/include/footer.mjml)
+
+**Note:** After any update, you must re-build the email templates **and restart the server** to apply the changes.
 
 ## Initialization
 

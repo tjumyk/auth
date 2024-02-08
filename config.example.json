@@ -8,8 +8,8 @@
   "DETECT_REQUEST_REGIONS": [],
 
   "MAIL": {
-    "display_name": "UNSWKG Identity",
-    "from": "example@unsw.edu.au",
+    "display_name": "Identity",
+    "from": "example@example.com",
     "reply_to_name": "Do Not Reply",
     "reply_to": "noreply@example.com",
     "mock_folder": null,
@@ -19,7 +19,7 @@
     }
   },
   "SITE": {
-    "name": "UNSWKG",
+    "name": "Identity",
     "root_url": "http://localhost:8077",
     "base_url": "/",
     "behind_proxy": false

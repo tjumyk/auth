@@ -12,10 +12,7 @@
           <h2>Hi {{user.name}},</h2>
         </mj-text>
         <mj-text padding-bottom="10px">
-          You are receiving this E-mail because you are either a new coursework student in COMP9318/COMP6714, a new group member, or any other people relevant to our group.
-        </mj-text>
-        <mj-text padding-bottom="10px">
-          We have created an account for you in our system to give you access to some of our internal web apps. You need to confirm your E-mail address before using your new account.
+          A new account has been created for you.
         </mj-text>
         <mj-text  padding-bottom="10px">Please click the following button to confirm your email.</mj-text>
         <mj-button href='{{site[root_url]}}{{site[base_url]}}account/confirm-email?uid={{user.id}}&token={{user.email_confirm_token}}'>Confirm E-mail</mj-button>

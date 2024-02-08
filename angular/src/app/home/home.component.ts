@@ -3,6 +3,7 @@ import {BasicError, OAuthClient, User} from "../models";
 import {AccountService} from "../account.service";
 import {finalize} from "rxjs/operators";
 import {TitleService} from "../title.service";
+import { environment } from '../../environments/environment';
 
 @Component({
   selector: 'app-home',
@@ -10,6 +11,7 @@ import {TitleService} from "../title.service";
   styleUrls: ['./home.component.less']
 })
 export class HomeComponent implements OnInit {
+  readonly env = environment;
   error: BasicError;
   user: User;
   isAdmin: boolean;
