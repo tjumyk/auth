@@ -33,12 +33,12 @@ def get_upload(path):
                 if not os.path.exists(thumbnail_folder_full):
                     os.makedirs(thumbnail_folder_full)
                 im.save(thumbnail_path_full)
-            return send_from_directory(thumbnail_root, thumbnail_path, cache_timeout=_cache_timeout)
+            return send_from_directory(thumbnail_root, thumbnail_path, max_age=_cache_timeout)
         except ValueError:
             return jsonify(msg='invalid thumbnail parameter'), 400
         except IOError as e:
             return jsonify(msg='failed to create thumbnail', detail=str(e)), 500
-    return send_from_directory(source_root, path, cache_timeout=_cache_timeout)
+    return send_from_directory(source_root, path, max_age=_cache_timeout)
 
 
 def init_app(app):
