@@ -112,7 +112,7 @@ class UserService:
         if user is None:
             return None
 
-        UserService.check_login_recent_failures(user)
+        UserService.check_login_recent_failures(user, ip)
 
         error = None
         error_detail = None
