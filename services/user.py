@@ -26,7 +26,8 @@ class UserService:
     email_reconfirm_request_wait = timedelta(minutes=1)
     password_reset_request_wait = timedelta(minutes=1)
     login_recent_failures_time_span = timedelta(minutes=15)
-    login_recent_failures_lock_threshold = 5
+    login_user_recent_failures_lock_threshold = 3
+    login_ip_recent_failures_lock_threshold = 5
     two_factor_disable_token_valid = timedelta(minutes=15)
     two_factor_disable_token_request_wait = timedelta(minutes=1)
 
@@ -202,14 +203,21 @@ class UserService:
                 raise UserServiceError(error)
 
     @staticmethod
-    def check_login_recent_failures(user):
+    def check_login_recent_failures(user: User, ip: str):
         from .login_record import LoginRecordService
         recent_failures_time_span = UserService.login_recent_failures_time_span
         if LoginRecordService.count_recent_failures_for_user(user, recent_failures_time_span) >= \
-                UserService.login_recent_failures_lock_threshold:
+                UserService.login_user_recent_failures_lock_threshold:
             recent_failures_minutes = round(recent_failures_time_span.total_seconds() / 60)
-            raise UserServiceError('too many recent failures', 'Please wait for at most %d minutes and then try again'
-                                   % recent_failures_minutes)
+            raise UserServiceError('too many recent failures',
+                                   'User login banned temporarily. Please wait for at most %d minutes '
+                                   'and then try again' % recent_failures_minutes)
+        if LoginRecordService.count_recent_failures_for_ip(ip, recent_failures_time_span) >= \
+                UserService.login_ip_recent_failures_lock_threshold:
+            recent_failures_minutes = round(recent_failures_time_span.total_seconds() / 60)
+            raise UserServiceError('too many recent failures',
+                                   'IP login banned temporarily. Please wait for at most %d minutes '
+                                   'and then try again' % recent_failures_minutes)
 
     @staticmethod
     def invite(name, email, external_auth_provider_id: str = None, skip_email_confirmation: bool = False):

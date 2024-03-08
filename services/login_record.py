@@ -51,3 +51,18 @@ class LoginRecordService:
                 break
             failures += 1
         return failures
+
+    @staticmethod
+    def count_recent_failures_for_ip(ip: str, time_span: timedelta) -> int:
+        if ip is None:
+            raise LoginRecordServiceError('ip is required')
+
+        failures = 0
+        for record in db.session.query(LoginRecord) \
+                .filter(LoginRecord.ip == ip,
+                        LoginRecord.time >= datetime.utcnow() - time_span) \
+                .order_by(desc(LoginRecord.id)):
+            if record.success:  # only count the latest consecutive failures
+                break
+            failures += 1
+        return failures
