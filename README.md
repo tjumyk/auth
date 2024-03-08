@@ -42,6 +42,8 @@ createuser auth -P
 createdb auth -O auth
 ```
 
+**Note:** You need to be a database superuser or switch to the `postgres` user to run the commands above.
+
 4. download GeoLite data files
 
 Please refer to [this repo](https://github.com/P3TERX/GeoLite.mmdb) to download `GeoLite2-ASN.mmdb`, `GeoLite2-City.mmdb` and `GeoLite2-Country.mmdb`, and save them in `mmdb` folder under the project root.
@@ -148,6 +150,7 @@ Wants=network.target
 [Service]
 Type=simple
 ExecStart=/home/kelvin/miniconda3/envs/idm/bin/gunicorn -w 4 -b '127.0.0.1:8077' app:app
+WorkingDirectory=/home/kelvin/projects/auth
 Restart=always
 RestartSec=1min
 
