@@ -200,7 +200,7 @@ def admin_user_confirm_email_url(uid):
         url = (f"{site_cfg['root_url']}{site_cfg['base_url']}account/confirm-email"
                f"?uid={user.id}&token={user.email_confirm_token}")
 
-        return jsonify(dict(url=url)), 204
+        return jsonify(dict(url=url))
     except UserServiceError as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
 
