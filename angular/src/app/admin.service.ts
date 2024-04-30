@@ -23,6 +23,10 @@ export class InviteForm {
   skip_email_confirmation?: boolean;
 }
 
+export interface ConfirmEmailURLResponse {
+  url: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -145,6 +149,12 @@ export class AdminService {
   reconfirm_email(uid: number): Observable<any> {
     return this.http.post(`${this.api}/users/${uid}/reconfirm-email`, null).pipe(
       tap(() => this.logger.info(`Restarted email confirmation for user (uid:${uid})`))
+    )
+  }
+
+  get_confirm_email_url(uid: number): Observable<ConfirmEmailURLResponse>{
+    return this.http.get<ConfirmEmailURLResponse>(`${this.api}/users/${uid}/confirm-email-url`).pipe(
+      tap(() => this.logger.info(`Obtained confirm email url for ${uid}`))
     )
   }
 

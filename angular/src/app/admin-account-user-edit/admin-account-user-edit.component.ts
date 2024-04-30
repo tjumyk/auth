@@ -33,7 +33,7 @@ export class AdminAccountUserEditComponent implements OnInit {
   updating_avatar: boolean;
   update_avatar_success: boolean;
   requesting_reconfirm_email: boolean;
-
+  requesting_confirm_email_url: boolean;
 
   admin_operation_success: {
     msg: string,
@@ -152,11 +152,11 @@ export class AdminAccountUserEditComponent implements OnInit {
 
     this.getExternalInfo();
 
-    if(user.external_auth_provider_id){
+    if (user.external_auth_provider_id) {
       this.accountService.get_external_auth_provider(user.external_auth_provider_id).subscribe(
-        provider=>this.provider = provider,
-        error=>this.error = error.error
-      )
+        provider => this.provider = provider,
+        error => this.error = error.error
+      );
     }
   }
 
@@ -174,6 +174,21 @@ export class AdminAccountUserEditComponent implements OnInit {
         this.admin_operation_success = {msg: 'Reconfirm E-mail process started'}
       },
       (error) => this.error = error.error
+    )
+  }
+
+  getConfirmEmailURL() {
+    this.error = undefined;
+    this.admin_operation_success = undefined;
+
+    this.requesting_confirm_email_url = true;
+    this.adminService.get_confirm_email_url(this.uid).pipe(
+      finalize(() => this.requesting_confirm_email_url = false)
+    ).subscribe(
+      resp => {
+        this.admin_operation_success = {msg: 'E-mail Confirmation Link', detail: resp.url}
+      },
+      error => this.error = error.error
     )
   }
 

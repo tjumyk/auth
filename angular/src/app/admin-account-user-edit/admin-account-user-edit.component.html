@@ -128,6 +128,7 @@
 
           <p *ngIf="!user.is_email_confirmed">
             <a class="ui button" [ngClass]="{'loading disabled': requesting_reconfirm_email}" (click)="reconfirmEmail()" i18n>Reconfirm E-mail</a>
+            <a class="ui button" [ngClass]="{'loading disabled': requesting_confirm_email_url}" (click)="getConfirmEmailURL()" i18n>Get E-mail Confirmation Link</a>
           </p>
           <p>
             <a class="ui red button" [hidden]="!user.is_active" [ngClass]="{'loading disabled': setting_active}" (click)="setActive(false)">

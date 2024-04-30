@@ -188,6 +188,23 @@ def admin_user_reconfirm_email(uid):
         return jsonify(msg=e.msg, detail=e.detail), 400
 
 
+@admin.route('/users/<int:uid>/confirm-email-url')
+@requires_admin
+def admin_user_confirm_email_url(uid):
+    try:
+        user = UserService.get(uid)
+        if user is None:
+            return jsonify(msg='user not found'), 404
+
+        site_cfg = app.config['SITE']
+        url = (f"{site_cfg['root_url']}{site_cfg['base_url']}account/confirm-email"
+               f"?uid={user.id}&token={user.email_confirm_token}")
+
+        return jsonify(dict(url=url)), 204
+    except UserServiceError as e:
+        return jsonify(msg=e.msg, detail=e.detail), 400
+
+
 @admin.route('/users/<int:uid>/login-records')
 @requires_admin
 def admin_user_login_records(uid):
