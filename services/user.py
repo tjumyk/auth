@@ -174,7 +174,7 @@ class UserService:
         if token is None:
             raise UserServiceError('token is required')
 
-        UserService.check_login_recent_failures(user)
+        UserService.check_login_recent_failures(user, ip)
 
         error = None
         error_source = None
