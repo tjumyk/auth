@@ -36,7 +36,7 @@
           </div>
         </div>
         <div *ngIf="clients">
-          <div class="ui grid four column doubling centered">
+          <div class="ui grid column doubling centered {{appGridColumns}}">
             <div class="column" *ngFor="let client of clients">
               <a class="ui icon header client-card" [href]="client.home_url" [title]="client.description || ''">
                 <img class="ui image icon" [src]="client.icon" *ngIf="client.icon; else defaultIcon">

@@ -3,7 +3,7 @@ import {BasicError, OAuthClient, User} from "../models";
 import {AccountService} from "../account.service";
 import {finalize} from "rxjs/operators";
 import {TitleService} from "../title.service";
-import { environment } from '../../environments/environment';
+import {environment} from '../../environments/environment';
 
 @Component({
   selector: 'app-home',
@@ -17,6 +17,7 @@ export class HomeComponent implements OnInit {
   isAdmin: boolean;
   loadingClients: boolean;
   clients: OAuthClient[];
+  appGridColumns = 'four';
 
   constructor(
     private accountService: AccountService,
@@ -43,7 +44,16 @@ export class HomeComponent implements OnInit {
         this.accountService.get_my_clients().pipe(
           finalize(() => this.loadingClients = false)
         ).subscribe(
-          clients => this.clients = clients,
+          clients => {
+            this.clients = clients;
+
+            const numClients = clients.length;
+            if (numClients === 5 || numClients === 6 || numClients === 9) {
+              this.appGridColumns = 'three';
+            } else {
+              this.appGridColumns = 'four';
+            }
+          },
           error => this.error = error.error
         )
       },
