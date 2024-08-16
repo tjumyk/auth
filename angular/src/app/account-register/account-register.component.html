@@ -1,0 +1,69 @@
+<div class="ui error message" *ngIf="error">
+  <i class="close icon" (click)="error=undefined"></i>
+  <div class="header"><i class="times circle icon"></i> {{error.msg}}</div>
+  <p>{{error.detail}}</p>
+</div>
+
+<div class="ui padded raised segment" *ngIf="verifying_logged_in">
+  <div class="ui large centered text inline loader active" i18n>Checking user status...</div>
+</div>
+
+<div class="ui padded raised green segment" *ngIf="register_success">
+  <div class="ui icon header">
+    <i class="ui mail green icon"></i>
+    <div class="content">
+      Confirmation Email Sent
+      <div class="sub header">
+        Please check your mailbox and click the activation link we just send to you to confirm your email address
+        and finalize your registration.
+      </div>
+    </div>
+  </div>
+</div>
+
+<div [hidden]="verifying_logged_in || register_success">
+
+  <form class="ui large form" #f="ngForm" (ngSubmit)="register(f)" [ngClass]="{'loading': registering}">
+    <div class="ui raised segment">
+
+      <div class="field"
+           [ngClass]="{'error': (f.submitted || name_model.touched || name_model.dirty) && name_model.invalid}">
+        <div class="ui left icon input">
+          <i class="user icon"></i>
+          <input type="text" name="name" placeholder="Username (alphanumeric, 3-16 characters)"
+                 required minlength="3" maxlength="16" pattern="^[\w]{3,16}$"
+                 [(ngModel)]="form.name" #name_model="ngModel">
+        </div>
+        <div class="errors" *ngIf="name_model.errors">
+          <label *ngIf="name_model.errors.required"><i class="times icon"></i> Name is required</label>
+          <label *ngIf="name_model.errors.minlength"><i class="times icon"></i> At least 3 characters</label>
+          <label *ngIf="name_model.errors.maxlength"><i class="times icon"></i> At most 16 characters</label>
+          <label *ngIf="name_model.errors.pattern"><i class="times icon"></i> Invalid format</label>
+        </div>
+      </div>
+      <div class="field"
+           [ngClass]="{'error': (f.submitted || email_model.touched || email_model.dirty) && email_model.invalid}">
+        <div class="ui left icon input">
+          <i class="mail icon"></i>
+          <input type="email" name="email" placeholder="Email (at most 64 characters)"
+                 required maxlength="64" email
+                 [(ngModel)]="form.email" #email_model="ngModel">
+        </div>
+        <div class="errors" *ngIf="email_model.errors">
+          <label *ngIf="email_model.errors.required"><i class="times icon"></i> E-mail is required</label>
+          <label *ngIf="email_model.errors.maxlength"><i class="times icon"></i> At most 64 characters</label>
+          <label *ngIf="email_model.errors.email"><i class="times icon"></i> Invalid E-mail format</label>
+        </div>
+      </div>
+
+      <button class="ui fluid large green button" type="submit" i18n>Sign Up</button>
+    </div>
+  </form>
+
+  <div class="footer">
+    <div class="ui horizontal bulleted link list">
+      <a class="item" routerLink="../login" i18n>Sign In</a>
+    </div>
+  </div>
+
+</div>

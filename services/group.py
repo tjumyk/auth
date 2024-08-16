@@ -39,6 +39,10 @@ class GroupService:
         return Group.query.filter_by(name=name).first()
 
     @staticmethod
+    def get_by_name_list(name_list: list):
+        return db.session.query(Group).filter(Group.name.in_(name_list)).all()
+
+    @staticmethod
     def search_by_name(name, limit=5):
         if name is None:
             raise GroupServiceError('name is required')

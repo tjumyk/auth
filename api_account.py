@@ -1,7 +1,10 @@
+from typing import Tuple
+
 from flask import Blueprint, current_app as app, request, jsonify
 
 import utils.two_factor as two_factor
 from models import db
+from services.group import GroupServiceError, GroupService
 from services.oauth import OAuthService, OAuthServiceError
 from services.user import UserService, UserServiceError
 from utils.external_auth.provider import get_provider, get_providers
@@ -42,6 +45,57 @@ def _get_client_ip():
     else:
         ip = request.remote_addr
     return ip
+
+
+@account.route('/register', methods=['POST'])
+def account_register():
+    try:
+        _json = request.json
+        name = _json.get('name')
+        email = _json.get('email')
+
+        allowed, add_to_groups, error_msg = _check_register(email)
+        if not allowed:
+            return jsonify(
+                msg='Registration Rejected',
+                detail=error_msg
+            ), 403
+
+        user = UserService.invite(name, email)
+        groups = GroupService.get_by_name_list(add_to_groups) if add_to_groups else []
+        if groups:
+            user.groups.extend(groups)
+        db.session.commit()
+        send_email(name, email, 'confirm_email', user=user, site=app.config['SITE'])
+        return jsonify(user.to_dict(with_advanced_fields=True)), 201
+    except (UserServiceError, GroupServiceError, ValueError) as e:
+        return jsonify(msg=e.msg, detail=e.detail), 400
+
+
+def _check_register(email) -> Tuple[bool, list, str]:
+    reg_conf = app.config.get('ACCOUNT_REGISTER')
+    if reg_conf is None:
+        return False, [], 'Account registration is disabled'
+    allow_free_register = reg_conf.get('free_register')
+    allow_domain_register = reg_conf.get('email_domain_register', [])
+    if not allow_free_register and not allow_domain_register:
+        return False, [], 'Account registration is disabled'
+
+    if '@' not in email:
+        raise ValueError('invalid email')
+    email_domain = email.split('@')[1]
+    match_domain = False
+    add_to_groups = set()
+    for domain_group in allow_domain_register:
+        accept_domains = domain_group.get('accept_domains', [])
+        if email_domain in accept_domains:
+            match_domain = True
+            add_to_groups.update(domain_group.get('add_to_groups', []))
+    add_to_groups = sorted(add_to_groups)
+    if allow_free_register or match_domain:
+        return True, add_to_groups, ''
+    else:
+        return False, [], 'Email domain is not in allowed domain list'
 
 
 @account.route('/logout')

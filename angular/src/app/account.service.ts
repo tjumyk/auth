@@ -40,6 +40,13 @@ export class AccountService {
     )
   }
 
+  register(name: string, email: string): Observable<User> {
+    return this.http.post<User>(`${this.api}/register`, {
+      name: name,
+      email: email
+    });
+  }
+
   logout(): Observable<any> {
     return this.http.get(`${this.api}/logout`).pipe(
       tap(() => {

@@ -39,6 +39,7 @@ import { AccountRequestDisableTwoFactorByEmailComponent } from './account-reques
 import { AccountDisableTwoFactorByEmailComponent } from './account-disable-two-factor-by-email/account-disable-two-factor-by-email.component';
 import { AdminEmailSendComponent } from './admin-email-send/admin-email-send.component';
 import { AdminAboutComponent } from './admin-about/admin-about.component';
+import {AccountRegisterComponent} from "./account-register/account-register.component";
 
 @NgModule({
   declarations: [
@@ -77,6 +78,7 @@ import { AdminAboutComponent } from './admin-about/admin-about.component';
     AccountDisableTwoFactorByEmailComponent,
     AdminEmailSendComponent,
     AdminAboutComponent,
+    AccountRegisterComponent
   ],
   imports: [
     BrowserModule,

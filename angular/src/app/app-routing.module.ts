@@ -33,6 +33,7 @@ import {AccountRequestDisableTwoFactorByEmailComponent} from "./account-request-
 import {AccountDisableTwoFactorByEmailComponent} from "./account-disable-two-factor-by-email/account-disable-two-factor-by-email.component";
 import {AdminEmailSendComponent} from "./admin-email-send/admin-email-send.component";
 import {AdminAboutComponent} from "./admin-about/admin-about.component";
+import {AccountRegisterComponent} from "./account-register/account-register.component";
 
 const routes: Routes = [
   {path: '', pathMatch: 'full', canActivate: [AuthGuard], component: HomeComponent},
@@ -45,6 +46,7 @@ const routes: Routes = [
         children: [
           {path: '', pathMatch: 'full', redirectTo: '/'},
           {path: 'login', component: AccountLoginComponent},
+          {path: 'register', component: AccountRegisterComponent},
           {path: 'logout', component: AccountLogoutComponent},
           {path: 'request-reset-password', component: AccountReqResetPasswordComponent},
           {path: 'reset-password', component: AccountResetPasswordComponent},
