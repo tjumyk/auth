@@ -25,6 +25,7 @@ export class AccountConfirmEmailComponent implements OnInit {
   user:User;
   token:string;
   form: SetPasswordForm = new SetPasswordForm();
+  alreadyConfirmed:boolean;
 
   provider: ExternalAuthProvider;
 
@@ -55,7 +56,13 @@ export class AccountConfirmEmailComponent implements OnInit {
           )
         }
       },
-      (error)=>this.error = error.error
+      (error)=> {
+        if(error.error && error.error.msg === 'already confirmed'){
+          this.alreadyConfirmed = true;
+        }else{
+          this.error = error.error;
+        }
+      }
     )
   }
 

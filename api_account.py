@@ -119,11 +119,11 @@ def account_confirm_email():
         token = args.get('token')
 
         if uid is None:
-            return jsonify(msg='user id is required')
+            return jsonify(msg='user id is required'), 400
         try:
             uid = int(uid)
         except ValueError:
-            return jsonify(msg='user id must be an integer')
+            return jsonify(msg='user id must be an integer'), 400
 
         user = UserService.get(uid)
         if user is None:

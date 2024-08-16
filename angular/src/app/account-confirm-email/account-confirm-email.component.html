@@ -4,6 +4,19 @@
   <p>{{error.detail}}</p>
 </div>
 
+<div class="ui padded raised green segment" *ngIf="alreadyConfirmed">
+  <div class="ui icon header">
+    <i class="ui check circle green icon"></i>
+    <div class="content">
+      Email Already Confirmed
+      <div class="sub header">
+        Your email has been confirmed and your account has been activated. Please sign in with your username/email and your password.
+      </div>
+      <a routerLink="/account/login" class="ui button primary sign-in">Sign In</a>
+    </div>
+  </div>
+</div>
+
 <div class="ui padded raised segment" *ngIf="verifying">
   <div class="ui large centered text inline loader active" i18n>Verifying token...</div>
 </div>
@@ -58,6 +71,6 @@
   </form>
 </div>
 
-<div class="ui center aligned message">
-  <ng-container i18n>Token expired?</ng-container> <a routerLink="../request-reconfirm-email" i18n>Reconfirm E-mail</a>
+<div class="ui center aligned message" *ngIf="!alreadyConfirmed">
+  <ng-container i18n>Token expired?</ng-container>&nbsp;<a routerLink="../request-reconfirm-email" i18n>Reconfirm E-mail</a>
 </div>
