@@ -1,7 +1,8 @@
+import json
 import os
 import re
-import json
 
+import click
 from flask import Flask, request, jsonify, send_from_directory
 
 from api_account import account
@@ -11,6 +12,7 @@ from api_oauth import oauth
 from models import db
 from page_oauth import oauth_pages
 from services.group import GroupService
+from services.oauth import OAuthService
 from services.user import UserService
 from utils import upload
 from utils.external_auth import provider
@@ -129,6 +131,19 @@ def init_db():
 @app.cli.command()
 def drop_db():
     db.drop_all()
+
+
+@app.cli.command()
+@click.argument('client_id', type=int)
+@click.argument('client_new_name')
+def rename_client(client_id: int, client_new_name):
+    with app.test_request_context():
+        client = OAuthService.get_client(client_id)
+        if client is None:
+            raise RuntimeError('client not found')
+        client.name = client_new_name
+        db.session.commit()
+        print(str(client))
 
 
 if __name__ == '__main__':
