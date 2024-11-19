@@ -387,11 +387,14 @@ class UserService:
         for key, value in kwargs.items():
             if key == 'nickname':
                 if value is not None:
-                    if not UserService.nickname_pattern.match(value):
-                        raise UserServiceError('invalid nickname format')
-                    if value != user.nickname and db.session.query(func.count()). \
-                            filter(User.nickname == value).scalar():
-                        raise UserServiceError('duplicate nickname')
+                    if isinstance(value, str) and len(value) == 0:
+                        value = None  # set NULL
+                    else:
+                        if not UserService.nickname_pattern.match(value):
+                            raise UserServiceError('invalid nickname format')
+                        if value != user.nickname and db.session.query(func.count()). \
+                                filter(User.nickname == value).scalar():
+                            raise UserServiceError('duplicate nickname')
             setattr(user, key, value)
         return old_values
 
