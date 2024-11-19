@@ -1,6 +1,7 @@
 import re
 from datetime import datetime, timedelta
 from secrets import token_urlsafe
+from typing import Optional
 
 from sqlalchemy import func
 from sqlalchemy.orm import joinedload
@@ -34,6 +35,10 @@ class OAuthService:
             raise OAuthServiceError('id must be an integer')
 
         return OAuthClient.query.get(_id)
+
+    @staticmethod
+    def get_client_by_redirect_url(url: str) -> Optional[OAuthClient]:
+        return db.session.query(OAuthClient).filter(OAuthClient.redirect_url == url).first()
 
     @staticmethod
     def get_all_clients():
