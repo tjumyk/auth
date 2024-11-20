@@ -1,5 +1,3 @@
-import logging
-
 from flask import Blueprint, request, jsonify, current_app as app
 
 from models import db
@@ -7,8 +5,6 @@ from services.oauth import OAuthService, OAuthServiceError
 from services.user import UserServiceError
 from utils.session import get_session_user
 from utils.url import url_append_param
-
-logger = logging.getLogger(__name__)
 
 oauth = Blueprint('oauth', __name__)
 
@@ -106,26 +102,24 @@ def oauth_get_access_token():
         client_secret = form.get('client_secret')
         redirect_url = form.get('redirect_url') or form.get('redirect_uri')  # make it compatible
         authorize_token = form.get('token') or form.get('code')  # make it compatible
+        auth = request.authorization  # some client use basic auth to provide client_id and client_secret (e.g. GitLab)
 
         if client_id is None:
-            # fallback to retrieve client with redirect_url (to be compatible with e.g. GitLab)
-            if not redirect_url:
-                return jsonify(msg='redirect_url not found'), 400
-            logger.warning('Insecure access token request: retrieving client with redirect_url only: ' + redirect_url)
-            client = OAuthService.get_client_by_redirect_url(redirect_url)
-            if client is None:
-                return jsonify(msg='client not found'), 400
-            client_id = client.id
-            client_secret = client.secret
-        else:
-            try:
-                client_id = int(client_id)
-            except ValueError:
-                return jsonify(msg='client_id must be an integer'), 400
-            # get client
-            client = OAuthService.get_client(client_id)
-            if client is None:
-                return jsonify(msg='client not found'), 400
+            # fallback to use auth info if applicable
+            if auth is not None and auth.type == 'basic':  # only basic auth supported
+                client_id = auth.username
+                client_secret = auth.password
+        if client_id is None:
+            return jsonify(msg='client_id is required'), 400
+
+        try:
+            client_id = int(client_id)
+        except ValueError:
+            return jsonify(msg='client_id must be an integer'), 400
+        # get client
+        client = OAuthService.get_client(client_id)
+        if client is None:
+            return jsonify(msg='client not found'), 400
 
         # get the access token
         access_token = OAuthService.get_access_token(client, client_secret, redirect_url, authorize_token)
