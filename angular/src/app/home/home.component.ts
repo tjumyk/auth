@@ -17,7 +17,6 @@ export class HomeComponent implements OnInit {
   isAdmin: boolean;
   loadingClients: boolean;
   clients: OAuthClient[];
-  appGridColumns = 'four';
 
   constructor(
     private accountService: AccountService,
@@ -46,13 +45,6 @@ export class HomeComponent implements OnInit {
         ).subscribe(
           clients => {
             this.clients = clients;
-
-            const numClients = clients.length;
-            if (numClients === 5 || numClients === 6 || numClients === 9) {
-              this.appGridColumns = 'three';
-            } else {
-              this.appGridColumns = 'four';
-            }
           },
           error => this.error = error.error
         )
