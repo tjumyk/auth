@@ -16,6 +16,7 @@ export class HomeComponent implements OnInit {
   user: User;
   isAdmin: boolean;
   loadingClients: boolean;
+  checkingIP: boolean;
   clients: OAuthClient[];
 
   constructor(
@@ -45,6 +46,32 @@ export class HomeComponent implements OnInit {
         ).subscribe(
           clients => {
             this.clients = clients;
+
+            this.checkingIP = true;
+            this.accountService.check_ip().pipe(
+              finalize(() => this.checkingIP = false)
+            ).subscribe(
+              result => {
+                if (!result || result.check_pass || !result.guarded_ports || result.guarded_ports.length === 0) {
+                  return;
+                }
+                for (const client of this.clients) {
+                  const url = client.home_url;
+                  if (!url) {
+                    continue;
+                  }
+                  let blocked = false;
+                  for (const port of result.guarded_ports) {
+                    if (url.indexOf(':' + port) > 0) {
+                      blocked = true;
+                      break;
+                    }
+                  }
+                  client._is_ip_blocked = blocked;
+                }
+              },
+              error => this.error = error.error
+            );
           },
           error => this.error = error.error
         )

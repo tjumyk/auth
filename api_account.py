@@ -1,5 +1,6 @@
 from typing import Tuple
 
+import requests
 from flask import Blueprint, current_app as app, request, jsonify
 
 import utils.two_factor as two_factor
@@ -430,5 +431,28 @@ def get_external_auth_provider(pid: str):
 @requires_login
 def get_external_auth_providers():
     return jsonify([provider.to_dict() for provider in get_providers()])
+
+
+@account.route('/ip-check')
+@requires_login
+def ip_check():
+    cfg_ip_check = app.config.get('IP_CHECK')
+    if not cfg_ip_check:
+        return '', 204
+    check_url = cfg_ip_check['url']
+    check_secret = cfg_ip_check['secret']
+    if not check_url or not check_secret:
+        return jsonify(msg='invalid config for ip check'), 500
+
+    api_path = '/api/auth-check-ip'
+    check_url_full = check_url.rstrip('/') + api_path
+    ip = _get_client_ip()
+
+    try:
+        resp = requests.get(check_url_full, params={'ip': ip}, headers={'AuthSecretKey': check_secret}, timeout=5)
+        result = resp.json()
+        return jsonify(check_pass=result.get('check_pass'), guarded_ports=result.get('guarded_ports'))
+    except Exception:
+        return jsonify(msg='ip check error'), 500
 
 # TODO reject weak passwords
