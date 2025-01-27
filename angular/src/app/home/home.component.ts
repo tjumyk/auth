@@ -18,6 +18,8 @@ export class HomeComponent implements OnInit {
   loadingClients: boolean;
   checkingIP: boolean;
   clients: OAuthClient[];
+  hasIPBlockedClient: boolean;
+  gateClient: OAuthClient;
 
   constructor(
     private accountService: AccountService,
@@ -47,6 +49,12 @@ export class HomeComponent implements OnInit {
           clients => {
             this.clients = clients;
 
+            for (const client of this.clients) {
+              if (client.name === 'gate') {
+                this.gateClient = client;
+              }
+            }
+
             this.checkingIP = true;
             this.accountService.check_ip().pipe(
               finalize(() => this.checkingIP = false)
@@ -74,7 +82,11 @@ export class HomeComponent implements OnInit {
                     continue;
                   }
                   const portNum = parseInt(port);
-                  client._is_ip_blocked = guardedPortSet.has(portNum);
+                  const isIpBlocked = guardedPortSet.has(portNum);
+                  if (isIpBlocked) {
+                    this.hasIPBlockedClient = true;
+                  }
+                  client._is_ip_blocked = isIpBlocked;
                 }
               },
               error => this.error = error.error

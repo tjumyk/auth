@@ -20,6 +20,21 @@
           <a class="ui button tiny" routerLink="/settings/two-factor" i18n>Enable it Now!</a>
         </div>
 
+        <div class="ui warning message" *ngIf="hasIPBlockedClient">
+          <div class="header"><i class="exclamation triangle icon"></i> Your IP is not trusted!</div>
+          <p>
+            Your IP address is not allowed to access apps with a <i class="icon yellow lock"></i> icon.
+            <span *ngIf="gateClient">
+              <br> But you may use the
+              <a href="{{gateClient.home_url}}">
+                <img [src]="gateClient.icon" *ngIf="gateClient.icon" class="ui image gate-client">
+                  {{gateClient.name}}
+              </a>
+              app below to add your IP to the white list.
+            </span>
+          </p>
+        </div>
+
         <div class="ui error message" *ngIf="error">
           <i class="close icon" (click)="error=undefined"></i>
           <div class="header"><i class="times circle icon"></i> {{error.msg}}</div>
