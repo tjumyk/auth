@@ -43,7 +43,7 @@
                 <ng-template #defaultIcon><i class="icon window restore outline circular default-client-icon"></i></ng-template>
                 <div class="content">
                   {{client.name}}
-                  <i class="yellow icon lock" *ngIf="client._is_ip_blocked"></i>
+                  <i class="yellow icon lock block-icon" *ngIf="client._is_ip_blocked"></i>
                 </div>
               </a>
             </div>

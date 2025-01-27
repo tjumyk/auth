@@ -55,19 +55,26 @@ export class HomeComponent implements OnInit {
                 if (!result || result.check_pass || !result.guarded_ports || result.guarded_ports.length === 0) {
                   return;
                 }
+                const guardedPortSet: Set<number> = new Set(result.guarded_ports);
                 for (const client of this.clients) {
                   const url = client.home_url;
                   if (!url) {
                     continue;
                   }
-                  let blocked = false;
-                  for (const port of result.guarded_ports) {
-                    if (url.indexOf(':' + port) > 0) {
-                      blocked = true;
-                      break;
+                  const urlObj = new URL(url);
+                  let port: string = urlObj.port;
+                  if (!port) {
+                    if (urlObj.protocol === 'http:') {
+                      port = '80';
+                    } else if (urlObj.protocol === 'https:') {
+                      port = '443';
                     }
                   }
-                  client._is_ip_blocked = blocked;
+                  if (!port) {
+                    continue;
+                  }
+                  const portNum = parseInt(port);
+                  client._is_ip_blocked = guardedPortSet.has(portNum);
                 }
               },
               error => this.error = error.error
