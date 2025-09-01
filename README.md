@@ -134,8 +134,7 @@ flask run -p 8077
 1. use a better server than flask, e.g. `gunicorn`
 
 ```bash
-pip install gunicorn eventlet
-gunicorn --worker-class eventlet -w 4 -b 127.0.0.1:8077 app:app
+gunicorn --worker-class eventlet -w 4 -b 127.0.0.1:8077 --log-file - --access-logfile - app:app
 ```
 2. use a reverse proxy (e.g. nginx) and HTTPS certificate (e.g. certbot) for public endpoint
 3. register system service to auto-start the server after each system reboot, e.g.
@@ -149,8 +148,12 @@ Wants=network.target
 
 [Service]
 Type=simple
-ExecStart=/home/kelvin/miniconda3/envs/idm/bin/gunicorn --worker-class eventlet -w 4 -b '127.0.0.1:8077' app:app
+User=kelvin
+Group=kelvin
+ExecStart=/home/kelvin/miniconda3/envs/idm/bin/gunicorn --worker-class eventlet -w 4 -b '127.0.0.1:8077' --log-file - --access-logfile - app:app
 WorkingDirectory=/home/kelvin/projects/auth
+StandardOutput=append:/home/kelvin/projects/auth/stdout.log
+StandardError=append:/home/kelvin/projects/auth/stderr.log
 Restart=always
 RestartSec=1min
 
