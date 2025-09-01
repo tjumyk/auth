@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {ExternalAuthProvider, OAuthClient, TwoFactorSetupInfo, User} from "./models";
+import {ExternalAuthProvider, IPCheckResult, OAuthClient, TwoFactorSetupInfo, User} from "./models";
 import {HttpClient, HttpParams} from "@angular/common/http";
 import {Logger, LogService} from "./log.service";
 import {Observable, of} from "rxjs";
@@ -209,5 +209,19 @@ export class AccountService {
     return this.http.get<ExternalAuthProvider[]>(`${this.api}/external-auth-providers`).pipe(
       tap((providers)=>this.logger.info(`Fetched ${providers.length} external auth providers`))
     )
+  }
+
+  check_ip(): Observable<IPCheckResult> {
+    return this.http.get<IPCheckResult>(`${this.api}/ip-check`).pipe(
+      tap(result => {
+        if (result) {
+          if (result.check_pass) {
+            this.logger.info('IP check passed');
+          } else {
+            this.logger.info('IP check failed');
+          }
+        }
+      })
+    );
   }
 }

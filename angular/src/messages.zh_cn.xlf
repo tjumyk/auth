@@ -2121,6 +2121,30 @@
         </context-group>
         <target>作者</target>
       </trans-unit>
+      <trans-unit id="28629af803ab8b5f6e995b17d486e6a1527e2a96" datatype="html">                                                                                                            
+         <source>Sign Up</source>                                                             
+         <context-group purpose="location">                                                   
+           <context context-type="sourcefile">app/account-login/account-login.component.html</context>                                                                                       
+           <context context-type="linenumber">56</context>                       
+         </context-group>                                                                     
+         <context-group purpose="location">                                                   
+           <context context-type="sourcefile">app/oauth-login/oauth-login.component.html</context>                                                                                           
+           <context context-type="linenumber">85</context>                                    
+         </context-group>                 
+         <context-group purpose="location">                                                                                                                                                  
+           <context context-type="sourcefile">app/account-register/account-register.component.html</context>                                                                                 
+           <context context-type="linenumber">59</context> 
+         </context-group>
+         <target>注册</target>
+       </trans-unit>
+       <trans-unit id="d0619d77236384b59f13559fdecb51b02c71761b" datatype="html">
+         <source>Get E-mail Confirmation Link</source>
+         <context-group purpose="location">                                                   
+           <context context-type="sourcefile">app/admin-account-user-edit/admin-account-user-edit.component.html</context>
+           <context context-type="linenumber">131</context>
+         </context-group>
+         <target>获取E-mail确认链接</target>
+       </trans-unit> 
     </body>
   </file>
 </xliff>

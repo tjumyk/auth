@@ -66,6 +66,8 @@ export class OAuthClient {
   home_url: string;
   description: string;
   icon: string;
+
+  _is_ip_blocked: boolean;
 }
 
 export class OAuthClientAdvanced extends OAuthClient {
@@ -132,4 +134,9 @@ export class SendEmailResponse{
 
 export class VersionInfo{
   commit: string;
+}
+
+export interface IPCheckResult {
+  check_pass: boolean;
+  guarded_ports: number[];
 }

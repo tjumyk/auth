@@ -16,7 +16,10 @@ export class HomeComponent implements OnInit {
   user: User;
   isAdmin: boolean;
   loadingClients: boolean;
+  checkingIP: boolean;
   clients: OAuthClient[];
+  hasIPBlockedClient: boolean;
+  gateClient: OAuthClient;
 
   constructor(
     private accountService: AccountService,
@@ -45,6 +48,49 @@ export class HomeComponent implements OnInit {
         ).subscribe(
           clients => {
             this.clients = clients;
+
+            for (const client of this.clients) {
+              if (client.name === 'gate') {
+                this.gateClient = client;
+              }
+            }
+
+            this.checkingIP = true;
+            this.accountService.check_ip().pipe(
+              finalize(() => this.checkingIP = false)
+            ).subscribe(
+              result => {
+                if (!result || result.check_pass || !result.guarded_ports || result.guarded_ports.length === 0) {
+                  return;
+                }
+                const guardedPortSet: Set<number> = new Set(result.guarded_ports);
+                for (const client of this.clients) {
+                  const url = client.home_url;
+                  if (!url) {
+                    continue;
+                  }
+                  const urlObj = new URL(url);
+                  let port: string = urlObj.port;
+                  if (!port) {
+                    if (urlObj.protocol === 'http:') {
+                      port = '80';
+                    } else if (urlObj.protocol === 'https:') {
+                      port = '443';
+                    }
+                  }
+                  if (!port) {
+                    continue;
+                  }
+                  const portNum = parseInt(port);
+                  const isIpBlocked = guardedPortSet.has(portNum);
+                  if (isIpBlocked) {
+                    this.hasIPBlockedClient = true;
+                  }
+                  client._is_ip_blocked = isIpBlocked;
+                }
+              },
+              error => this.error = error.error
+            );
           },
           error => this.error = error.error
         )
