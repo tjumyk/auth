@@ -63,7 +63,7 @@
                         maxlength="256"
                         [(ngModel)]="form.description" name="description" #desc_model="ngModel"></textarea>
               <div class="errors" *ngIf="desc_model.errors">
-                <label *ngIf="desc_model.errors.maxlength">At most 256 characters</label>
+                <label *ngIf="desc_model.errors['maxlength']">At most 256 characters</label>
               </div>
             </div>
             <button class="ui primary fluid submit button" type="submit" i18n>Update Profile</button>

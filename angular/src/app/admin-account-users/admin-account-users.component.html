@@ -40,7 +40,7 @@
     </thead>
     <tbody>
     <tr *ngFor="let user of userPages.pageItems; index as i">
-      <td>{{i+userPages.startRow}}</td>
+      <td><ng-container *ngIf="userPages.startRow!==undefined">{{i+userPages.startRow}}</ng-container></td>
       <td>{{user.id}}</td>
       <td>
         <img src="{{user.avatar}}?size=64" *ngIf="user.avatar" class="ui image avatar">
@@ -86,7 +86,7 @@
 
     <div class="ui menu right floated secondary fitted">
       <div class="item">
-        Showing {{userPages.startRow}}-{{userPages.endRow}} Rows, Total: {{userPages.items.length}}
+        Showing {{userPages.startRow}}-{{userPages.endRow}} Rows, Total: {{userPages.items?.length}}
       </div>
       <div class="item">
         <form class="ui form">

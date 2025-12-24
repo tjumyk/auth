@@ -24,10 +24,10 @@
                    required minlength="3" maxlength="16" pattern="^[\w]{3,16}$"
                    [(ngModel)]="form.name" #name_model="ngModel">
             <div class="errors" *ngIf="name_model.errors">
-              <label *ngIf="name_model.errors.required"><i class="times icon"></i> Name is required</label>
-              <label *ngIf="name_model.errors.minlength"><i class="times icon"></i> At least 3 characters</label>
-              <label *ngIf="name_model.errors.maxlength"><i class="times icon"></i> At most 16 characters</label>
-              <label *ngIf="name_model.errors.pattern"><i class="times icon"></i> Invalid format</label>
+              <label *ngIf="name_model.errors['required']"><i class="times icon"></i> Name is required</label>
+              <label *ngIf="name_model.errors['minlength']"><i class="times icon"></i> At least 3 characters</label>
+              <label *ngIf="name_model.errors['maxlength']"><i class="times icon"></i> At most 16 characters</label>
+              <label *ngIf="name_model.errors['pattern']"><i class="times icon"></i> Invalid format</label>
             </div>
           </div>
           <div class="field"
@@ -37,8 +37,8 @@
                    required maxlength="128"
                    [(ngModel)]="form.redirect_url" #redirect_url_model="ngModel">
             <div class="errors" *ngIf="redirect_url_model.errors">
-              <label *ngIf="redirect_url_model.errors.required"><i class="times icon"></i> Redirect URL is required</label>
-              <label *ngIf="redirect_url_model.errors.maxlength"><i class="times icon"></i> At most 128 characters</label>
+              <label *ngIf="redirect_url_model.errors['required']"><i class="times icon"></i> Redirect URL is required</label>
+              <label *ngIf="redirect_url_model.errors['maxlength']"><i class="times icon"></i> At most 128 characters</label>
             </div>
           </div>
           <div class="field"
@@ -48,8 +48,8 @@
                        required maxlength="128"
                        [(ngModel)]="form.home_url" #home_url_model="ngModel">
             <div class="errors" *ngIf="home_url_model.errors">
-              <label *ngIf="home_url_model.errors.required"><i class="times icon"></i> Home URL is required</label>
-              <label *ngIf="home_url_model.errors.maxlength"><i class="times icon"></i> At most 128 characters</label>
+              <label *ngIf="home_url_model.errors['required']"><i class="times icon"></i> Home URL is required</label>
+              <label *ngIf="home_url_model.errors['maxlength']"><i class="times icon"></i> At most 128 characters</label>
             </div>
           </div>
           <div class="field"
@@ -59,7 +59,7 @@
                        maxlength="256"
                        [(ngModel)]="form.description" #desc_model="ngModel"></textarea>
             <div class="errors" *ngIf="desc_model.errors">
-              <label *ngIf="desc_model.errors.maxlength"><i class="times icon"></i> At most 256 characters</label>
+              <label *ngIf="desc_model.errors['maxlength']"><i class="times icon"></i> At most 256 characters</label>
             </div>
           </div>
           <button type="submit" class="ui primary fluid button" i18n>Add</button>

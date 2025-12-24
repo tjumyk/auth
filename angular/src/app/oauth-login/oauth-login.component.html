@@ -53,7 +53,7 @@
                      [(ngModel)]="form.name_or_email" name="name_or_email" #name_or_email="ngModel">
             </div>
             <div *ngIf="name_or_email.errors" class="errors">
-              <label *ngIf="name_or_email.errors.required"><i class="times icon"></i> <ng-container i18n>Username or E-mail address is required</ng-container> </label>
+              <label *ngIf="name_or_email.errors['required']"><i class="times icon"></i> <ng-container i18n>Username or E-mail address is required</ng-container> </label>
             </div>
           </div>
           <div class="field" [ngClass]="{'error': password.invalid && (f.submitted || password.dirty || password.touched)}">
@@ -64,7 +64,7 @@
                      [(ngModel)]="form.password" name="password" #password="ngModel">
             </div>
             <div *ngIf="password.errors" class="errors">
-              <label *ngIf="password.errors.required"><i class="times icon"></i> <ng-container i18n>Password is required</ng-container> </label>
+              <label *ngIf="password.errors['required']"><i class="times icon"></i> <ng-container i18n>Password is required</ng-container> </label>
             </div>
           </div>
           <div class="ui field">

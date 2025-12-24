@@ -1,24 +1,30 @@
 import {Component, OnInit} from '@angular/core';
 import {BasicError} from "../models";
-import {NgForm} from "@angular/forms";
+import {FormsModule, NgForm} from "@angular/forms";
 import {AdminService} from "../admin.service";
 import {finalize} from "rxjs/operators";
 import {ActivatedRoute, Router} from "@angular/router";
 import {TitleService} from "../title.service";
+import {NgClass, NgIf} from "@angular/common";
 
 class NewGroupForm {
-  name: string;
-  description: string;
+  name: string | undefined;
+  description: string | undefined;
 }
 
 @Component({
   selector: 'app-admin-account-group-new',
   templateUrl: './admin-account-group-new.component.html',
+  imports: [
+    FormsModule,
+    NgClass,
+    NgIf
+  ],
   styleUrls: ['./admin-account-group-new.component.less']
 })
 export class AdminAccountGroupNewComponent implements OnInit {
-  error: BasicError;
-  requesting: boolean;
+  error: BasicError | undefined;
+  requesting: boolean | undefined;
 
   form: NewGroupForm = new NewGroupForm();
 
@@ -35,7 +41,7 @@ export class AdminAccountGroupNewComponent implements OnInit {
   }
 
   newGroup(f: NgForm) {
-    if (f.invalid)
+    if (f.invalid || this.form.name === undefined || this.form.description === undefined)
       return;
 
     this.error = undefined;
@@ -43,9 +49,9 @@ export class AdminAccountGroupNewComponent implements OnInit {
     this.requesting = true;
     this.adminService.add_group(this.form.name, this.form.description).pipe(
       finalize(() => this.requesting = false)
-    ).subscribe(
-      (group) => this.router.navigate([`../g/${group.id}`], {relativeTo: this.route}),
-      (error) => this.error = error.error
-    )
+    ).subscribe({
+      next: (group) => this.router.navigate([`../g/${group.id}`], {relativeTo: this.route}),
+      error: (error) => this.error = error.error
+    })
   }
 }

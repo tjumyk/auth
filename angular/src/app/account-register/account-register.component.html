@@ -35,10 +35,10 @@
                  [(ngModel)]="form.name" #name_model="ngModel">
         </div>
         <div class="errors" *ngIf="name_model.errors">
-          <label *ngIf="name_model.errors.required"><i class="times icon"></i> Name is required</label>
-          <label *ngIf="name_model.errors.minlength"><i class="times icon"></i> At least 3 characters</label>
-          <label *ngIf="name_model.errors.maxlength"><i class="times icon"></i> At most 16 characters</label>
-          <label *ngIf="name_model.errors.pattern"><i class="times icon"></i> Invalid format</label>
+          <label *ngIf="name_model.errors['required']"><i class="times icon"></i> Name is required</label>
+          <label *ngIf="name_model.errors['minlength']"><i class="times icon"></i> At least 3 characters</label>
+          <label *ngIf="name_model.errors['maxlength']"><i class="times icon"></i> At most 16 characters</label>
+          <label *ngIf="name_model.errors['pattern']"><i class="times icon"></i> Invalid format</label>
         </div>
       </div>
       <div class="field"
@@ -50,9 +50,9 @@
                  [(ngModel)]="form.email" #email_model="ngModel">
         </div>
         <div class="errors" *ngIf="email_model.errors">
-          <label *ngIf="email_model.errors.required"><i class="times icon"></i> E-mail is required</label>
-          <label *ngIf="email_model.errors.maxlength"><i class="times icon"></i> At most 64 characters</label>
-          <label *ngIf="email_model.errors.email"><i class="times icon"></i> Invalid E-mail format</label>
+          <label *ngIf="email_model.errors['required']"><i class="times icon"></i> E-mail is required</label>
+          <label *ngIf="email_model.errors['maxlength']"><i class="times icon"></i> At most 64 characters</label>
+          <label *ngIf="email_model.errors['email']"><i class="times icon"></i> Invalid E-mail format</label>
         </div>
       </div>
 

@@ -43,7 +43,7 @@
               <div class="ui small labels">
                 <a class="ui basic label" *ngFor="let group of user.groups" routerLink="../../../groups/g/{{group.id}}" title="{{group.description}}" >{{group.name}}</a>
               </div>
-              <span *ngIf="user.groups.length==0" class="text muted" i18n>(None)</span>
+              <span *ngIf="user.groups?.length==0" class="text muted" i18n>(None)</span>
             </div>
             <div class="item">
               <div class="header" i18n>Auth Provider</div>
@@ -161,9 +161,9 @@
                      minlength="3" maxlength="16" pattern="^[ \w\-]{3,16}$"
                      [(ngModel)]="form.nickname" name="nickname" #nickname_model="ngModel">
               <div *ngIf="nickname_model.errors" class="errors">
-                <label *ngIf="nickname_model.errors.minlength"><i class="times icon"></i>At least 3 characters</label>
-                <label *ngIf="nickname_model.errors.maxlength"><i class="times icon"></i>At most 16 characters</label>
-                <label *ngIf="nickname_model.errors.pattern"><i class="times icon"></i>Invalid format</label>
+                <label *ngIf="nickname_model.errors['minlength']"><i class="times icon"></i>At least 3 characters</label>
+                <label *ngIf="nickname_model.errors['maxlength']"><i class="times icon"></i>At most 16 characters</label>
+                <label *ngIf="nickname_model.errors['pattern']"><i class="times icon"></i>Invalid format</label>
               </div>
             </div>
             <button class="ui primary fluid submit button" type="submit" i18n>Update Profile</button>
@@ -209,8 +209,11 @@
         <tr *ngFor="let record of user.authorizations; index as i">
           <td>
             <a routerLink="/admin/oauth/clients/c/{{record.client_id}}">
-              <img [src]="record.client.icon" *ngIf="record.client.icon" class="ui image client">
-              {{record.client.name}}
+              <ng-container *ngIf="record.client; else missingClient">
+                <img [src]="record.client.icon" *ngIf="record.client.icon" class="ui image client">
+                {{record.client.name}}
+              </ng-container>
+              <ng-template #missingClient>(Missing Client Info: {{record.client_id}})</ng-template>
             </a>
           </td>
           <td>{{record.created_at | date:'short'}}</td>
@@ -240,7 +243,7 @@
           <td>{{record.time | date:'short'}}</td>
           <td class="ip">
             {{record.ip}}
-            <i class="flag" *ngIf="record.country?.iso_code" [ngClass]="record.country.iso_code|lowercase"
+            <i class="flag" *ngIf="record.country && record.country.iso_code" [ngClass]="record.country.iso_code|lowercase"
                [title]="record.country.name" (click)="lookupIPInfo(record.ip, btnLookupIPInfo)" #btnLookupIPInfo></i>
           </td>
           <td [title]="record.user_agent">

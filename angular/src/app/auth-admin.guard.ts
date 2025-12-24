@@ -18,11 +18,13 @@ export class AuthAdminGuard implements CanActivate {
     next: ActivatedRouteSnapshot,
     state: RouterStateSnapshot): Observable<boolean> | Promise<boolean> | boolean {
     return this.accountService.get_current_user().pipe(
-      map((user: User) => {
+      map((user: User | undefined) => {
         if (user != null){
-          for(let group of user.groups){
-            if(group.name == 'admin'){
-              return true;
+          if(user.groups){
+            for(let group of user.groups){
+              if(group.name == 'admin'){
+                return true;
+              }
             }
           }
           this.router.navigate(['/forbidden']);

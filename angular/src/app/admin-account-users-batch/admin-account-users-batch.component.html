@@ -138,15 +138,15 @@
     <!--Progress-->
     <div *ngIf="processing">
       <div class="ui progress">
-        <div class="bar" [ngStyle]="{'width.%': processed/userItems.length*100}">
+        <div *ngIf="processed !== undefined" class="bar" [ngStyle]="{'width.%': processed/userItems.length*100}">
           <div class="progress">{{processed/userItems.length|percent}}</div>
         </div>
         <div class="label">
           <span *ngIf="findingUsers" i18n>Finding users</span>
           <span *ngIf="invitingUsers" i18n>Inviting users</span>
           <span *ngIf="deletingUsers" i18n>Deleting users</span>
-          <span *ngIf="addingUsersToGroup">Adding users to group "{{selectedGroup.name}}"</span>
-          <span *ngIf="removingUsersFromGroup">Removing users from group "{{selectedGroup.name}}"</span>
+          <span *ngIf="addingUsersToGroup">Adding users to group <ng-container *ngIf="selectedGroup">"{{selectedGroup.name}}"</ng-container></span>
+          <span *ngIf="removingUsersFromGroup">Removing users from group <ng-container *ngIf="selectedGroup">"{{selectedGroup.name}}"</ng-container></span>
           ({{processed}}/{{userItems.length}})
         </div>
       </div>
@@ -169,21 +169,24 @@
           {{item.clientError.detail}}
         </td>
         <ng-template #noClientError>
-          <td>
-            <a href="admin/account/users/u/{{item.user.id}}" target="_blank" *ngIf="item.user; else noUserData">{{item.form.name}}</a>
-            <ng-template #noUserData>{{item.form.name}}</ng-template>
-          </td>
-          <td>{{item.form.email}}</td>
-          <td [ngClass]="{'error': item.serverError, 'positive': item.success}">
-            <div *ngIf="item.processing">Processing... <i class="icon loading notched circle"></i></div>
-            <div *ngIf="item.waiting">Waiting... <i class="icon hourglass half"></i></div>
-            <div *ngIf="item.success">{{item.success}}</div>
-            <div *ngIf="item.serverError">
-              <div><b>{{item.serverError.msg}}</b></div>
-              {{item.serverError.detail}}
-            </div>
-          </td>
+          <ng-container *ngIf="item.form; else noFormInfo">
+            <td>
+              <a href="admin/account/users/u/{{item.user.id}}" target="_blank" *ngIf="item.user; else noUserData">{{item.form.name}}</a>
+              <ng-template #noUserData>{{item.form.name}}</ng-template>
+            </td>
+            <td>{{item.form.email}}</td>
+            <td [ngClass]="{'error': item.serverError, 'positive': item.success}">
+              <div *ngIf="item.processing">Processing... <i class="icon loading notched circle"></i></div>
+              <div *ngIf="item.waiting">Waiting... <i class="icon hourglass half"></i></div>
+              <div *ngIf="item.success">{{item.success}}</div>
+              <div *ngIf="item.serverError">
+                <div><b>{{item.serverError.msg}}</b></div>
+                {{item.serverError.detail}}
+              </div>
+            </td>
+          </ng-container>
         </ng-template>
+        <ng-template #noFormInfo>(Missing form info)</ng-template>
       </tr>
       </tbody>
     </table>

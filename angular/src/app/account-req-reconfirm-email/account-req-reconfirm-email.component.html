@@ -14,7 +14,7 @@
                [(ngModel)]="name_or_email" name="name_or_email" #name_model="ngModel">
       </div>
       <div *ngIf="name_model.errors" class="errors">
-        <label *ngIf="name_model.errors.required"><i class="times icon"></i> <ng-container i18n>Username or E-mail address is required</ng-container> </label>
+        <label *ngIf="name_model.errors['required']"><i class="times icon"></i> <ng-container i18n>Username or E-mail address is required</ng-container> </label>
       </div>
     </div>
     <button class="ui fluid large primary submit button" type="submit" i18n>Reconfirm E-mail</button>

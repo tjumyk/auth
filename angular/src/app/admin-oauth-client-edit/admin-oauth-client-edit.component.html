@@ -102,8 +102,8 @@
                      required maxlength="128"
                      [(ngModel)]="form.redirect_url" #redirect_url_model="ngModel">
               <div class="errors" *ngIf="redirect_url_model.errors">
-                <label *ngIf="redirect_url_model.errors.required"><i class="times icon"></i> Redirect URL is required</label>
-                <label *ngIf="redirect_url_model.errors.maxlength"><i class="times icon"></i> At most 128 characters</label>
+                <label *ngIf="redirect_url_model.errors['required']"><i class="times icon"></i> Redirect URL is required</label>
+                <label *ngIf="redirect_url_model.errors['maxlength']"><i class="times icon"></i> At most 128 characters</label>
               </div>
             </div>
             <div class="field"
@@ -113,8 +113,8 @@
                      required maxlength="128"
                      [(ngModel)]="form.home_url" #home_url_model="ngModel">
               <div class="errors" *ngIf="home_url_model.errors">
-                <label *ngIf="home_url_model.errors.required"><i class="times icon"></i> Home URL is required</label>
-                <label *ngIf="home_url_model.errors.maxlength"><i class="times icon"></i> At most 128 characters</label>
+                <label *ngIf="home_url_model.errors['required']"><i class="times icon"></i> Home URL is required</label>
+                <label *ngIf="home_url_model.errors['maxlength']"><i class="times icon"></i> At most 128 characters</label>
               </div>
             </div>
             <div class="field"
@@ -124,7 +124,7 @@
                          maxlength="256"
                          [(ngModel)]="form.description" #desc_model="ngModel"></textarea>
               <div class="errors" *ngIf="desc_model.errors">
-                <label *ngIf="desc_model.errors.maxlength"><i class="times icon"></i> At most 256 characters</label>
+                <label *ngIf="desc_model.errors['maxlength']"><i class="times icon"></i> At most 256 characters</label>
               </div>
             </div>
 
@@ -271,9 +271,14 @@
         <thead><tr><th>#</th><th i18n>User ID</th><th i18n>User Name</th><th i18n>Created At</th><th i18n>Updated At</th></tr></thead>
         <tbody>
         <tr *ngFor="let record of authorizationPages.pageItems; index as i">
-          <td>{{i+authorizationPages.startRow}}</td>
+          <td><ng-container *ngIf="authorizationPages.startRow !== undefined">{{i+authorizationPages.startRow}}</ng-container></td>
           <td>{{record.user_id}}</td>
-          <td><a routerLink="../../../../account/users/u/{{record.user_id}}">{{record.user.name}}</a></td>
+          <td>
+            <ng-container *ngIf="record.user; else missingUserInfo">
+              <a routerLink="../../../../account/users/u/{{record.user_id}}">{{record.user.name}}</a>
+            </ng-container>
+            <ng-template #missingUserInfo>(Missing user info)</ng-template>
+          </td>
           <td>{{record.created_at | date:'short'}}</td>
           <td>{{record.modified_at | date:'short'}}</td>
         </tr>
@@ -282,7 +287,7 @@
       <div class="ui segment bottom attached clearing">
         <div class="ui secondary fitted menu right floated">
           <div class="item">
-            Showing {{authorizationPages.startRow}}-{{authorizationPages.endRow}} Rows, Total: {{authorizationPages.items.length}}
+            Showing {{authorizationPages.startRow}}-{{authorizationPages.endRow}} Rows, Total: {{authorizationPages.items?.length}}
           </div>
           <div class="item">
             <form class="ui form">

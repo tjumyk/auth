@@ -1,26 +1,33 @@
 import {Component, OnInit} from '@angular/core';
 import {AccountService} from "../account.service";
 import {BasicError, User} from "../models";
-import {ActivatedRoute, Router} from "@angular/router";
+import {ActivatedRoute, Router, RouterLink} from "@angular/router";
 import {finalize} from "rxjs/operators";
-import {NgForm} from "@angular/forms";
+import {FormsModule, NgForm} from "@angular/forms";
 import {TitleService} from "../title.service";
+import {NgClass, NgIf} from "@angular/common";
 
 class RegisterForm {
-  name: string;
-  email: string;
+  name: string | undefined;
+  email: string | undefined;
 }
 
 @Component({
   selector: 'app-account-register',
   templateUrl: './account-register.component.html',
+  imports: [
+    NgIf,
+    NgClass,
+    FormsModule,
+    RouterLink
+  ],
   styleUrls: ['./account-register.component.less']
 })
 export class AccountRegisterComponent implements OnInit {
-  verifying_logged_in: boolean;
-  registering: boolean;
-  error: BasicError;
-  register_success: boolean;
+  verifying_logged_in: boolean | undefined;
+  registering: boolean | undefined;
+  error: BasicError | undefined;
+  register_success: boolean | undefined;
 
   form: RegisterForm = {
     name: undefined,
@@ -42,33 +49,33 @@ export class AccountRegisterComponent implements OnInit {
     this.verifying_logged_in = true;
     this.accountService.get_current_user().pipe(
       finalize(() => this.verifying_logged_in = false)
-    ).subscribe(
-      user => {
+    ).subscribe({
+      next: user => {
         if (user != null) {
           this.afterLogin(user)
         }
       },
-      error => this.error = error.error
-    )
+      error: error => this.error = error.error
+    })
   }
 
   register(f: NgForm): void {
-    if (f.invalid)
+    if (f.invalid || this.form.name === undefined || this.form.email === undefined)
       return;
 
     this.error = undefined;
     this.registering = true;
     this.accountService.register(this.form.name, this.form.email).pipe(
       finalize(() => this.registering = false)
-    ).subscribe(
-      (user: User) => {
+    ).subscribe({
+      next: (user: User) => {
         this.register_success = true;
       },
-      (error) => this.error = error.error
-    );
+      error: (error) => this.error = error.error
+    });
   }
 
-  afterLogin(user: User){
+  afterLogin(user: User) {
     let redirect = this.route.snapshot.queryParamMap.get('redirect') || "/";
     this.router.navigate([redirect], {replaceUrl: true})
   }

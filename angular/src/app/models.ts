@@ -1,9 +1,9 @@
-export class BasicError {
+export interface BasicError {
   msg: string;
   detail?: string;
 }
 
-export class User {
+export interface User {
   id: number;
   name: string;
   email: string;
@@ -19,14 +19,14 @@ export class User {
   authorizations?: OAuthAuthorization[];
 }
 
-export class UserAdvanced extends User {
+export interface UserAdvanced extends User {
   created_at: string;
   modified_at: string;
   email_confirmed_at: string;
   is_email_confirmed: boolean;
 }
 
-export class Group {
+export interface Group {
   id: number;
   name: string;
   description: string;
@@ -36,13 +36,13 @@ export class Group {
   allowed_clients?: OAuthClient[];
 }
 
-export class GroupAdvanced extends Group {
+export interface GroupAdvanced extends Group {
   created_at: string;
   modified_at: string;
 }
 
 
-export class LoginRecord {
+export interface LoginRecord {
   id: number;
   user_id: number;
   time: string;
@@ -52,14 +52,17 @@ export class LoginRecord {
   reason: string;
 
   country?: IPCountryInfo;
+
+  _ua_os_icon?: string;
+  _ua_browser_icon?: string;
 }
 
-export class IPCountryInfo {
+export interface IPCountryInfo {
   name: string;
   iso_code: string;
 }
 
-export class OAuthClient {
+export interface OAuthClient {
   id: number;
   name: string;
   is_public: boolean;
@@ -70,7 +73,7 @@ export class OAuthClient {
   _is_ip_blocked: boolean;
 }
 
-export class OAuthClientAdvanced extends OAuthClient {
+export interface OAuthClientAdvanced extends OAuthClient {
   created_at: string;
   modified_at: string;
   secret: string;
@@ -78,7 +81,7 @@ export class OAuthClientAdvanced extends OAuthClient {
   allowed_groups: Group[];
 }
 
-export class OAuthAuthorization {
+export interface OAuthAuthorization {
   client_id: number;
   user_id: number;
   created_at: string;
@@ -88,7 +91,7 @@ export class OAuthAuthorization {
   user?: User;
 }
 
-export class IPInfo{
+export interface IPInfo{
   country?: string;
   country_code?: string;
   region?: string;
@@ -101,7 +104,7 @@ export class IPInfo{
   hostname?: string;
 }
 
-export class ExternalUserInfoResult{
+export interface ExternalUserInfoResult{
   id: string;
   name: string;
   type: string;
@@ -109,11 +112,11 @@ export class ExternalUserInfoResult{
   error?: BasicError;
 }
 
-export class TwoFactorSetupInfo{
+export interface TwoFactorSetupInfo{
   qr_code: string;
 }
 
-export class ExternalAuthProvider{
+export interface ExternalAuthProvider{
   id: string;
   name: string;
   description?:string;
@@ -121,18 +124,11 @@ export class ExternalAuthProvider{
   reset_password_url?: string;
 }
 
-export class SendEmailForm{
-  subject: string;
-  receivers: string;
-  receiver_groups: string;
-  body: string;
-}
-
-export class SendEmailResponse{
+export interface SendEmailResponse{
   num_recipients: number;
 }
 
-export class VersionInfo{
+export interface VersionInfo{
   commit: string;
 }
 

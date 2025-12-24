@@ -5,7 +5,7 @@
     	<a class='link' href='https://github.com/tjumyk/'>Home Page</a>
     </mj-text>
     <mj-text align="center" color='#5f5f5f'>
-      &copy; 2024 Yukai (Kelvin) Miao.
+      {{site[copyright]}}
     </mj-text>
   </mj-column>
 

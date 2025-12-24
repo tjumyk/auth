@@ -1,40 +1,49 @@
 import {Component, OnInit} from '@angular/core';
 import {AccountService} from "../account.service";
-import {ActivatedRoute, Router} from "@angular/router";
-import {NgForm} from "@angular/forms";
+import {ActivatedRoute, Router, RouterLink} from "@angular/router";
+import {FormsModule, NgForm} from "@angular/forms";
 import {BasicError, OAuthClient, User} from "../models";
 import {finalize} from "rxjs/operators";
 import {OauthService} from "../oauth.service";
 import {TitleService} from "../title.service";
+import {NgClass, NgIf} from "@angular/common";
+import {TwoFactorLoginBoxComponent} from "../two-factor-login-box/two-factor-login-box.component";
 
 class LoginForm {
-  name_or_email: string;
-  password: string;
+  name_or_email: string | undefined;
+  password: string | undefined;
   remember: boolean = false;
 }
 
 @Component({
   selector: 'app-oauth-login',
   templateUrl: './oauth-login.component.html',
+  imports: [
+    NgIf,
+    TwoFactorLoginBoxComponent,
+    NgClass,
+    FormsModule,
+    RouterLink
+  ],
   styleUrls: ['./oauth-login.component.less']
 })
 export class OauthLoginComponent implements OnInit {
-  verifying_logged_in: boolean;
-  loading_client: boolean;
-  starting_authorization: boolean;
-  start_authorization_success: boolean;
-  logging_in: boolean;
-  error: BasicError;
+  verifying_logged_in: boolean | undefined;
+  loading_client: boolean | undefined;
+  starting_authorization: boolean | undefined;
+  start_authorization_success: boolean | undefined;
+  logging_in: boolean | undefined;
+  error: BasicError | undefined;
 
-  client_id: number;
-  redirect_url: string;
-  original_path: string;
-  state: string;
+  client_id: number | undefined;
+  redirect_url: string | undefined | null;
+  original_path: string | undefined | null;
+  state: string | undefined | null;
 
-  user: User;
-  client: OAuthClient;
+  user: User | undefined;
+  client: OAuthClient | undefined;
 
-  show_two_factor: boolean;
+  show_two_factor: boolean | undefined;
 
   form: LoginForm = {
     name_or_email: undefined,
@@ -55,12 +64,13 @@ export class OauthLoginComponent implements OnInit {
     this.titleService.setTitle('OAuth Sign In');
 
     let params = this.route.snapshot.queryParamMap;
-    this.client_id = parseInt(params.get('client_id'));
+    const _client_id = params.get('client_id');
+    this.client_id = _client_id ? parseInt(_client_id) : undefined;
     this.redirect_url = params.get('redirect_url');
     this.original_path = params.get('original_path');
     this.state = params.get('state');
 
-    if (isNaN(this.client_id) || !this.redirect_url) {
+    if (this.client_id === undefined || isNaN(this.client_id) || !this.redirect_url) {
       this.error = {msg: 'wrong url parameters'};
       return; // stop the following initialisations
     }
@@ -73,68 +83,78 @@ export class OauthLoginComponent implements OnInit {
     this.verifying_logged_in = true;
     this.accountService.get_current_user().pipe(
       finalize(() => this.verifying_logged_in = false)
-    ).subscribe(
-      user => {
+    ).subscribe({
+      next: user => {
         this.user = user;
         if (user == null)
           this.loadClient(); // only load client info if user need to wait at login page
         else
           this.oauthConnect() // when auto connect, skip loading client info
       },
-      error => this.error = error.error
-    )
+      error: error => this.error = error.error
+    })
   }
 
   private loadClient() {
     this.error = undefined;
+    if (this.client_id === undefined) {
+      return;
+    }
+
     this.loading_client = true;
     this.oauthService.get_client(this.client_id).pipe(
       finalize(() => this.loading_client = false)
-    ).subscribe(
-      client => {
+    ).subscribe({
+      next: client => {
         this.client = client;
         this.titleService.setTitle(client.name, 'OAuth Sign In');
       },
-      error => this.error = error.error
-    )
+      error: error => this.error = error.error
+    })
   }
 
   login(f: NgForm): void {
-    if (f.invalid)
+    if (f.invalid || this.form.name_or_email === undefined || this.form.password === undefined)
       return;
 
     this.error = undefined;
     this.logging_in = true;
     this.accountService.login(this.form.name_or_email, this.form.password, this.form.remember).pipe(
       finalize(() => this.logging_in = false)
-    ).subscribe(
-      (user) => {
-        if(user.is_two_factor_enabled){
+    ).subscribe({
+      next: (user) => {
+        if (user.is_two_factor_enabled) {
           this.show_two_factor = true;
-        }else{
+        } else {
           this.afterLogin(user)
         }
       },
-      (error) => this.error = error.error
-    );
+      error: (error) => this.error = error.error
+    });
   }
 
-  afterLogin(user: User){
+  afterLogin(user: User) {
     this.user = user;
     this.oauthConnect()
   }
 
   oauthConnect() {
+    if (this.client_id === undefined || this.redirect_url === undefined || this.redirect_url === null) {
+      return;
+    }
+
     this.starting_authorization = true;
     this.oauthService.connect(this.client_id, this.redirect_url, this.original_path, this.state).pipe(
       finalize(() => this.starting_authorization = false)
-    ).subscribe(
-      (result) => {
+    ).subscribe({
+      next: (result) => {
         this.start_authorization_success = true;
-        window.location.href = result.redirect_url
+        if(result.redirect_url){
+          window.location.href = result.redirect_url
+        }
       },
-      (error) => this.error = error.error
-    )
+      error: (error) => this.error = error.error
+    })
   }
 
 }

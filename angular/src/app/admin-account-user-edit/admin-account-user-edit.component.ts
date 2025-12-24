@@ -1,10 +1,10 @@
 import {Component, OnInit} from '@angular/core';
-import {Location} from "@angular/common";
+import {DatePipe, DecimalPipe, Location, LowerCasePipe, NgClass, NgForOf, NgIf} from "@angular/common";
 import {BasicError, ExternalAuthProvider, ExternalUserInfoResult, LoginRecord, UserAdvanced} from "../models";
-import {NgForm} from "@angular/forms";
+import {FormsModule, NgForm} from "@angular/forms";
 import {UploadFilters, UploadValidator} from "../upload-util";
 import {finalize} from "rxjs/operators";
-import {ActivatedRoute, Router} from "@angular/router";
+import {ActivatedRoute, Router, RouterLink} from "@angular/router";
 import {AdminService} from "../admin.service";
 import {TitleService} from "../title.service";
 import {AccountService} from "../account.service";
@@ -14,53 +14,63 @@ import IOS = UAParser.IOS;
 
 
 class StatusForm {
-  is_active: boolean;
+  is_active: boolean | undefined;
 }
 
 class ProfileForm {
-  nickname: string;
+  nickname: string | undefined;
 }
 
 @Component({
   selector: 'app-admin-account-user-edit',
   templateUrl: './admin-account-user-edit.component.html',
+  imports: [
+    NgIf,
+    RouterLink,
+    DatePipe,
+    NgForOf,
+    NgClass,
+    FormsModule,
+    DecimalPipe,
+    LowerCasePipe
+  ],
   styleUrls: ['./admin-account-user-edit.component.less']
 })
 export class AdminAccountUserEditComponent implements OnInit {
-  loading_user: boolean;
-  updating_profile: boolean;
-  update_profile_success: boolean;
-  updating_avatar: boolean;
-  update_avatar_success: boolean;
-  requesting_reconfirm_email: boolean;
-  requesting_confirm_email_url: boolean;
+  loading_user: boolean | undefined;
+  updating_profile: boolean | undefined;
+  update_profile_success: boolean | undefined;
+  updating_avatar: boolean | undefined;
+  update_avatar_success: boolean | undefined;
+  requesting_reconfirm_email: boolean | undefined;
+  requesting_confirm_email_url: boolean | undefined;
 
   admin_operation_success: {
     msg: string,
     detail?: string
-  };
+  } | undefined;
 
-  error: BasicError;
-  update_profile_error: BasicError;
-  update_avatar_error: BasicError;
+  error: BasicError | undefined;
+  update_profile_error: BasicError | undefined;
+  update_avatar_error: BasicError | undefined;
 
-  loading_login_records: boolean;
+  loading_login_records: boolean | undefined;
   login_records: LoginRecord[] = [];
 
-  setting_active: boolean;
-  deleting: boolean;
-  impersonating: boolean;
+  setting_active: boolean | undefined;
+  deleting: boolean | undefined;
+  impersonating: boolean | undefined;
 
-  external_info: ExternalUserInfoResult[];
-  getting_external_info: boolean;
+  external_info: ExternalUserInfoResult[] | undefined;
+  getting_external_info: boolean | undefined;
 
   avatar_validator: UploadValidator;
 
-  user: UserAdvanced;
-  uid: number;
+  user: UserAdvanced | undefined;
+  uid: number | undefined;
   status_form: StatusForm = new StatusForm();
   form: ProfileForm = new ProfileForm();
-  provider: ExternalAuthProvider;
+  provider: ExternalAuthProvider | undefined;
 
   private ua_parser = new UAParser();
 
@@ -76,7 +86,8 @@ export class AdminAccountUserEditComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.uid = parseInt(this.route.snapshot.paramMap.get('uid'));
+    const _uid = this.route.snapshot.paramMap.get('uid');
+    this.uid = _uid ? parseInt(_uid) : undefined;
 
     this.loadUser();
     this.loadUserLoginRecords();
@@ -84,23 +95,33 @@ export class AdminAccountUserEditComponent implements OnInit {
 
   private loadUser() {
     this.error = undefined;
+    if (this.uid === undefined) {
+      return;
+    }
+
     this.loading_user = true;
     this.adminService.get_user(this.uid, true).pipe(
       finalize(() => this.loading_user = false)
-    ).subscribe(
-      (user) => this.setUser(user),
-      (error) => this.error = error.error
-    );
+    ).subscribe({
+      next: (user) => this.setUser(user),
+      error: (error) => this.error = error.error
+    });
   }
 
   private loadUserLoginRecords() {
+    if (this.uid === undefined) {
+      return;
+    }
     this.loading_login_records = true;
     this.adminService.get_user_login_records(this.uid, true).pipe(
       finalize(() => this.loading_login_records = false)
-    ).subscribe(
-      (records) => {
-        let ua_parsed = {};
+    ).subscribe({
+      next: (records) => {
+        let ua_parsed: { [key: string]: UAParser.IResult } = {};
         for (let r of records) {
+          if (r.user_agent === undefined) {
+            continue;
+          }
           let ua = ua_parsed[r.user_agent];
           if (!ua) {
             this.ua_parser.setUA(r.user_agent);
@@ -111,8 +132,8 @@ export class AdminAccountUserEditComponent implements OnInit {
         }
         this.login_records = records
       },
-      (error) => this.error = error.error
-    )
+      error: (error) => this.error = error.error
+    })
   }
 
   private getOSIcon(os: IOS) {
@@ -153,10 +174,10 @@ export class AdminAccountUserEditComponent implements OnInit {
     this.getExternalInfo();
 
     if (user.external_auth_provider_id) {
-      this.accountService.get_external_auth_provider(user.external_auth_provider_id).subscribe(
-        provider => this.provider = provider,
-        error => this.error = error.error
-      );
+      this.accountService.get_external_auth_provider(user.external_auth_provider_id).subscribe({
+        next: provider => this.provider = provider,
+        error: error => this.error = error.error
+      });
     }
   }
 
@@ -165,64 +186,80 @@ export class AdminAccountUserEditComponent implements OnInit {
     this.error = undefined;
     this.admin_operation_success = undefined;
 
+    if (this.uid === undefined) {
+      return
+    }
+
     this.requesting_reconfirm_email = true;
     this.adminService.reconfirm_email(this.uid).pipe(
       finalize(() => this.requesting_reconfirm_email = false)
-    ).subscribe(
-      () => {
+    ).subscribe({
+      next: () => {
         this.loadUser();
         this.admin_operation_success = {msg: 'Reconfirm E-mail process started'}
       },
-      (error) => this.error = error.error
-    )
+      error: (error) => this.error = error.error
+    })
   }
 
   getConfirmEmailURL() {
     this.error = undefined;
     this.admin_operation_success = undefined;
 
+    if (this.uid === undefined) {
+      return
+    }
+
     this.requesting_confirm_email_url = true;
     this.adminService.get_confirm_email_url(this.uid).pipe(
       finalize(() => this.requesting_confirm_email_url = false)
-    ).subscribe(
-      resp => {
+    ).subscribe({
+      next: resp => {
         this.admin_operation_success = {msg: 'E-mail Confirmation Link', detail: resp.url}
       },
-      error => this.error = error.error
-    )
+      error: error => this.error = error.error
+    })
   }
 
-  setActive(is_active) {
+  setActive(is_active: boolean) {
     this.error = undefined;
     this.admin_operation_success = undefined;
+
+    if (this.uid === undefined) {
+      return;
+    }
 
     this.setting_active = true;
     this.adminService.set_user_active(this.uid, is_active).pipe(
       finalize(() => this.setting_active = false)
-    ).subscribe(
-      () => {
+    ).subscribe({
+      next: () => {
         this.loadUser();
         this.admin_operation_success = {msg: 'User status updated successfully'}
       },
-      (error) => this.error = error.error
-    )
+      error: (error) => this.error = error.error
+    })
   }
 
   deleteUser() {
+    if (this.uid === undefined || this.user === undefined) {
+      return;
+    }
+
     if (!confirm(`Really want to delete user ${this.user.name}?`))
       return;
 
     this.deleting = true;
     this.adminService.delete_user(this.uid).pipe(
       finalize(() => this.deleting = false)
-    ).subscribe(
-      () => this.router.navigate(['../..'], {relativeTo: this.route}),
-      (error) => this.error = error.error
-    )
+    ).subscribe({
+      next: () => this.router.navigate(['../..'], {relativeTo: this.route}),
+      error: (error) => this.error = error.error
+    })
   }
 
   updateProfile(f: NgForm) {
-    if (f.invalid)
+    if (f.invalid || this.uid === undefined || this.form.nickname === undefined)
       return;
 
     this.update_profile_success = undefined;
@@ -231,24 +268,27 @@ export class AdminAccountUserEditComponent implements OnInit {
     this.updating_profile = true;
     this.adminService.update_user_profile(this.uid, this.form.nickname).pipe(
       finalize(() => this.updating_profile = false)
-    ).subscribe(
-      (user) => {
+    ).subscribe({
+      next: (user) => {
         this.setUser(user);
         this.update_profile_success = true
       },
-      (error) => this.update_profile_error = error.error
-    )
+      error: (error) => this.update_profile_error = error.error
+    })
   }
 
   uploadAvatar(input: HTMLInputElement) {
     let files = input.files;
-    if (files.length == 0)
+    if (files === null || files.length == 0 || this.uid === undefined)
       return;
 
     this.update_avatar_success = undefined;
     this.update_avatar_error = undefined;
 
     let file = files.item(0);
+    if (file === null) {
+      return;
+    }
     if (!this.avatar_validator.check(file)) {
       input.value = '';  // reset
       this.update_avatar_error = this.avatar_validator.error;
@@ -261,16 +301,20 @@ export class AdminAccountUserEditComponent implements OnInit {
         this.updating_avatar = false;
         input.value = '';  // reset
       })
-    ).subscribe(
-      (user) => {
+    ).subscribe({
+      next: (user) => {
         this.setUser(user);
         this.update_avatar_success = true
       },
-      (error) => this.update_avatar_error = error.error
-    )
+      error: (error) => this.update_avatar_error = error.error
+    })
   }
 
   impersonateUser() {
+    if (this.uid === undefined || this.user === undefined) {
+      return;
+    }
+
     if (!confirm(`You will log out from the current account and log in as ${this.user.name}.\nContinue?`))
       return;
 
@@ -279,13 +323,13 @@ export class AdminAccountUserEditComponent implements OnInit {
       finalize(() => {
         this.impersonating = false;
       })
-    ).subscribe(
-      () => {
+    ).subscribe({
+      next: () => {
         this.location.go('/');
         window.location.reload();
       },
-      error => this.error = error.error
-    )
+      error: error => this.error = error.error
+    })
   }
 
   lookupIPInfo(ip_addr: string, btn: HTMLElement) {
@@ -294,22 +338,26 @@ export class AdminAccountUserEditComponent implements OnInit {
       finalize(() => {
         btn.classList.remove('disabled', 'loading');
       })
-    ).subscribe(
-      info => {
+    ).subscribe({
+      next: info => {
         alert(JSON.stringify(info, null, 4))
       },
-      error => this.error = error.error
-    )
+      error: error => this.error = error.error
+    })
   }
 
   getExternalInfo() {
+    if (this.uid === undefined) {
+      return;
+    }
+
     this.getting_external_info = true;
     this.adminService.get_user_external_info(this.uid).pipe(
       finalize(() => this.getting_external_info = false)
-    ).subscribe(
-      info => this.external_info = info,
-      error => this.error = error.error
-    )
+    ).subscribe({
+      next: info => this.external_info = info,
+      error: error => this.error = error.error
+    })
   }
 
 }

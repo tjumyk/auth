@@ -1,41 +1,50 @@
 import {Component, OnInit} from '@angular/core';
 import {BasicError, GroupAdvanced, UserAdvanced} from "../models";
 import {AdminService} from "../admin.service";
-import {ActivatedRoute, Router} from "@angular/router";
+import {ActivatedRoute, Router, RouterLink} from "@angular/router";
 import {debounceTime, distinctUntilChanged, finalize, switchMap} from "rxjs/operators";
-import {NgForm} from "@angular/forms";
+import {FormsModule, NgForm} from "@angular/forms";
 import {of, Subject} from "rxjs";
 import {TitleService} from "../title.service";
+import {DatePipe, NgClass, NgForOf, NgIf} from "@angular/common";
 
 class ProfileForm {
-  description: string;
+  description: string | undefined;
 }
 
 @Component({
   selector: 'app-admin-account-group-edit',
   templateUrl: './admin-account-group-edit.component.html',
+  imports: [
+    NgIf,
+    DatePipe,
+    FormsModule,
+    NgClass,
+    RouterLink,
+    NgForOf
+  ],
   styleUrls: ['./admin-account-group-edit.component.less']
 })
 export class AdminAccountGroupEditComponent implements OnInit {
-  error: BasicError;
-  loading_group: boolean;
-  loading_group_members: boolean;
-  updating_profile: boolean;
-  deleting: boolean;
+  error: BasicError | undefined;
+  loading_group: boolean | undefined;
+  loading_group_members: boolean | undefined;
+  updating_profile: boolean | undefined;
+  deleting: boolean | undefined;
 
-  update_profile_success: boolean;
-  update_profile_error: BasicError;
+  update_profile_success: boolean | undefined;
+  update_profile_error: BasicError | undefined;
 
-  add_member_error: BasicError;
-  added_member: UserAdvanced;
-  remove_member_error: BasicError;
-  removed_member: UserAdvanced;
+  add_member_error: BasicError | undefined;
+  added_member: UserAdvanced | undefined;
+  remove_member_error: BasicError | undefined;
+  removed_member: UserAdvanced | undefined;
 
-  group: GroupAdvanced;
-  members: UserAdvanced[];
-  gid: number;
+  group: GroupAdvanced | undefined;
+  members: UserAdvanced[] | undefined;
+  gid: number | undefined;
 
-  user_search_results: UserAdvanced[];
+  user_search_results: UserAdvanced[] | null | undefined;
   private user_search_names = new Subject<string>();
 
   form: ProfileForm = {
@@ -51,7 +60,8 @@ export class AdminAccountGroupEditComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.gid = parseInt(this.route.snapshot.paramMap.get('gid'));
+    const _gid = this.route.snapshot.paramMap.get('gid');
+    this.gid = _gid ? parseInt(_gid) : undefined;
 
     this.setupUserSearch();
     this.loadGroup();
@@ -67,34 +77,40 @@ export class AdminAccountGroupEditComponent implements OnInit {
           return of(null);
         return this.adminService.search_user_by_name(name, 10)
       })
-    ).subscribe(
-      (results) => this.user_search_results = results,
-      (error) => this.add_member_error = error.error
-    );
+    ).subscribe({
+      next: (results) => this.user_search_results = results,
+      error: (error) => this.add_member_error = error.error
+    });
   }
 
   private loadGroup() {
     this.error = undefined;
+    if (this.gid === undefined) {
+      return;
+    }
 
     this.loading_group = true;
     this.adminService.get_group(this.gid, true).pipe(
       finalize(() => this.loading_group = false)
-    ).subscribe(
-      (group) => this.setGroup(group),
-      (error) => this.error = error.error
-    );
+    ).subscribe({
+      next: (group) => this.setGroup(group),
+      error: (error) => this.error = error.error
+    });
   }
 
   private loadGroupMembers() {
     this.error = undefined;
+    if (this.gid === undefined) {
+      return
+    }
 
     this.loading_group_members = true;
     this.adminService.group_get_users(this.gid).pipe(
       finalize(() => this.loading_group_members = false)
-    ).subscribe(
-      (users) => this.members = users,
-      (error) => this.error = error.error
-    )
+    ).subscribe({
+      next: (users) => this.members = users,
+      error: (error) => this.error = error.error
+    })
   }
 
   private setGroup(group: GroupAdvanced) {
@@ -104,20 +120,23 @@ export class AdminAccountGroupEditComponent implements OnInit {
   }
 
   deleteGroup() {
+    if (this.group === undefined || this.gid === undefined) {
+      return;
+    }
     if (!confirm(`Really want to delete group ${this.group.name}?`))
       return;
 
     this.deleting = true;
     this.adminService.delete_group(this.gid).pipe(
       finalize(() => this.deleting = false)
-    ).subscribe(
-      () => this.router.navigate(['../..'], {relativeTo: this.route}),
-      (error) => this.error = error.error
-    )
+    ).subscribe({
+      next: () => this.router.navigate(['../..'], {relativeTo: this.route}),
+      error: (error) => this.error = error.error
+    })
   }
 
   updateProfile(f: NgForm) {
-    if (f.invalid)
+    if (f.invalid || this.gid === undefined || this.form.description === undefined)
       return;
 
     this.update_profile_error = undefined;
@@ -126,13 +145,13 @@ export class AdminAccountGroupEditComponent implements OnInit {
     this.updating_profile = true;
     this.adminService.update_group(this.gid, this.form.description).pipe(
       finalize(() => this.updating_profile = false)
-    ).subscribe(
-      (group) => {
+    ).subscribe({
+      next: (group) => {
         this.setGroup(group);
         this.update_profile_success = true;
       },
-      (error) => this.update_profile_error = error.error
-    )
+      error: (error) => this.update_profile_error = error.error
+    })
   }
 
   searchUser(name: string) {
@@ -143,38 +162,52 @@ export class AdminAccountGroupEditComponent implements OnInit {
     this.add_member_error = undefined;
     this.added_member = undefined;
 
+    if (this.gid === undefined) {
+      return;
+    }
+
     btn.classList.add('disabled', 'loading');
     this.adminService.group_add_user(this.gid, user.id).pipe(
       finalize(() => btn.classList.remove('disabled', 'loading'))
-    ).subscribe(
-      () => {
+    ).subscribe({
+      next: () => {
         this.added_member = user;
-        this.members.push(user);
+        if (this.members) {
+          this.members.push(user);
+        }
       },
-      (error) => this.add_member_error = error.error
-    )
+      error: (error) => this.add_member_error = error.error
+    })
   }
 
   removeUserFromGroup(user: UserAdvanced, index: number, btn: HTMLElement) {
     this.remove_member_error = undefined;
     this.removed_member = undefined;
 
+    if (this.gid === undefined) {
+      return;
+    }
+
     btn.classList.add('disabled', 'loading');
     this.adminService.group_remove_user(this.gid, user.id).pipe(
       finalize(() => btn.classList.remove('disabled', 'loading'))
-    ).subscribe(
-      () => {
-        this.members.splice(index, 1);
+    ).subscribe({
+      next: () => {
+        if (this.members) {
+          this.members.splice(index, 1);
+        }
         this.removed_member = user;
       },
-      (error) => this.remove_member_error = error.error
-    )
+      error: (error) => this.remove_member_error = error.error
+    })
   }
 
   alreadyInGroup(user: UserAdvanced): boolean {
-    for (let u of this.members) {
-      if (user.id == u.id)
-        return true;
+    if (this.members) {
+      for (let u of this.members) {
+        if (user.id == u.id)
+          return true;
+      }
     }
     return false;
   }

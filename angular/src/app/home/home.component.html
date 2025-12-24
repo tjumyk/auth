@@ -14,7 +14,7 @@
           </div>
         </h2>
 
-        <div class="ui warning message" *ngIf="isAdmin && !user.is_two_factor_enabled">
+        <div class="ui warning message" *ngIf="isAdmin && user && !user.is_two_factor_enabled">
           <div class="header"><i class="exclamation triangle icon"></i> <ng-container i18n>Please enable the Two-Factor Authentication!</ng-container></div>
           <p>Since admins have superpowers, we strongly suggest you enabling the Two-Factor Authentication to protect both your account and the systems.</p>
           <a class="ui button tiny" routerLink="/settings/two-factor" i18n>Enable it Now!</a>
@@ -73,9 +73,12 @@
             </p>
             <p>
               <a class="ui button basic" routerLink="/settings">
-                <img src="{{user.avatar}}?size=64" class="ui image avatar" *ngIf="user.avatar; else noAvatar">
-                <ng-template #noAvatar><i class="icon user circle"></i></ng-template>
-                {{user.nickname || user.name}}
+                <ng-container *ngIf="user; else missingUserInfo">
+                  <img src="{{user.avatar}}?size=64" class="ui image avatar" *ngIf="user.avatar; else noAvatar">
+                  <ng-template #noAvatar><i class="icon user circle"></i></ng-template>
+                  {{user.nickname || user.name}}
+                </ng-container>
+                <ng-template #missingUserInfo>(Missing User Info)</ng-template>
               </a>
             </p>
           </div>

@@ -1,6 +1,6 @@
 import {BasicError} from "./models";
 
-export class UploadFilter {
+export interface UploadFilter {
   readonly accept: string[];
   readonly accept_ext: string[];
   readonly size_limit: number
@@ -22,7 +22,7 @@ export class UploadFilters {
 }
 
 export class UploadValidator {
-  error: BasicError;
+  error: BasicError| undefined;
 
   constructor(readonly filter: UploadFilter) {
   }

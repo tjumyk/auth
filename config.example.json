@@ -22,7 +22,10 @@
     "name": "Identity",
     "root_url": "http://localhost:8077",
     "base_url": "/",
-    "behind_proxy": false
+    "behind_proxy": false,
+    "organization_name": "Default Organization",
+    "group_name": "Default Group",
+    "copyright": "&copy; 2024 Yukai (Kelvin) Miao."
   },
   "ADMIN": {
     "name": "admin",

@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 
-export class Logger {
+export interface Logger {
   debug: (message: any) => void;
   info: (message: any) => void;
   warn: (message: any) => void;
@@ -18,11 +18,11 @@ export class LogService {
   }
 
   get_logger(tag: string): Logger {
-    let logger = new Logger();
-    logger.debug = console.debug.bind(window.console, `%c${tag}%c %s`, this.css_tag + 'border-color: #767676;', this.css_message);
-    logger.info = console.info.bind(window.console, `%c${tag}%c %s`, this.css_tag + 'border-color: #2185d0;', this.css_message);
-    logger.warn = console.warn.bind(window.console, `%c${tag}%c %s`, this.css_tag + 'border-color: #db2828;', this.css_message);
-    logger.error = console.error.bind(window.console, `%c${tag}%c %s`, this.css_tag + 'border-color: #db2828;', this.css_message);
-    return logger
+    return {
+      debug: console.debug.bind(window.console, `%c${tag}%c %s`, this.css_tag + 'border-color: #767676;', this.css_message),
+      info: console.info.bind(window.console, `%c${tag}%c %s`, this.css_tag + 'border-color: #2185d0;', this.css_message),
+      warn: console.warn.bind(window.console, `%c${tag}%c %s`, this.css_tag + 'border-color: #db2828;', this.css_message),
+      error: console.error.bind(window.console, `%c${tag}%c %s`, this.css_tag + 'border-color: #db2828;', this.css_message),
+    }
   }
 }

@@ -1,29 +1,35 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {BasicError} from "../models";
 import {AdminService} from "../admin.service";
 import {ActivatedRoute, Router} from "@angular/router";
-import {NgForm} from "@angular/forms";
+import {FormsModule, NgForm} from "@angular/forms";
 import {finalize} from "rxjs/operators";
 import {TitleService} from "../title.service";
+import {NgClass, NgIf} from "@angular/common";
 
-class NewClientForm{
-  name: string;
-  redirect_url: string;
-  home_url: string;
-  description: string;
+class NewClientForm {
+  name: string | undefined;
+  redirect_url: string | undefined;
+  home_url: string | undefined;
+  description: string | undefined;
 }
 
 @Component({
   selector: 'app-admin-oauth-client-new',
   templateUrl: './admin-oauth-client-new.component.html',
+  imports: [
+    FormsModule,
+    NgClass,
+    NgIf
+  ],
   styleUrls: ['./admin-oauth-client-new.component.less']
 })
 export class AdminOauthClientNewComponent implements OnInit {
 
-  error: BasicError;
-  requesting: boolean;
+  error: BasicError | undefined;
+  requesting: boolean | undefined;
 
-  form: NewClientForm=new NewClientForm();
+  form: NewClientForm = new NewClientForm();
 
   constructor(
     private adminService: AdminService,
@@ -34,11 +40,12 @@ export class AdminOauthClientNewComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.titleService.setTitle('New OAuth Client',' Management')
+    this.titleService.setTitle('New OAuth Client', ' Management')
   }
 
   newClient(f: NgForm) {
-    if (f.invalid)
+    if (f.invalid || this.form.name === undefined || this.form.redirect_url === undefined
+      || this.form.home_url === undefined || this.form.description === undefined)
       return;
 
     this.error = undefined;
@@ -47,10 +54,10 @@ export class AdminOauthClientNewComponent implements OnInit {
     this.adminService.add_oauth_client(this.form.name, this.form.redirect_url, this.form.home_url,
       this.form.description).pipe(
       finalize(() => this.requesting = false)
-    ).subscribe(
-      (group) => this.router.navigate([`../c/${group.id}`], {relativeTo: this.route}),
-      (error) => this.error = error.error
-    )
+    ).subscribe({
+      next: (group) => this.router.navigate([`../c/${group.id}`], {relativeTo: this.route}),
+      error: (error) => this.error = error.error
+    })
   }
 
 }

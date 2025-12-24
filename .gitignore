@@ -9,3 +9,5 @@ static/
 static_cn/
 mailbox/
 upload/
+/stdout.log
+/stderr.log

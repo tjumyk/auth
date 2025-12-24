@@ -1,20 +1,25 @@
 import {Component, OnInit} from '@angular/core';
 import {TitleService} from "../title.service";
-import {AdminService} from "../admin.service";
-import {BasicError, SendEmailForm} from "../models";
-import {NgForm} from "@angular/forms";
+import {AdminService, SendEmailForm} from "../admin.service";
+import {BasicError} from "../models";
+import {FormsModule, NgForm} from "@angular/forms";
 import {finalize} from "rxjs/operators";
+import {NgIf} from "@angular/common";
 
 @Component({
   selector: 'app-admin-email-send',
   templateUrl: './admin-email-send.component.html',
+  imports: [
+    NgIf,
+    FormsModule
+  ],
   styleUrls: ['./admin-email-send.component.less']
 })
 export class AdminEmailSendComponent implements OnInit {
-  success: string;
-  error: BasicError;
+  success: string | undefined;
+  error: BasicError | undefined;
   form: SendEmailForm = new SendEmailForm();
-  sending: boolean;
+  sending: boolean | undefined;
 
   constructor(
     private titleService: TitleService,
@@ -32,11 +37,11 @@ export class AdminEmailSendComponent implements OnInit {
     this.sending = true;
     this.adminService.send_email(this.form).pipe(
       finalize(() => this.sending = false)
-    ).subscribe(
-      resp => {
+    ).subscribe({
+      next: resp => {
         this.success = `Email has been sent to ${resp.num_recipients} users`
       },
-      error => this.error = error.error
-    )
+      error: error => this.error = error.error
+    })
   }
 }

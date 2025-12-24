@@ -2,33 +2,41 @@ import {Component, OnInit} from '@angular/core';
 import {BasicError, User} from "../models";
 import {AccountService} from "../account.service";
 import {finalize} from "rxjs/operators";
-import {NgForm} from "@angular/forms";
+import {FormsModule, NgForm} from "@angular/forms";
 import {UploadFilters, UploadValidator} from "../upload-util";
 import {TitleService} from "../title.service";
+import {DecimalPipe, NgClass, NgForOf, NgIf} from "@angular/common";
 
 class ProfileForm {
-  nickname: string;
+  nickname: string | undefined;
 }
 
 @Component({
   selector: 'app-settings-profile',
   templateUrl: './settings-profile.component.html',
+  imports: [
+    NgIf,
+    FormsModule,
+    NgClass,
+    DecimalPipe,
+    NgForOf
+  ],
   styleUrls: ['./settings-profile.component.less']
 })
 export class SettingsProfileComponent implements OnInit {
-  loading_user: boolean;
-  updating_profile: boolean;
-  update_profile_success: boolean;
-  updating_avatar: boolean;
-  update_avatar_success: boolean;
+  loading_user: boolean | undefined;
+  updating_profile: boolean | undefined;
+  update_profile_success: boolean | undefined;
+  updating_avatar: boolean | undefined;
+  update_avatar_success: boolean | undefined;
 
-  error: BasicError;
-  update_profile_error: BasicError;
-  update_avatar_error: BasicError;
+  error: BasicError | undefined;
+  update_profile_error: BasicError | undefined;
+  update_avatar_error: BasicError | undefined;
 
   avatar_validator: UploadValidator;
 
-  user: User;
+  user: User | undefined;
   form: ProfileForm = new ProfileForm();
 
   constructor(
@@ -61,27 +69,34 @@ export class SettingsProfileComponent implements OnInit {
     this.update_profile_success = undefined;
     this.update_profile_error = undefined;
 
+    if (this.form.nickname === undefined) {
+      return;
+    }
+
     this.updating_profile = true;
     this.accountService.update_my_profile(this.form.nickname).pipe(
       finalize(() => this.updating_profile = false)
-    ).subscribe(
-      (user) => {
+    ).subscribe({
+      next: (user) => {
         this.setUser(user);
         this.update_profile_success = true
       },
-      (error) => this.update_profile_error = error.error
-    )
+      error: (error) => this.update_profile_error = error.error
+    })
   }
 
   uploadAvatar(input: HTMLInputElement) {
     let files = input.files;
-    if (files.length == 0)
+    if (files === null || files.length == 0)
       return;
 
     this.update_avatar_success = undefined;
     this.update_avatar_error = undefined;
 
     let file = files.item(0);
+    if (file === null) {
+      return;
+    }
     if (!this.avatar_validator.check(file)) {
       input.value = '';  // reset
       this.update_avatar_error = this.avatar_validator.error;
@@ -94,12 +109,12 @@ export class SettingsProfileComponent implements OnInit {
         this.updating_avatar = false;
         input.value = '';  // reset
       })
-    ).subscribe(
-      (user) => {
+    ).subscribe({
+      next: (user) => {
         this.setUser(user);
         this.update_avatar_success = true
       },
-      (error) => this.update_avatar_error = error.error
-    )
+      error: (error) => this.update_avatar_error = error.error
+    })
   }
 }

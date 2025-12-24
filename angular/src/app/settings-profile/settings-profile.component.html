@@ -34,7 +34,7 @@
           <div class="ui small labels">
             <div class="ui basic label" *ngFor="let group of user.groups" title="{{group.description}}">{{group.name}}</div>
           </div>
-          <span *ngIf="user.groups.length==0" class="text muted" i18n>(None)</span>
+          <span *ngIf="user.groups?.length==0" class="text muted" i18n>(None)</span>
         </div>
       </div>
     </div>
@@ -56,9 +56,9 @@
                  minlength="3" maxlength="16" pattern="^[ \w\-]{3,16}$"
                  [(ngModel)]="form.nickname" name="nickname" #nickname_model="ngModel">
           <div *ngIf="nickname_model.errors" class="errors">
-            <label *ngIf="nickname_model.errors.minlength"><i class="times icon"></i>At least 3 characters</label>
-            <label *ngIf="nickname_model.errors.maxlength"><i class="times icon"></i>At most 16 characters</label>
-            <label *ngIf="nickname_model.errors.pattern"><i class="times icon"></i>Invalid format</label>
+            <label *ngIf="nickname_model.errors['minlength']"><i class="times icon"></i>At least 3 characters</label>
+            <label *ngIf="nickname_model.errors['maxlength']"><i class="times icon"></i>At most 16 characters</label>
+            <label *ngIf="nickname_model.errors['pattern']"><i class="times icon"></i>Invalid format</label>
           </div>
         </div>
         <button class="ui primary fluid submit button" type="submit" i18n>Update Profile</button>

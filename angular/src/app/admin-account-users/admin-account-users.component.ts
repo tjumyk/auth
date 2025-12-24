@@ -5,17 +5,27 @@ import {debounceTime, finalize} from "rxjs/operators";
 import {Pagination} from "../table-util";
 import {Subject} from "rxjs";
 import {TitleService} from "../title.service";
+import {NgClass, NgForOf, NgIf} from "@angular/common";
+import {RouterLink} from "@angular/router";
+import {FormsModule} from "@angular/forms";
 
 @Component({
   selector: 'app-admin-account-users',
   templateUrl: './admin-account-users.component.html',
+  imports: [
+    NgIf,
+    RouterLink,
+    NgForOf,
+    NgClass,
+    FormsModule
+  ],
   styleUrls: ['./admin-account-users.component.less']
 })
 export class AdminAccountUsersComponent implements OnInit {
 
-  error: BasicError;
-  loading_user_list: boolean;
-  userPages: Pagination<UserAdvanced>;
+  error: BasicError | undefined;
+  loading_user_list: boolean | undefined;
+  userPages: Pagination<UserAdvanced> | undefined;
 
   searchKey = new Subject<string>();
 
@@ -30,18 +40,21 @@ export class AdminAccountUsersComponent implements OnInit {
 
     this.searchKey.pipe(
       debounceTime(300)
-    ).subscribe(
-      key => {
+    ).subscribe({
+      next: key => {
+        if(this.userPages === undefined){
+          return;
+        }
         this.userPages.search(key)
       },
-      error => this.error = error.error
-    );
+      error: error => this.error = error.error
+    });
 
     this.loading_user_list = true;
     this.adminService.get_user_list().pipe(
       finalize(() => this.loading_user_list = false)
-    ).subscribe(
-      (user_list) => {
+    ).subscribe({
+      next: (user_list) => {
         this.userPages = new Pagination<UserAdvanced>(user_list);
         this.userPages.setSearchMatcher((user: UserAdvanced, key: string) => {
           const keyLower = key.toLowerCase();
@@ -56,8 +69,8 @@ export class AdminAccountUsersComponent implements OnInit {
           return false;
         });
       },
-      (error) => this.error = error.error
-    );
+        error:(error) => this.error = error.error
+    });
   }
 
   deleteUser(user: UserAdvanced, btn: HTMLElement) {
@@ -67,8 +80,12 @@ export class AdminAccountUsersComponent implements OnInit {
     btn.classList.add('loading', 'disabled');
     this.adminService.delete_user(user.id).pipe(
       finalize(() => btn.classList.remove('loading', 'disabled'))
-    ).subscribe(
-      () => {
+    ).subscribe({
+      next: () => {
+        if(this.userPages === undefined || this.userPages.sourceItems === undefined){
+          return;
+        }
+
         let index = 0;
         for (let _user of this.userPages.sourceItems) {
           if (_user.id == user.id) {
@@ -79,11 +96,14 @@ export class AdminAccountUsersComponent implements OnInit {
           ++index;
         }
       },
-      (error) => this.error = error.error
-    )
+      error: (error) => this.error = error.error
+    })
   }
 
   sortField(field: string, th: HTMLElement) {
+    if(this.userPages === undefined || th.parentNode === null){
+      return;
+    }
     let sibling = th.parentNode.firstChild;
     while (sibling) {
       if (sibling.nodeType == 1 && sibling != th) {
@@ -103,7 +123,7 @@ export class AdminAccountUsersComponent implements OnInit {
         this.userPages.sort(field, true);
       } else {
         th.classList.remove('sorted', 'descending', 'ascending');
-        this.userPages.sort(null);
+        this.userPages.sort(undefined);
       }
     }
   }

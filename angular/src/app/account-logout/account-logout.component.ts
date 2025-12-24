@@ -3,16 +3,22 @@ import {AccountService} from "../account.service";
 import {finalize} from "rxjs/operators";
 import {BasicError} from "../models";
 import {TitleService} from "../title.service";
+import {RouterLink} from "@angular/router";
+import {NgIf} from "@angular/common";
 
 @Component({
   selector: 'app-account-logout',
   templateUrl: './account-logout.component.html',
+  imports: [
+    RouterLink,
+    NgIf
+  ],
   styleUrls: ['./account-logout.component.less']
 })
 export class AccountLogoutComponent implements OnInit {
-  logging_out:boolean;
-  error: BasicError;
-  success: boolean;
+  logging_out:boolean | undefined;
+  error: BasicError | undefined;
+  success: boolean | undefined;
 
   constructor(
     private accountService: AccountService,
@@ -25,10 +31,10 @@ export class AccountLogoutComponent implements OnInit {
     this.logging_out = true;
     this.accountService.logout().pipe(
       finalize(()=>this.logging_out=false)
-    ).subscribe(
-      ()=>this.success = true,
-      (error)=>this.error = error.error
-    )
+    ).subscribe({
+      next:()=>this.success = true,
+      error: (error)=>this.error = error.error
+    })
   }
 
 }

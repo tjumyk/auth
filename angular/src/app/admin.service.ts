@@ -11,16 +11,22 @@ import {
   OAuthAuthorization,
   OAuthClientAdvanced,
   UserAdvanced,
-  SendEmailForm,
   SendEmailResponse
 } from "./models";
 import {map, tap} from "rxjs/operators";
 
 export class InviteForm {
-  name: string;
-  email: string;
+  name: string | undefined;
+  email: string | undefined;
   external_auth_provider_id?: ExternalAuthProvider;
   skip_email_confirmation?: boolean;
+}
+
+export class SendEmailForm {
+  subject: string | undefined;
+  receivers: string | undefined;
+  receiver_groups: string | undefined;
+  body: string | undefined;
 }
 
 export interface ConfirmEmailURLResponse {
@@ -43,9 +49,9 @@ export class AdminService {
 
   get_user_list(): Observable<UserAdvanced[]> {
     return this.http.get(`${this.api}/users`).pipe(
-      map((data) => {
+      map((data: any) => {
         let group_dict: { [gid: number]: GroupAdvanced } = {};
-        for (let group  of data['groups']) {
+        for (let group of data['groups']) {
           let g = group as GroupAdvanced;
           group_dict[g.id] = g
         }
@@ -152,7 +158,7 @@ export class AdminService {
     )
   }
 
-  get_confirm_email_url(uid: number): Observable<ConfirmEmailURLResponse>{
+  get_confirm_email_url(uid: number): Observable<ConfirmEmailURLResponse> {
     return this.http.get<ConfirmEmailURLResponse>(`${this.api}/users/${uid}/confirm-email-url`).pipe(
       tap(() => this.logger.info(`Obtained confirm email url for ${uid}`))
     )
@@ -160,7 +166,7 @@ export class AdminService {
 
   get_user_login_records(uid: number, require_country: boolean = false): Observable<LoginRecord[]> {
     let params = new HttpParams();
-    if(require_country){
+    if (require_country) {
       params = params.append('country', 'true');
     }
     return this.http.get<LoginRecord[]>(`${this.api}/users/${uid}/login-records`, {params}).pipe(
@@ -332,14 +338,14 @@ export class AdminService {
     let params = new HttpParams();
     if (resolve_hostname)
       params = params.append('resolve-hostname', 'true');
-    return this.http.get(`${this.api}/ip-info/${ip_addr}`, {params:params}).pipe(
+    return this.http.get(`${this.api}/ip-info/${ip_addr}`, {params: params}).pipe(
       tap(() => this.logger.info(`Fetched IP info of ${ip_addr}`))
     )
   }
 
-  send_email(form: SendEmailForm): Observable<SendEmailResponse>{
+  send_email(form: SendEmailForm): Observable<SendEmailResponse> {
     return this.http.post<SendEmailResponse>(`${this.api}/send-email`, form).pipe(
-      tap(resp=>this.logger.info(`Email sent to ${resp.num_recipients} recipients`))
+      tap(resp => this.logger.info(`Email sent to ${resp.num_recipients} recipients`))
     )
   }
 }

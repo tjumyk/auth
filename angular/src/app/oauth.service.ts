@@ -6,8 +6,8 @@ import {tap} from "rxjs/operators";
 import {OAuthClient} from "./models";
 
 export class OAuthConnectResult {
-  token: string;
-  redirect_url: string;
+  token: string | undefined;
+  redirect_url: string | undefined;
 }
 
 @Injectable({
@@ -24,7 +24,7 @@ export class OauthService {
     this.logger = logService.get_logger('OAuthService')
   }
 
-  connect(client_id: number, redirect_url: string, original_path?:string, state?: string): Observable<OAuthConnectResult> {
+  connect(client_id: number, redirect_url: string, original_path?:string | null, state?: string | null): Observable<OAuthConnectResult> {
     let params = new HttpParams()
       .append('client_id', client_id.toString())
       .append('redirect_url', redirect_url);

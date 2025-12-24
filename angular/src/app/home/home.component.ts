@@ -4,22 +4,29 @@ import {AccountService} from "../account.service";
 import {finalize} from "rxjs/operators";
 import {TitleService} from "../title.service";
 import {environment} from '../../environments/environment';
+import {RouterLink} from "@angular/router";
+import {NgForOf, NgIf} from "@angular/common";
 
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
+  imports: [
+    RouterLink,
+    NgIf,
+    NgForOf
+  ],
   styleUrls: ['./home.component.less']
 })
 export class HomeComponent implements OnInit {
   readonly env = environment;
-  error: BasicError;
-  user: User;
-  isAdmin: boolean;
-  loadingClients: boolean;
-  checkingIP: boolean;
-  clients: OAuthClient[];
-  hasIPBlockedClient: boolean;
-  gateClient: OAuthClient;
+  error: BasicError | undefined;
+  user: User | undefined;
+  isAdmin: boolean | undefined;
+  loadingClients: boolean | undefined;
+  checkingIP: boolean | undefined;
+  clients: OAuthClient[] | undefined;
+  hasIPBlockedClient: boolean | undefined;
+  gateClient: OAuthClient | undefined;
 
   constructor(
     private accountService: AccountService,
@@ -30,23 +37,29 @@ export class HomeComponent implements OnInit {
   ngOnInit() {
     this.titleService.setTitle();
 
-    this.accountService.get_current_user().subscribe(
-      user=>{
+    this.accountService.get_current_user().subscribe({
+      next: user => {
         this.user = user;
 
-        this.isAdmin=false;
-        for(let group of user.groups){
-          if(group.name == 'admin'){
-            this.isAdmin = true;
-            break;
+        this.isAdmin = false;
+        if(user == null){
+          return;
+        }
+
+        if (user.groups) {
+          for (let group of user.groups) {
+            if (group.name == 'admin') {
+              this.isAdmin = true;
+              break;
+            }
           }
         }
 
         this.loadingClients = true;
         this.accountService.get_my_clients().pipe(
           finalize(() => this.loadingClients = false)
-        ).subscribe(
-          clients => {
+        ).subscribe({
+          next: clients => {
             this.clients = clients;
 
             for (const client of this.clients) {
@@ -58,9 +71,10 @@ export class HomeComponent implements OnInit {
             this.checkingIP = true;
             this.accountService.check_ip().pipe(
               finalize(() => this.checkingIP = false)
-            ).subscribe(
-              result => {
-                if (!result || result.check_pass || !result.guarded_ports || result.guarded_ports.length === 0) {
+            ).subscribe({
+              next: result => {
+                if (!result || result.check_pass || !result.guarded_ports || result.guarded_ports.length === 0
+                  || this.clients === undefined) {
                   return;
                 }
                 const guardedPortSet: Set<number> = new Set(result.guarded_ports);
@@ -89,14 +103,14 @@ export class HomeComponent implements OnInit {
                   client._is_ip_blocked = isIpBlocked;
                 }
               },
-              error => this.error = error.error
-            );
+              error: error => this.error = error.error
+            });
           },
-          error => this.error = error.error
-        )
+          error: error => this.error = error.error
+        })
       },
-      error=>this.error=error.error
-    )
+      error: error => this.error = error.error
+    })
   }
 
 }

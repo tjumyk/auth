@@ -2,24 +2,34 @@ import {Component, OnInit} from '@angular/core';
 import {BasicError, ExternalAuthProvider, UserAdvanced} from "../models";
 import {AdminService, InviteForm} from "../admin.service";
 import {finalize} from "rxjs/operators";
-import {NgForm} from "@angular/forms";
+import {FormsModule, NgForm} from "@angular/forms";
 import {TitleService} from "../title.service";
 import {AccountService} from "../account.service";
+import {DatePipe, NgClass, NgForOf, NgIf} from "@angular/common";
+import {RouterLink} from "@angular/router";
 
 @Component({
   selector: 'app-admin-account-user-invite',
   templateUrl: './admin-account-user-invite.component.html',
+  imports: [
+    NgIf,
+    FormsModule,
+    NgClass,
+    RouterLink,
+    NgForOf,
+    DatePipe
+  ],
   styleUrls: ['./admin-account-user-invite.component.less']
 })
 export class AdminAccountUserInviteComponent implements OnInit {
-  error: BasicError;
-  requesting: boolean;
-  new_user: UserAdvanced;
+  error: BasicError | undefined;
+  requesting: boolean | undefined;
+  new_user: UserAdvanced | undefined;
   form: InviteForm = new InviteForm();
 
   new_users: UserAdvanced[] = [];
 
-  providers: ExternalAuthProvider[];
+  providers: ExternalAuthProvider[] | undefined;
 
   constructor(
     private adminService: AdminService,
@@ -30,12 +40,12 @@ export class AdminAccountUserInviteComponent implements OnInit {
 
   ngOnInit() {
     this.titleService.setTitle('Invite User', 'Management');
-    this.accountService.get_external_auth_providers().subscribe(
-      providers => {
+    this.accountService.get_external_auth_providers().subscribe({
+      next: providers => {
         this.providers = providers;
       },
-      error => this.error = error.error
-    )
+      error: error => this.error = error.error
+    })
   }
 
   invite(f: NgForm) {
@@ -47,17 +57,17 @@ export class AdminAccountUserInviteComponent implements OnInit {
     this.requesting = true;
     this.adminService.invite_user(this.form).pipe(
       finalize(() => this.requesting = false)
-    ).subscribe(
-      (user) => {
+    ).subscribe({
+      next: (user) => {
         this.new_user = user;
         this.new_users.push(user)
       },
-      (error) => this.error = error.error
-    )
+      error: (error) => this.error = error.error
+    })
   }
 
   onChangeProvider() {
-    if(!this.form.external_auth_provider_id){
+    if (!this.form.external_auth_provider_id) {
       this.form.skip_email_confirmation = undefined;
     }
   }
