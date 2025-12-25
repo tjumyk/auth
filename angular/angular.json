@@ -1,17 +1,12 @@
 {
   "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
   "version": 1,
-  "cli": {
-    "packageManager": "npm"
-  },
   "newProjectRoot": "projects",
   "projects": {
     "auth": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
-          "inlineTemplate": true,
-          "inlineStyle": true,
           "style": "less",
           "skipTests": true
         },
@@ -40,6 +35,15 @@
       "root": "",
       "sourceRoot": "src",
       "prefix": "app",
+      "i18n": {
+        "sourceLocale": "en-US",
+        "locales": {
+          "zh-Hans": {
+            "translation": "src/locale/messages.zh_cn.xlf",
+            "subPath": ""
+          }
+        }
+      },
       "architect": {
         "build": {
           "builder": "@angular/build:application",
@@ -48,14 +52,15 @@
             "deployUrl": "static/",
             "outputPath": "../static",
             "browser": "src/main.ts",
+            "polyfills": [
+              "zone.js",
+              "@angular/localize/init"
+            ],
             "tsConfig": "tsconfig.app.json",
             "inlineStyleLanguage": "less",
             "assets": [
               "src/favicon.ico",
-              {
-                "glob": "**/*",
-                "input": "src/assets"
-              }
+              "src/assets"
             ],
             "styles": [
               "src/lib/semantic/semantic.min.css",
@@ -83,9 +88,12 @@
               "optimization": false,
               "extractLicenses": false,
               "sourceMap": true
+            },
+            "cn": {
+              "localize": ["zh-Hans"]
             }
           },
-          "defaultConfiguration": "production"
+          "defaultConfiguration": "production,cn"
         },
         "serve": {
           "builder": "@angular/build:dev-server",
@@ -98,6 +106,30 @@
             }
           },
           "defaultConfiguration": "development"
+        },
+        "extract-i18n": {
+          "builder": "@angular/build:extract-i18n"
+        },
+        "test": {
+          "builder": "@angular/build:karma",
+          "options": {
+            "polyfills": [
+              "zone.js",
+              "zone.js/testing",
+              "@angular/localize/init"
+            ],
+            "tsConfig": "tsconfig.spec.json",
+            "inlineStyleLanguage": "less",
+            "assets": [
+              {
+                "glob": "**/*",
+                "input": "public"
+              }
+            ],
+            "styles": [
+              "src/styles.less"
+            ]
+          }
         }
       }
     }

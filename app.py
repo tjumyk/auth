@@ -31,9 +31,18 @@ class MyFlask(Flask):
             endpoint='region_static',
             view_func=self.send_region_static_file
         )
+        # fix media issue with angular 21 builder, but no regional support
+        self.add_url_rule(
+            '/media/<path:filename>',
+            endpoint='static_media',
+            view_func=self.send_static_media_file
+        )
 
     def send_static_file(self, filename):
         return self.send_region_static_file(filename, None)
+
+    def send_static_media_file(self, filename):
+        return self.send_region_static_file(os.path.join('media', filename), None)
 
     def send_region_static_file(self, filename, region):
         """Identify hashed static files and send them with a longer cache timeout.
@@ -42,7 +51,7 @@ class MyFlask(Flask):
         """
         if not self.has_static_folder:
             raise RuntimeError('No static folder for this object')
-        if filename == 'index.html':
+        if filename.endswith('index.html'):
             cache_timeout = self._index_page_cache_timeout
         elif self._hashed_static_file_pattern.fullmatch(filename):
             cache_timeout = self._hashed_static_file_cache_timeout
@@ -74,7 +83,11 @@ class MyFlask(Flask):
         return None
 
 
-app = MyFlask(__name__)
+_STATIC_ROOT_PATH = 'static/browser'  # for newer angular setup
+_STATIC_INDEX_HTML_PATH = 'index.html'
+_STATIC_URL_PATH = '/static'
+
+app = MyFlask(__name__, static_folder=_STATIC_ROOT_PATH, static_url_path=_STATIC_URL_PATH)
 with open('config.json') as _f_cfg:
     app.config.from_mapping(json.load(_f_cfg))
 
@@ -96,7 +109,7 @@ app.register_blueprint(oauth_pages, url_prefix='/oauth')
 @app.route('/oauth/<path:path>')
 def get_index_page(path=''):
     region = app.get_request_region()
-    return app.send_region_static_file('index.html', region)
+    return app.send_region_static_file(_STATIC_INDEX_HTML_PATH, region)
 
 
 @app.errorhandler(404)
@@ -109,9 +122,9 @@ def page_not_found(error):
 
     region = app.get_request_region()
     # in case we are building the front-end
-    if not os.path.exists(os.path.join(app.get_region_static_folder(region), 'index.html')):
+    if not os.path.exists(os.path.join(app.get_region_static_folder(region), _STATIC_INDEX_HTML_PATH)):
         return "Building front-end in progress", 503
-    return app.send_region_static_file('index.html', region), 404
+    return app.send_region_static_file(_STATIC_INDEX_HTML_PATH, region), 404
 
 
 @app.cli.command()
