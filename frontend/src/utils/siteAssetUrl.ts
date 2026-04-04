@@ -1,6 +1,6 @@
 /**
- * Resolves avatar (or OAuth client icon) URLs for <img src>.
- * Prefer relative `avatar` joined with SITE.base_url (VITE_SITE_BASE_URL); use `avatar_full` only when relative is absent.
+ * Resolve URLs for site-hosted assets (uploads, user avatars, OAuth client icons).
+ * Stored paths are relative to SITE.base_url (VITE_SITE_BASE_URL); absolute http(s) URLs pass through.
  * In dev, Vite proxies /upload to Flask (see vite.config.ts).
  */
 
@@ -22,17 +22,24 @@ export function joinSiteBaseWithPath(baseUrl: string, relativePath: string): str
   return `${normalized}/${rel}`
 }
 
+/**
+ * Single stored path from the API: relative to the site base, or already an absolute URL.
+ */
+export function siteAssetSrc(storedPath: string | null | undefined): string | undefined {
+  const value = storedPath?.trim()
+  if (!value) {
+    return undefined
+  }
+  if (value.startsWith('http://') || value.startsWith('https://')) {
+    return value
+  }
+  return joinSiteBaseWithPath(getSiteBaseUrl(), value)
+}
+
+/** Account user payloads: prefer relative `avatar`, then optional absolute `avatar_full`. */
 export function userAvatarSrc(user: {
   avatar_full?: string | null
   avatar?: string | null
 }): string | undefined {
-  const rel = user.avatar?.trim()
-  if (rel) {
-    if (rel.startsWith('http://') || rel.startsWith('https://')) {
-      return rel
-    }
-    return joinSiteBaseWithPath(getSiteBaseUrl(), rel)
-  }
-  const full = user.avatar_full?.trim()
-  return full || undefined
+  return siteAssetSrc(user.avatar) ?? siteAssetSrc(user.avatar_full)
 }

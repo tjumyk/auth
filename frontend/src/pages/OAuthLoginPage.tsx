@@ -31,6 +31,7 @@ import { useI18n } from '@/hooks/useI18n'
 import type { BasicError } from '@/models/apiError'
 import { siteConfig } from '@/models/siteConfig'
 import type { User } from '@/models/user'
+import { siteAssetSrc } from '@/utils/siteAssetUrl'
 
 /** Compact cue that this flow is handled by the central identity service (not the OAuth client). */
 function OAuthIdentityPill(): React.ReactElement {
@@ -282,7 +283,7 @@ export function OAuthLoginPage(): React.ReactElement {
       ) : clientQ.data ? (
         <Stack gap="md" align="center">
           <Avatar
-            src={clientQ.data.icon?.trim() ? clientQ.data.icon : null}
+            src={siteAssetSrc(clientQ.data.icon) ?? undefined}
             alt={clientQ.data.name}
             name={clientQ.data.name}
             size={64}

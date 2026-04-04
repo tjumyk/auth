@@ -40,7 +40,7 @@ import { getBasicErrorFromUnknown } from '@/api/client'
 import { useI18n } from '@/hooks/useI18n'
 import type { BasicError } from '@/models/apiError'
 import type { AdminGroup, AdminOAuthClient } from '@/models/admin'
-import { userAvatarSrc } from '@/utils/userAvatarSrc'
+import { siteAssetSrc } from '@/utils/siteAssetUrl'
 
 const ICON_MAX = 262_144
 
@@ -53,7 +53,7 @@ function validateIcon(file: File, t: (k: string) => string): string | null {
 }
 
 function clientIconSrc(c: Pick<AdminOAuthClient, 'icon'>): string | undefined {
-  return userAvatarSrc({ avatar: c.icon, avatar_full: null })
+  return siteAssetSrc(c.icon)
 }
 
 export function AdminOAuthClientEditPage(): React.ReactElement {

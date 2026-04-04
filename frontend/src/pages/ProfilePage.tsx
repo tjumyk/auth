@@ -40,7 +40,7 @@ import type { AccountMeUser } from '@/models/user'
 import { siteConfig } from '@/models/siteConfig'
 import { groupNameToBadgeColor } from '@/utils/groupBadgeColor'
 import { validateNewPassword, validateRepeatNewPassword } from '@/utils/passwordValidation'
-import { userAvatarSrc } from '@/utils/userAvatarSrc'
+import { userAvatarSrc } from '@/utils/siteAssetUrl'
 
 const AVATAR_ACCEPT = 'image/png,image/jpeg,image/jpg,image/gif'
 const AVATAR_MAX_BYTES = 262_144

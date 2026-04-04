@@ -42,7 +42,7 @@ import { getBasicErrorFromUnknown } from '@/api/client'
 import { useI18n } from '@/hooks/useI18n'
 import type { BasicError } from '@/models/apiError'
 import type { AdminUser } from '@/models/admin'
-import { userAvatarSrc } from '@/utils/userAvatarSrc'
+import { userAvatarSrc } from '@/utils/siteAssetUrl'
 
 const AVATAR_MAX_BYTES = 262_144
 

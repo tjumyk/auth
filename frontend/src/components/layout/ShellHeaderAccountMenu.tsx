@@ -6,7 +6,7 @@ import { Link } from 'react-router'
 import { ThemeLocaleToolbar } from '@/components/layout/ThemeLocaleToolbar'
 import { useAuthUser } from '@/hooks/useAuthUser'
 import { useI18n } from '@/hooks/useI18n'
-import { userAvatarSrc } from '@/utils/userAvatarSrc'
+import { userAvatarSrc } from '@/utils/siteAssetUrl'
 
 export function ShellHeaderAccountMenu({
   onAfterNavigate,
