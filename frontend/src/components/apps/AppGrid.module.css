@@ -1,14 +1,41 @@
 .card {
   display: block;
+  position: relative;
   transition:
     transform 180ms ease,
     box-shadow 200ms ease,
-    border-color 200ms ease;
+    border-color 200ms ease,
+    opacity 180ms ease,
+    filter 180ms ease;
 }
 
 .card:hover {
   transform: translateY(-2px);
   box-shadow: var(--mantine-shadow-md);
+}
+
+.cardTop {
+  position: relative;
+  display: inline-block;
+}
+
+.lockBadge {
+  position: absolute;
+  top: 0;
+  right: 0;
+  transform: translate(25%, -25%);
+  box-shadow: var(--mantine-shadow-xs);
+}
+
+.cardRestricted {
+  opacity: 0.82;
+  filter: saturate(0.88);
+  border-style: dashed;
+}
+
+.cardRestricted:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--mantine-shadow-sm);
 }
 
 .iconWrap {
@@ -31,6 +58,10 @@
   }
 
   .card:hover .iconWrap {
+    transform: none;
+  }
+
+  .cardRestricted:hover {
     transform: none;
   }
 }

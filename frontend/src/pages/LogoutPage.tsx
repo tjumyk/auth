@@ -1,18 +1,19 @@
 import { useQueryClient } from '@tanstack/react-query'
-import { Alert, Anchor, Center, Container, Group, Loader, Stack, Text, Title } from '@mantine/core'
+import { Alert, Anchor, Loader, Stack, Text, Title } from '@mantine/core'
 import { useDocumentTitle } from '@mantine/hooks'
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router'
 
 import { getLogout } from '@/api/account'
 import { getBasicErrorFromUnknown } from '@/api/client'
-import { ThemeLocaleToolbar } from '@/components/layout/ThemeLocaleToolbar'
+import { PublicAuthCard, PublicAuthCenter } from '@/components/layout/PublicAuthShell'
 import { useI18n } from '@/hooks/useI18n'
 import type { BasicError } from '@/models/apiError'
+import { siteConfig } from '@/models/siteConfig'
 
 export function LogoutPage(): React.ReactElement {
   const { t } = useI18n()
-  useDocumentTitle(t('signOutPageTitle'))
+  useDocumentTitle(`${siteConfig.name} · ${t('signOutPageTitle')}`)
   const queryClient = useQueryClient()
   const [phase, setPhase] = useState<'loading' | 'success' | 'error'>('loading')
   const [err, setErr] = useState<BasicError | null>(null)
@@ -39,26 +40,22 @@ export function LogoutPage(): React.ReactElement {
     }
   }, [queryClient])
 
+  if (phase === 'loading') {
+    return (
+      <PublicAuthCenter direction="column" gap="md">
+        <Loader />
+        <Text size="sm" c="dimmed" ta="center">
+          {t('signingOut')}
+        </Text>
+      </PublicAuthCenter>
+    )
+  }
+
   return (
-    <Container size="xs" py="xl">
-      <Group justify="flex-end" mb="md">
-        <ThemeLocaleToolbar />
-      </Group>
-      <Title order={2} mb="lg">
-        {t('signOutHeading')}
-      </Title>
-      {phase === 'loading' ? (
-        <Center py="xl">
-          <Stack align="center" gap="sm">
-            <Loader />
-            <Text size="sm" c="dimmed">
-              {t('signingOut')}
-            </Text>
-          </Stack>
-        </Center>
-      ) : null}
+    <PublicAuthCard stackGap="md">
+      <Title order={2}>{t('signOutHeading')}</Title>
       {phase === 'success' ? (
-        <Stack>
+        <Stack gap="sm">
           <Text>{t('signedOutMessage')}</Text>
           <Anchor component={Link} to="/account/login">
             {t('signInAgain')}
@@ -70,6 +67,6 @@ export function LogoutPage(): React.ReactElement {
           {err.detail}
         </Alert>
       ) : null}
-    </Container>
+    </PublicAuthCard>
   )
 }

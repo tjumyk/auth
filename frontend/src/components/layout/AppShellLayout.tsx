@@ -6,6 +6,7 @@ import {
   Divider,
   Group,
   Menu,
+  Stack,
   Text,
   UnstyledButton,
   useComputedColorScheme,
@@ -97,9 +98,14 @@ export function AppShellLayout(): React.ReactElement {
     getInitialValueInEffect: true,
   })
 
+  const headerSubline = useMemo(() => {
+    const parts = [siteConfig.organizationName.trim(), siteConfig.groupName.trim()].filter(Boolean)
+    return parts.length ? parts.join(' · ') : ''
+  }, [])
+
   return (
     <AppShell
-      header={{ height: 56 }}
+      header={{ height: headerSubline ? 64 : 56 }}
       padding="md"
       styles={{
         root: shellStyles.root,
@@ -116,23 +122,32 @@ export function AppShellLayout(): React.ReactElement {
             aria-label={t('goHome')}
             style={{ minWidth: 0, textDecoration: 'none', color: 'inherit' }}
           >
-            <Group gap="sm" wrap="nowrap" style={{ minWidth: 0 }}>
+            <Group gap="sm" wrap="nowrap" align="center" style={{ minWidth: 0 }}>
               <SiteLogoImage placement="header" />
-              <Text fw={600} style={{ minWidth: 0 }} lineClamp={1}>
-                {siteConfig.name}
-              </Text>
+              <Stack gap={2} style={{ minWidth: 0 }}>
+                <Text fw={600} lineClamp={1} lh={1.25} style={{ minWidth: 0 }}>
+                  {siteConfig.name}
+                </Text>
+                {headerSubline ? (
+                  <Text size="xs" c="dimmed" lineClamp={1} lh={1.2} style={{ minWidth: 0 }}>
+                    {headerSubline}
+                  </Text>
+                ) : null}
+              </Stack>
             </Group>
           </Box>
           <Group gap="xs" wrap="nowrap" align="center" justify="flex-end" style={{ flexShrink: 0 }}>
-            <ThemeLocaleToolbar />
-            <Divider
-              orientation="vertical"
-              h={24}
-              style={{ alignSelf: 'center' }}
-            />
+            <Group gap="xs" wrap="nowrap" align="center" visibleFrom="sm">
+              <ThemeLocaleToolbar />
+              <Divider
+                orientation="vertical"
+                h={24}
+                style={{ alignSelf: 'center' }}
+              />
+            </Group>
             <Menu
               shadow="md"
-              width={220}
+              width={260}
               position="bottom-end"
               withinPortal
               floatingStrategy="fixed"
@@ -164,6 +179,13 @@ export function AppShellLayout(): React.ReactElement {
                 </UnstyledButton>
               </Menu.Target>
               <Menu.Dropdown>
+                <Box hiddenFrom="sm">
+                  <Menu.Label>{t('appearanceAndLanguage')}</Menu.Label>
+                  <Box px={6} py={6}>
+                    <ThemeLocaleToolbar variant="menu" />
+                  </Box>
+                  <Menu.Divider />
+                </Box>
                 <Menu.Item component={Link} to="/account/profile" leftSection={<IconUser size={16} />}>
                   {t('profileNav')}
                 </Menu.Item>

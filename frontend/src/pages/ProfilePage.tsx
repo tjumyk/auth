@@ -6,6 +6,7 @@ import {
   Badge,
   Button,
   Container,
+  Divider,
   FileButton,
   Group,
   Paper,
@@ -16,16 +17,18 @@ import {
   Text,
   TextInput,
   Title,
+  Tooltip,
 } from '@mantine/core'
 import { useForm } from '@mantine/form'
 import { useDocumentTitle } from '@mantine/hooks'
-import { IconUser } from '@tabler/icons-react'
+import { IconArrowLeft, IconUser } from '@tabler/icons-react'
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router'
 
 import {
   ACCOUNT_ME_QUERY_KEY,
   fetchAccountMe,
+  fetchExternalAuthProvider,
   putAccountAvatar,
   putAccountNickname,
   putAccountPassword,
@@ -34,20 +37,21 @@ import { getBasicErrorFromUnknown } from '@/api/client'
 import { useI18n } from '@/hooks/useI18n'
 import type { BasicError } from '@/models/apiError'
 import { siteConfig } from '@/models/siteConfig'
+import { validateNewPassword, validateRepeatNewPassword } from '@/utils/passwordValidation'
 
 const AVATAR_ACCEPT = 'image/png,image/jpeg,image/jpg,image/gif'
 const AVATAR_MAX_BYTES = 262_144
 
-function nicknameValidator(
-  value: string,
-  invalidMsg: string,
-): string | null {
+function nicknameValidator(value: string, t: (key: string) => string): string | null {
   const v = value.trim()
-  if (v.length === 0) {
-    return null
+  if (v.length < 3) {
+    return t('nicknameMinLength')
+  }
+  if (v.length > 16) {
+    return t('nicknameMaxLength')
   }
   if (!/^[ \w-]{3,16}$/.test(v)) {
-    return invalidMsg
+    return t('nicknameInvalid')
   }
   return null
 }
@@ -132,10 +136,17 @@ export function ProfilePage(): React.ReactElement {
     queryFn: fetchAccountMe,
   })
 
+  const externalProviderId = meQ.data?.external_auth_provider_id ?? null
+  const providerQ = useQuery({
+    queryKey: ['externalAuthProvider', externalProviderId],
+    queryFn: () => fetchExternalAuthProvider(externalProviderId!),
+    enabled: Boolean(externalProviderId),
+  })
+
   const nickForm = useForm({
     initialValues: { nickname: '' },
     validate: {
-      nickname: (v) => nicknameValidator(v, t('nicknameInvalid')),
+      nickname: (v) => nicknameValidator(v, t),
     },
   })
 
@@ -155,14 +166,8 @@ export function ProfilePage(): React.ReactElement {
     },
     validate: {
       old_password: (v) => (v.length > 0 ? null : t('fieldRequired')),
-      new_password: (v) => {
-        if (v.length < 8 || v.length > 20) {
-          return t('passwordLengthHint')
-        }
-        return null
-      },
-      confirm_password: (v, values) =>
-        v === values.new_password ? null : t('passwordsDoNotMatch'),
+      new_password: (v) => validateNewPassword(v, t),
+      confirm_password: (v, values) => validateRepeatNewPassword(v, values.new_password, t),
     },
   })
 
@@ -210,7 +215,9 @@ export function ProfilePage(): React.ReactElement {
 
   const user = meQ.data
   const avatarSrc = user?.avatar_full ?? user?.avatar ?? null
-  const canChangePassword = !user?.external_auth_provider_id
+  const showLocalPasswordForm = Boolean(
+    user && (!user.external_auth_provider_id || !user.external_auth_enforced),
+  )
 
   return (
     <Container size="sm" py="xl">
@@ -222,6 +229,7 @@ export function ProfilePage(): React.ReactElement {
             variant="subtle"
             size="compact-sm"
             mb="xs"
+            leftSection={<IconArrowLeft size={16} />}
           >
             {t('backToHome')}
           </Button>
@@ -274,11 +282,20 @@ export function ProfilePage(): React.ReactElement {
                   </Text>
                   {user.groups?.length ? (
                     <Group gap="xs" mt={4}>
-                      {user.groups.map((g) => (
-                        <Badge key={g.id} variant="light" size="sm">
-                          {g.name}
-                        </Badge>
-                      ))}
+                      {user.groups.map((g) => {
+                        const desc = g.description?.trim()
+                        return desc ? (
+                          <Tooltip key={g.id} label={desc} withArrow>
+                            <Badge variant="light" size="sm">
+                              {g.name}
+                            </Badge>
+                          </Tooltip>
+                        ) : (
+                          <Badge key={g.id} variant="light" size="sm">
+                            {g.name}
+                          </Badge>
+                        )
+                      })}
                     </Group>
                   ) : (
                     <Text c="dimmed" size="sm">
@@ -307,13 +324,14 @@ export function ProfilePage(): React.ReactElement {
                 key={locale}
                 onSubmit={nickForm.onSubmit((values) => {
                   setProfileOk(false)
-                  nickM.mutate(values.nickname)
+                  nickM.mutate(values.nickname.trim())
                 })}
               >
                 <Stack gap="md">
                   <TextInput
                     label={t('nickname')}
                     description={t('nicknameHint')}
+                    placeholder={t('nicknamePlaceholder')}
                     {...nickForm.getInputProps('nickname')}
                   />
                   <Button type="submit" loading={nickM.isPending}>
@@ -377,54 +395,112 @@ export function ProfilePage(): React.ReactElement {
               <Title order={4} mb="md">
                 {t('passwordSection')}
               </Title>
-              {!canChangePassword ? (
-                <Text size="sm" c="dimmed" mb="md">
-                  {t('passwordManagedExternally')}
+              <Stack gap="md">
+                {passwordOk ? (
+                  <Alert color="green" onClose={() => setPasswordOk(false)} withCloseButton>
+                    {t('passwordUpdated')}
+                  </Alert>
+                ) : null}
+                {passwordError ? (
+                  <Alert
+                    color="red"
+                    title={passwordError.msg}
+                    onClose={() => setPasswordError(null)}
+                    withCloseButton
+                  >
+                    {passwordError.detail}
+                  </Alert>
+                ) : null}
+                {showLocalPasswordForm ? (
+                  <form
+                    key={`pwd-${locale}`}
+                    onSubmit={pwdForm.onSubmit((values) => {
+                      setPasswordOk(false)
+                      pwdM.mutate({
+                        old_password: values.old_password,
+                        new_password: values.new_password,
+                      })
+                    })}
+                  >
+                    <Stack gap="md">
+                      <PasswordInput
+                        label={t('currentPassword')}
+                        {...pwdForm.getInputProps('old_password')}
+                      />
+                      <PasswordInput
+                        label={t('newPassword')}
+                        {...pwdForm.getInputProps('new_password')}
+                      />
+                      <PasswordInput
+                        label={t('confirmNewPassword')}
+                        {...pwdForm.getInputProps('confirm_password')}
+                      />
+                      <Text size="xs" c="dimmed">
+                        {t('passwordLengthHint')} {t('passwordComplexityHint')}
+                      </Text>
+                      <Button type="submit" loading={pwdM.isPending}>
+                        {t('updatePassword')}
+                      </Button>
+                    </Stack>
+                  </form>
+                ) : null}
+                {externalProviderId ? (
+                  <>
+                    {!showLocalPasswordForm ? (
+                      <Text size="sm" c="dimmed">
+                        {t('passwordManagedExternally')}
+                      </Text>
+                    ) : null}
+                    {showLocalPasswordForm ? <Divider /> : null}
+                    {providerQ.isPending ? <Skeleton height={56} /> : null}
+                    {providerQ.isError ? (
+                      <Alert color="red" title={t('passwordExternalLoadFailed')}>
+                        <Anchor component="button" type="button" onClick={() => void providerQ.refetch()}>
+                          {t('retry')}
+                        </Anchor>
+                      </Alert>
+                    ) : null}
+                    {providerQ.data ? (
+                      providerQ.data.update_password_url ? (
+                        <Stack gap="sm">
+                          <Text size="sm">
+                            {t('passwordExternalIntro', { providerName: providerQ.data.name })}
+                          </Text>
+                          <Button
+                            component="a"
+                            href={providerQ.data.update_password_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            {t('passwordExternalButton', { providerName: providerQ.data.name })}
+                          </Button>
+                        </Stack>
+                      ) : (
+                        <Text size="sm">
+                          {t('passwordExternalNoLink', { providerName: providerQ.data.name })}
+                        </Text>
+                      )
+                    ) : null}
+                  </>
+                ) : null}
+              </Stack>
+            </Paper>
+
+            <Paper p="md" radius="md" withBorder shadow="xs">
+              <Title order={4} mb="md">
+                {t('twoFactorSettingsTitle')}
+              </Title>
+              <Stack gap="sm" align="flex-start">
+                <Text size="sm" c="dimmed">
+                  {t('twoFactorSectionBlurb')}
                 </Text>
-              ) : null}
-              {passwordOk ? (
-                <Alert color="green" mb="md" onClose={() => setPasswordOk(false)} withCloseButton>
-                  {t('passwordUpdated')}
-                </Alert>
-              ) : null}
-              {passwordError ? (
-                <Alert
-                  color="red"
-                  mb="md"
-                  title={passwordError.msg}
-                  onClose={() => setPasswordError(null)}
-                  withCloseButton
-                >
-                  {passwordError.detail}
-                </Alert>
-              ) : null}
-              {canChangePassword ? (
-                <form
-                  key={`pwd-${locale}`}
-                  onSubmit={pwdForm.onSubmit((values) => {
-                    setPasswordOk(false)
-                    pwdM.mutate({
-                      old_password: values.old_password,
-                      new_password: values.new_password,
-                    })
-                  })}
-                >
-                  <Stack gap="md">
-                    <PasswordInput label={t('currentPassword')} {...pwdForm.getInputProps('old_password')} />
-                    <PasswordInput label={t('newPassword')} {...pwdForm.getInputProps('new_password')} />
-                    <PasswordInput
-                      label={t('confirmNewPassword')}
-                      {...pwdForm.getInputProps('confirm_password')}
-                    />
-                    <Text size="xs" c="dimmed">
-                      {t('passwordLengthHint')}
-                    </Text>
-                    <Button type="submit" loading={pwdM.isPending}>
-                      {t('updatePassword')}
-                    </Button>
-                  </Stack>
-                </form>
-              ) : null}
+                <Text size="sm" fw={500}>
+                  {user.is_two_factor_enabled ? t('twoFactorStatusOn') : t('twoFactorStatusOff')}
+                </Text>
+                <Button component={Link} to="/account/two-factor" variant="light">
+                  {t('twoFactorManageCta')}
+                </Button>
+              </Stack>
             </Paper>
           </>
         ) : null}
