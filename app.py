@@ -160,4 +160,4 @@ def rename_client(client_id: int, client_new_name):
 
 
 if __name__ == '__main__':
-    app.run(host='localhost', port=8077)
+    app.run(host='localhost', port=8077, debug=True)
