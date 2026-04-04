@@ -41,7 +41,7 @@ export const LoginRecordSchema = z.object({
   ip: z.string(),
   user_agent: z.string(),
   success: z.boolean(),
-  reason: z.string(),
+  reason: z.union([z.string(), z.null()]).optional(),
   country: IPCountryInfoSchema.optional(),
 })
 

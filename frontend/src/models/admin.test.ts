@@ -5,6 +5,7 @@ import {
   AdminOAuthClientSchema,
   AdminUserListEnvelopeSchema,
   AdminUserSchema,
+  LoginRecordSchema,
   OAuthAuthorizationSchema,
 } from '@/models/admin'
 
@@ -101,6 +102,20 @@ describe('admin models', () => {
       allowed_groups: [{ id: 1, name: 'g', description: null }],
     }
     expect(AdminOAuthClientSchema.safeParse(raw).success).toBe(true)
+  })
+
+  it('parses login record with null reason and country (admin login-records API)', () => {
+    const raw = {
+      country: { iso_code: 'CN', name: 'China' },
+      id: 1272,
+      ip: '183.241.36.91',
+      reason: null,
+      success: true,
+      time: 'Sat, 04 Apr 2026 12:14:41 GMT',
+      user_agent: 'Mozilla/5.0',
+      user_id: 1,
+    }
+    expect(LoginRecordSchema.safeParse(raw).success).toBe(true)
   })
 
   it('parses admin group', () => {
