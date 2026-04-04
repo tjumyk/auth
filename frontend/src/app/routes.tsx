@@ -1,8 +1,22 @@
-import { createBrowserRouter } from 'react-router'
+import { createBrowserRouter, Navigate } from 'react-router'
 
+import { RequireAdmin } from '@/components/auth/RequireAdmin'
 import { RequireAuth } from '@/components/auth/RequireAuth'
+import { AdminLayout } from '@/components/layout/AdminLayout'
 import { AppShellLayout } from '@/components/layout/AppShellLayout'
 import { PublicAuthRouteLayout } from '@/components/layout/PublicAuthRouteLayout'
+import { AdminAboutPage } from '@/pages/admin/AdminAboutPage'
+import { AdminBatchUsersPage } from '@/pages/admin/AdminBatchUsersPage'
+import { AdminGroupEditPage } from '@/pages/admin/AdminGroupEditPage'
+import { AdminGroupNewPage } from '@/pages/admin/AdminGroupNewPage'
+import { AdminGroupsPage } from '@/pages/admin/AdminGroupsPage'
+import { AdminOAuthClientEditPage } from '@/pages/admin/AdminOAuthClientEditPage'
+import { AdminOAuthClientNewPage } from '@/pages/admin/AdminOAuthClientNewPage'
+import { AdminOAuthClientsPage } from '@/pages/admin/AdminOAuthClientsPage'
+import { AdminSendEmailPage } from '@/pages/admin/AdminSendEmailPage'
+import { AdminUserEditPage } from '@/pages/admin/AdminUserEditPage'
+import { AdminUserInvitePage } from '@/pages/admin/AdminUserInvitePage'
+import { AdminUsersPage } from '@/pages/admin/AdminUsersPage'
 import { ConfirmEmailPage } from '@/pages/ConfirmEmailPage'
 import { DisableTwoFactorByEmailPage } from '@/pages/DisableTwoFactorByEmailPage'
 import { ForbiddenPage } from '@/pages/ForbiddenPage'
@@ -33,6 +47,73 @@ export const router = createBrowserRouter([
           { index: true, element: <HomePage /> },
           { path: 'account/profile', element: <ProfilePage /> },
           { path: 'account/two-factor', element: <TwoFactorSettingsPage /> },
+        ],
+      },
+      {
+        path: 'admin',
+        element: (
+          <RequireAuth>
+            <RequireAdmin>
+              <AdminLayout />
+            </RequireAdmin>
+          </RequireAuth>
+        ),
+        children: [
+          { index: true, element: <Navigate to="account/users" replace /> },
+          {
+            path: 'account',
+            children: [
+              { index: true, element: <Navigate to="users" replace /> },
+              {
+                path: 'users',
+                children: [
+                  { index: true, element: <AdminUsersPage /> },
+                  { path: 'u/:uid', element: <AdminUserEditPage /> },
+                  /* Deprecated: use invite modal on AdminUsersPage; see AdminUserInvitePage. */
+                  { path: 'invite', element: <AdminUserInvitePage /> },
+                  {
+                    path: 'batch',
+                    element: <AdminBatchUsersPage />,
+                  },
+                ],
+              },
+              {
+                path: 'groups',
+                children: [
+                  { index: true, element: <AdminGroupsPage /> },
+                  { path: 'g/:gid', element: <AdminGroupEditPage /> },
+                  /* Deprecated: use new-group modal on AdminGroupsPage; see AdminGroupNewPage. */
+                  { path: 'new', element: <AdminGroupNewPage /> },
+                ],
+              },
+            ],
+          },
+          {
+            path: 'oauth',
+            children: [
+              { index: true, element: <Navigate to="clients" replace /> },
+              {
+                path: 'clients',
+                children: [
+                  { index: true, element: <AdminOAuthClientsPage /> },
+                  { path: 'c/:cid', element: <AdminOAuthClientEditPage /> },
+                  /* Deprecated: use new-client modal on AdminOAuthClientsPage; see AdminOAuthClientNewPage. */
+                  { path: 'new', element: <AdminOAuthClientNewPage /> },
+                ],
+              },
+            ],
+          },
+          {
+            path: 'email',
+            children: [
+              { index: true, element: <Navigate to="send" replace /> },
+              {
+                path: 'send',
+                element: <AdminSendEmailPage />,
+              },
+            ],
+          },
+          { path: 'about', element: <AdminAboutPage /> },
         ],
       },
       {

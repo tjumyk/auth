@@ -36,8 +36,11 @@ import {
 import { getBasicErrorFromUnknown } from '@/api/client'
 import { useI18n } from '@/hooks/useI18n'
 import type { BasicError } from '@/models/apiError'
+import type { AccountMeUser } from '@/models/user'
 import { siteConfig } from '@/models/siteConfig'
+import { groupNameToBadgeColor } from '@/utils/groupBadgeColor'
 import { validateNewPassword, validateRepeatNewPassword } from '@/utils/passwordValidation'
+import { userAvatarSrc } from '@/utils/userAvatarSrc'
 
 const AVATAR_ACCEPT = 'image/png,image/jpeg,image/jpg,image/gif'
 const AVATAR_MAX_BYTES = 262_144
@@ -191,6 +194,9 @@ export function ProfilePage(): React.ReactElement {
       setAvatarError(null)
       setAvatarOk(true)
       queryClient.setQueryData(['whoami'], user)
+      queryClient.setQueryData<AccountMeUser | undefined>(ACCOUNT_ME_QUERY_KEY, (prev) =>
+        prev ? { ...prev, ...user } : prev,
+      )
       void queryClient.invalidateQueries({ queryKey: ACCOUNT_ME_QUERY_KEY })
     },
     onError: (err) => {
@@ -214,7 +220,7 @@ export function ProfilePage(): React.ReactElement {
   })
 
   const user = meQ.data
-  const avatarSrc = user?.avatar_full ?? user?.avatar ?? null
+  const avatarSrc = user ? userAvatarSrc(user) : null
   const showLocalPasswordForm = Boolean(
     user && (!user.external_auth_provider_id || !user.external_auth_enforced),
   )
@@ -286,12 +292,17 @@ export function ProfilePage(): React.ReactElement {
                         const desc = g.description?.trim()
                         return desc ? (
                           <Tooltip key={g.id} label={desc} withArrow>
-                            <Badge variant="light" size="sm">
+                            <Badge variant="light" size="sm" color={groupNameToBadgeColor(g.name)}>
                               {g.name}
                             </Badge>
                           </Tooltip>
                         ) : (
-                          <Badge key={g.id} variant="light" size="sm">
+                          <Badge
+                            key={g.id}
+                            variant="light"
+                            size="sm"
+                            color={groupNameToBadgeColor(g.name)}
+                          >
                             {g.name}
                           </Badge>
                         )

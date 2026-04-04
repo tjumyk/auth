@@ -90,6 +90,16 @@ export async function getLogout(): Promise<void> {
   await apiClient.get('/api/account/logout')
 }
 
+export async function fetchExternalAuthProviders(): Promise<ExternalAuthProvider[]> {
+  const res = await apiClient.get<unknown>('/api/account/external-auth-providers')
+  const parsed = z.array(ExternalAuthProviderSchema).safeParse(res.data)
+  if (!parsed.success) {
+    console.error('external auth providers parse error', parsed.error.flatten())
+    throw new Error('Invalid external auth providers payload from server')
+  }
+  return parsed.data
+}
+
 export async function fetchExternalAuthProvider(pid: string): Promise<ExternalAuthProvider> {
   const res = await apiClient.get<unknown>(`/api/account/external-auth-providers/${encodeURIComponent(pid)}`)
   const parsed = ExternalAuthProviderSchema.safeParse(res.data)
@@ -123,7 +133,11 @@ export async function putAccountNickname(nickname: string): Promise<User> {
 export async function putAccountAvatar(file: File): Promise<User> {
   const body = new FormData()
   body.append('avatar', file)
-  const res = await apiClient.put<unknown>('/api/account/me', body)
+  // Instance default Content-Type is application/json; axios would stringify FormData to JSON
+  // (losing the file) before the adapter clears the header. Omit so the browser sends multipart.
+  const res = await apiClient.put<unknown>('/api/account/me', body, {
+    headers: { 'Content-Type': false },
+  })
   const parsed = UserSchema.safeParse(res.data)
   if (!parsed.success) {
     console.error('update avatar parse error', parsed.error.flatten())

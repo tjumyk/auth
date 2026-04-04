@@ -7,11 +7,26 @@ import { defineConfig } from 'vitest/config'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
+/**
+ * Browser hits Vite; these paths forward to Flask (`VITE_FLASK_ORIGIN`).
+ * - `/api`, `/oauth` — APIs and OAuth pages
+ * - `/upload` — uploaded files (e.g. avatars stored as `upload/avatar/…` in JSON → requested as `/upload/avatar/…`)
+ */
+function flaskDevProxy(target: string): Record<string, { target: string; changeOrigin: boolean }> {
+  const opts = { target, changeOrigin: true as const }
+  return {
+    '/api': opts,
+    '/oauth': opts,
+    '/upload': opts,
+  }
+}
+
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '')
   const flaskOrigin = env.VITE_FLASK_ORIGIN ?? 'http://127.0.0.1:8077'
   const base = mode === 'production' ? '/static/' : '/'
+  const proxy = flaskDevProxy(flaskOrigin)
 
   return {
     plugins: [react()],
@@ -25,10 +40,10 @@ export default defineConfig(({ mode }) => {
       fs: {
         allow: [path.resolve(__dirname, '..')],
       },
-      proxy: {
-        '/api': { target: flaskOrigin, changeOrigin: true },
-        '/oauth': { target: flaskOrigin, changeOrigin: true },
-      },
+      proxy,
+    },
+    preview: {
+      proxy,
     },
     build: {
       outDir: '../static/browser',

@@ -12,6 +12,7 @@ export const UserSchema = z.object({
   email: z.string(),
   nickname: z.string().nullable().optional(),
   avatar: z.string().nullable().optional(),
+  avatar_full: z.string().nullable().optional(),
   is_active: z.boolean(),
   is_two_factor_enabled: z.boolean(),
   external_auth_provider_id: z.string().nullable().optional(),
@@ -22,9 +23,5 @@ export const UserSchema = z.object({
 export type Group = z.infer<typeof GroupSchema>
 export type User = z.infer<typeof UserSchema>
 
-/** GET `/api/account/me` includes absolute avatar URL for display. */
-export const AccountMeUserSchema = UserSchema.extend({
-  avatar_full: z.string().nullable().optional(),
-})
-
-export type AccountMeUser = z.infer<typeof AccountMeUserSchema>
+export const AccountMeUserSchema = UserSchema
+export type AccountMeUser = User

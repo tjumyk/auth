@@ -7,12 +7,11 @@ import {
   Container,
   Group,
   Paper,
-  rem,
   Stack,
   Text,
   Title,
 } from '@mantine/core'
-import { IconUser } from '@tabler/icons-react'
+import { IconSettings, IconUser } from '@tabler/icons-react'
 import { useMemo } from 'react'
 import { Link } from 'react-router'
 
@@ -24,10 +23,7 @@ import {
   enrichOAuthClientsWithIpCheck,
   findGateClient,
 } from '@/utils/enrichOAuthClientsWithIpCheck'
-
-function isAdmin(user: { groups?: { name: string }[] }): boolean {
-  return user.groups?.some((g) => g.name === 'admin') ?? false
-}
+import { isAdmin } from '@/utils/isAdmin'
 
 export function HomePage(): React.ReactElement {
   const { t } = useI18n()
@@ -79,25 +75,7 @@ export function HomePage(): React.ReactElement {
           <Group gap="xs" wrap="nowrap" align="center">
             <Text size="lg">{t('welcomeUser', { name: displayName })}</Text>
             {isAdmin(user) ? (
-              <Badge
-                variant="light"
-                color="violet"
-                styles={{
-                  root: {
-                    height: 'auto',
-                    minHeight: 'var(--badge-height)',
-                    paddingBlock: rem(4),
-                    lineHeight: 1.45,
-                    overflow: 'visible',
-                  },
-                  label: {
-                    lineHeight: 1.45,
-                    overflow: 'visible',
-                    textBoxTrim: 'none',
-                    textBoxEdge: 'text',
-                  },
-                }}
-              >
+              <Badge variant="light" color="violet">
                 {t('administrator')}
               </Badge>
             ) : null}
@@ -113,6 +91,18 @@ export function HomePage(): React.ReactElement {
             >
               {t('profileNav')}
             </Button>
+            {isAdmin(user) ? (
+              <Button
+                component={Link}
+                to="/admin"
+                variant="light"
+                color="violet"
+                size="sm"
+                leftSection={<IconSettings size={18} stroke={1.5} />}
+              >
+                {t('management')}
+              </Button>
+            ) : null}
           </Group>
         </Group>
 
