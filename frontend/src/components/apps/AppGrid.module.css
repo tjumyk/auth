@@ -1,0 +1,36 @@
+.card {
+  display: block;
+  transition:
+    transform 180ms ease,
+    box-shadow 200ms ease,
+    border-color 200ms ease;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--mantine-shadow-md);
+}
+
+.iconWrap {
+  display: inline-flex;
+  transition: transform 200ms ease;
+}
+
+.card:hover .iconWrap {
+  transform: scale(1.04);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card,
+  .iconWrap {
+    transition-duration: 0.01ms;
+  }
+
+  .card:hover {
+    transform: none;
+  }
+
+  .card:hover .iconWrap {
+    transform: none;
+  }
+}

@@ -11,3 +11,4 @@ mailbox/
 upload/
 /stdout.log
 /stderr.log
+/instance/
