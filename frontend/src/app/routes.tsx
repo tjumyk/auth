@@ -32,6 +32,7 @@ import { RequestDisableTwoFactorPage } from '@/pages/RequestDisableTwoFactorPage
 import { RequestReconfirmEmailPage } from '@/pages/RequestReconfirmEmailPage'
 import { RequestResetPasswordPage } from '@/pages/RequestResetPasswordPage'
 import { TwoFactorSettingsPage } from '@/pages/TwoFactorSettingsPage'
+import type { AppLocationScrollState } from '@/models/locationScrollState'
 
 export const router = createBrowserRouter([
   {
@@ -47,6 +48,29 @@ export const router = createBrowserRouter([
           { index: true, element: <HomePage /> },
           { path: 'account/profile', element: <ProfilePage /> },
           { path: 'account/two-factor', element: <TwoFactorSettingsPage /> },
+          /* Legacy Angular paths → canonical routes (+ scroll state where needed) */
+          {
+            path: 'settings',
+            element: <Navigate to="/account/profile" replace />,
+          },
+          {
+            path: 'settings/profile',
+            element: <Navigate to="/account/profile" replace />,
+          },
+          {
+            path: 'settings/password',
+            element: (
+              <Navigate
+                to="/account/profile"
+                replace
+                state={{ scrollTo: 'password' } satisfies AppLocationScrollState}
+              />
+            ),
+          },
+          {
+            path: 'settings/two-factor',
+            element: <Navigate to="/account/two-factor" replace />,
+          },
         ],
       },
       {

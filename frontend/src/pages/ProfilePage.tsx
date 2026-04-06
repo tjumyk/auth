@@ -23,7 +23,7 @@ import { useForm } from '@mantine/form'
 import { useDocumentTitle } from '@mantine/hooks'
 import { IconArrowLeft, IconUser } from '@tabler/icons-react'
 import { useEffect, useState } from 'react'
-import { Link } from 'react-router'
+import { Link, useLocation } from 'react-router'
 
 import {
   ACCOUNT_ME_QUERY_KEY,
@@ -40,6 +40,7 @@ import type { AccountMeUser } from '@/models/user'
 import { siteConfig } from '@/models/siteConfig'
 import { groupNameToBadgeColor } from '@/utils/groupBadgeColor'
 import { validateNewPassword, validateRepeatNewPassword } from '@/utils/passwordValidation'
+import { PROFILE_SECTION_DOM_IDS, type AppLocationScrollState } from '@/models/locationScrollState'
 import { userAvatarSrc } from '@/utils/siteAssetUrl'
 
 const AVATAR_ACCEPT = 'image/png,image/jpeg,image/jpg,image/gif'
@@ -124,6 +125,7 @@ function ProfilePageSkeleton(): React.ReactElement {
 
 export function ProfilePage(): React.ReactElement {
   const { t, locale } = useI18n()
+  const location = useLocation()
   const queryClient = useQueryClient()
   const [profileError, setProfileError] = useState<BasicError | null>(null)
   const [avatarError, setAvatarError] = useState<BasicError | null>(null)
@@ -220,6 +222,24 @@ export function ProfilePage(): React.ReactElement {
   })
 
   const user = meQ.data
+
+  useEffect(() => {
+    if (!user) {
+      return
+    }
+    const scrollTo = (location.state as AppLocationScrollState | null)?.scrollTo
+    if (!scrollTo) {
+      return
+    }
+    const domId = PROFILE_SECTION_DOM_IDS[scrollTo]
+    if (!domId) {
+      return
+    }
+    const id = window.setTimeout(() => {
+      document.getElementById(domId)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }, 0)
+    return () => window.clearTimeout(id)
+  }, [user, location.key, location.state])
   const avatarSrc = user ? userAvatarSrc(user) : null
   const showLocalPasswordForm = Boolean(
     user && (!user.external_auth_provider_id || !user.external_auth_enforced),
@@ -257,7 +277,7 @@ export function ProfilePage(): React.ReactElement {
 
         {user ? (
           <>
-            <Paper p="md" radius="md" withBorder shadow="xs">
+            <Paper id="profile-account-details" p="md" radius="md" withBorder shadow="xs">
               <Title order={4} mb="md">
                 {t('accountDetails')}
               </Title>
@@ -317,7 +337,7 @@ export function ProfilePage(): React.ReactElement {
               </SimpleGrid>
             </Paper>
 
-            <Paper p="md" radius="md" withBorder shadow="xs">
+            <Paper id="profile-nickname" p="md" radius="md" withBorder shadow="xs">
               <Title order={4} mb="md">
                 {t('nicknameSection')}
               </Title>
@@ -352,7 +372,7 @@ export function ProfilePage(): React.ReactElement {
               </form>
             </Paper>
 
-            <Paper p="md" radius="md" withBorder shadow="xs">
+            <Paper id="profile-avatar" p="md" radius="md" withBorder shadow="xs">
               <Title order={4} mb="md">
                 {t('avatarSection')}
               </Title>
@@ -402,7 +422,7 @@ export function ProfilePage(): React.ReactElement {
               </Stack>
             </Paper>
 
-            <Paper p="md" radius="md" withBorder shadow="xs">
+            <Paper id="profile-password" p="md" radius="md" withBorder shadow="xs">
               <Title order={4} mb="md">
                 {t('passwordSection')}
               </Title>

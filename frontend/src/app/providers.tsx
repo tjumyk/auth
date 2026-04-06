@@ -1,4 +1,5 @@
 import { ColorSchemeScript, MantineProvider } from '@mantine/core'
+import { Notifications } from '@mantine/notifications'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import type { ReactNode } from 'react'
 import { Provider } from 'react-redux'
@@ -22,6 +23,7 @@ export function AppProviders({ children }: { children: ReactNode }): React.React
       <QueryClientProvider client={queryClient}>
         <ColorSchemeScript defaultColorScheme="auto" />
         <MantineProvider theme={theme} defaultColorScheme="auto">
+          <Notifications position="top-right" autoClose={4000} zIndex={4000} />
           <I18nProvider>{children}</I18nProvider>
         </MantineProvider>
       </QueryClientProvider>

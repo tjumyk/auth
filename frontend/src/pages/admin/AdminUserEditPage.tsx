@@ -17,6 +17,7 @@ import {
   Title,
 } from '@mantine/core'
 import { useForm } from '@mantine/form'
+import { notifications } from '@mantine/notifications'
 import { useDisclosure } from '@mantine/hooks'
 import { IconArrowLeft } from '@tabler/icons-react'
 import { useEffect, useState } from 'react'
@@ -152,7 +153,12 @@ export function AdminUserEditPage(): React.ReactElement {
     mutationFn: () => getAdminConfirmEmailUrl(uid),
     onSuccess: async (url) => {
       setPageError(null)
-      await navigator.clipboard.writeText(url)
+      try {
+        await navigator.clipboard.writeText(url)
+        notifications.show({ color: 'teal', message: t('copyToClipboardSuccess') })
+      } catch {
+        notifications.show({ color: 'red', message: t('copyToClipboardFailed') })
+      }
     },
     onError: (e) => setPageError(getBasicErrorFromUnknown(e)),
   })

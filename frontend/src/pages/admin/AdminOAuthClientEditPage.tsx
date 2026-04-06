@@ -15,6 +15,7 @@ import {
   Title,
 } from '@mantine/core'
 import { useForm } from '@mantine/form'
+import { notifications } from '@mantine/notifications'
 import { useDebouncedValue, useDisclosure } from '@mantine/hooks'
 import { IconArrowLeft, IconApps } from '@tabler/icons-react'
 import { useEffect, useState } from 'react'
@@ -198,7 +199,12 @@ export function AdminOAuthClientEditPage(): React.ReactElement {
   })
 
   const copySecret = async (secret: string): Promise<void> => {
-    await navigator.clipboard.writeText(secret)
+    try {
+      await navigator.clipboard.writeText(secret)
+      notifications.show({ color: 'teal', message: t('copyToClipboardSuccess') })
+    } catch {
+      notifications.show({ color: 'red', message: t('copyToClipboardFailed') })
+    }
   }
 
   if (!valid) {
