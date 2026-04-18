@@ -108,6 +108,9 @@ class OAuthService:
             elif key == 'description':
                 if value and len(value) > OAuthService.client_description_max_length:
                     raise OAuthServiceError('description too long')
+            elif key == 'icon':
+                if value is not None and not isinstance(value, str):
+                    raise OAuthServiceError('invalid icon')
             setattr(client, key, value)
         return old_values
 

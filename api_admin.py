@@ -383,16 +383,16 @@ def oauth_client(cid):
             files = request.files
             params = request.form.to_dict() or (request.json if request.is_json else {}) or {}
 
-            # handle upload
+            # handle upload (FileStorage is falsy when filename is empty; still a file part)
             icon_file = files.get('icon')
-            if icon_file:
+            if icon_file is not None:
                 if not icon_file.filename:
                     return jsonify(msg='icon file cannot be empty'), 400
                 url = handle_upload(icon_file, 'icon', image_check=True, image_check_squared=True)
                 params['icon'] = url  # save url in params
 
             old_profile = OAuthService.update_client_profile(client, **params)
-            if icon_file:
+            if icon_file is not None:
                 old_icon = old_profile.get('icon')
                 if old_icon:
                     handle_post_upload(old_icon, 'icon')
