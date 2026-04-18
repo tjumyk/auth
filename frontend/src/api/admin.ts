@@ -166,7 +166,9 @@ export async function putAdminUserNickname(uid: number, nickname: string): Promi
 export async function putAdminUserAvatar(uid: number, file: File): Promise<AdminUser> {
   const fd = new FormData()
   fd.append('avatar', file)
-  const res = await apiClient.put<unknown>(`/api/admin/users/${uid}`, fd)
+  const res = await apiClient.put<unknown>(`/api/admin/users/${uid}`, fd, {
+    headers: { 'Content-Type': false },
+  })
   const parsed = AdminUserSchema.safeParse(res.data)
   if (!parsed.success) {
     console.error('admin user avatar parse error', parsed.error.flatten())
@@ -343,7 +345,10 @@ export async function putAdminOAuthClientProfile(
 export async function putAdminOAuthClientIcon(cid: number, file: File): Promise<AdminOAuthClient> {
   const fd = new FormData()
   fd.append('icon', file)
-  const res = await apiClient.put<unknown>(`/api/admin/clients/${cid}`, fd)
+  // Instance default Content-Type is application/json; omit so the browser sends multipart (see putAccountAvatar).
+  const res = await apiClient.put<unknown>(`/api/admin/clients/${cid}`, fd, {
+    headers: { 'Content-Type': false },
+  })
   const parsed = AdminOAuthClientSchema.safeParse(res.data)
   if (!parsed.success) {
     console.error('admin oauth client icon parse error', parsed.error.flatten())
