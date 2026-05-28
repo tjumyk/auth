@@ -3,7 +3,12 @@
 
 __pycache__
 
+.env
+.env.*
+!.env.example
+
 config.json
+config.prod.json
 test.db
 static/
 static_cn/

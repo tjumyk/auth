@@ -181,3 +181,104 @@ Then, enable the service with supervisor controller:
 ```bash
 sudo supervisorctl update
 ```
+
+## Docker Deployment (Backend + Frontend + PostgreSQL)
+
+This repository now supports production-style deployment with Docker Compose:
+
+- `backend`: Flask + gunicorn (`python:3.11-slim`)
+- `frontend`: React/Vite static build served by nginx (`node:20-alpine` + `nginx:alpine`)
+- `db`: PostgreSQL (`postgres:15`)
+
+### 1. Prepare environment variables
+
+Copy example env file and update required values:
+
+```bash
+cp .env.example .env
+```
+
+At minimum, update:
+
+- `POSTGRES_PASSWORD`
+- `SQLALCHEMY_DATABASE_URI`
+- `SECRET_KEY`
+- `ADMIN_PASSWORD`
+- `SITE_ROOT_URL`
+
+### 2. Configure backend runtime config file
+
+Container build config selection:
+
+1. If `config.prod.json` exists, it is copied into backend image as `config.json`.
+2. Otherwise backend build falls back to `config.json`.
+
+Runtime precedence is: **environment variables > config.json**.
+
+Supported backend env overrides include:
+
+- `SECRET_KEY`
+- `SQLALCHEMY_DATABASE_URI` (or alias `DB_URL`)
+- `SITE_ROOT_URL`, `SITE_BASE_URL`, `SITE_BEHIND_PROXY`
+- `ADMIN_NAME`, `ADMIN_EMAIL`, `ADMIN_PASSWORD`
+- `MAIL_FROM`, `MAIL_DISPLAY_NAME`, `MAIL_REPLY_TO`, `MAIL_REPLY_TO_NAME`
+- `UPLOAD_ROOT_FOLDER`
+- `FLASK_DEBUG`
+
+### 3. Build and start
+
+```bash
+docker compose up -d --build
+```
+
+View logs:
+
+```bash
+docker compose logs -f frontend backend db
+```
+
+### 4. Initialize database (first run only)
+
+```bash
+docker compose exec backend flask create-db
+docker compose exec backend flask init-db
+```
+
+### 5. Access the service
+
+- Default: `http://localhost:8080/`
+- API is routed through frontend nginx to backend (`/api`, `/oauth`, `/upload`).
+
+### 6. Optional subpath deployment (e.g. `/id/`)
+
+Set in `.env`:
+
+```bash
+FRONTEND_BASE_PATH=/id/
+SITE_BASE_URL=/id/
+SITE_ROOT_URL=http://example.com/id/
+```
+
+Then rebuild frontend image:
+
+```bash
+docker compose up -d --build frontend
+```
+
+### 7. Stop / restart / update
+
+```bash
+docker compose down
+docker compose up -d
+docker compose up -d --build
+```
+
+### Notes
+
+- Backend gunicorn uses sync workers with threads (`GUNICORN_WORKERS`, `GUNICORN_THREADS`), not eventlet.
+- Backend runs as non-root user `appuser` (UID 1000) via entrypoint.
+- Health checks: backend `GET /api/meta/health`, frontend nginx on `/`.
+- Email HTML templates are built from MJML during backend image build (`mail_templates/mjml`).
+- PostgreSQL data is persisted in volume `postgres_data`.
+- Upload files are persisted in volume `backend_upload`.
+- Backend container does not include frontend source/assets; nginx frontend is a separate service.

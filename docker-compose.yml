@@ -1,0 +1,76 @@
+services:
+  db:
+    image: postgres:15
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-auth}
+      POSTGRES_USER: ${POSTGRES_USER:-auth}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-change_me}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-auth} -d ${POSTGRES_DB:-auth}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        APT_MIRROR: ${APT_MIRROR:-mirrors.tuna.tsinghua.edu.cn}
+        ALPINE_MIRROR: ${ALPINE_MIRROR:-mirrors.tuna.tsinghua.edu.cn}
+        NPM_REGISTRY: ${NPM_REGISTRY:-https://registry.npmmirror.com}
+        PIP_INDEX_URL: ${PIP_INDEX_URL:-https://pypi.tuna.tsinghua.edu.cn/simple}
+        PIP_TRUSTED_HOST: ${PIP_TRUSTED_HOST:-pypi.tuna.tsinghua.edu.cn}
+        PIP_CACHE_DIR: ${PIP_CACHE_DIR:-}
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      BACKEND_PORT: ${BACKEND_PORT:-8077}
+      SQLALCHEMY_DATABASE_URI: ${SQLALCHEMY_DATABASE_URI:-postgresql://auth:change_me@db:5432/auth}
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import os, urllib.request; urllib.request.urlopen('http://127.0.0.1:' + os.environ.get('BACKEND_PORT', '8077') + '/api/meta/health')\""]
+      interval: 30s
+      timeout: 10s
+      start_period: 10s
+      retries: 3
+    volumes:
+      - backend_upload:/app/upload
+
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+      args:
+        ALPINE_MIRROR: ${ALPINE_MIRROR:-mirrors.tuna.tsinghua.edu.cn}
+        NPM_REGISTRY: ${NPM_REGISTRY:-https://registry.npmmirror.com}
+        VITE_BASE_URL: ${FRONTEND_BASE_PATH:-/}
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      FRONTEND_BASE_PATH: ${FRONTEND_BASE_PATH:-/}
+      BACKEND_UPSTREAM: backend:${BACKEND_PORT:-8077}
+    depends_on:
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1/ || exit 1"]
+      interval: 30s
+      timeout: 10s
+      start_period: 5s
+      retries: 3
+    ports:
+      - "${FRONTEND_PORT:-8080}:80"
+
+volumes:
+  postgres_data:
+  backend_upload:

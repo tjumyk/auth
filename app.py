@@ -1,6 +1,7 @@
 import json
 import os
 import re
+from typing import Any, Callable
 
 import click
 from flask import Flask, request, jsonify, send_from_directory
@@ -87,9 +88,66 @@ _STATIC_ROOT_PATH = 'static/browser'  # for newer angular setup
 _STATIC_INDEX_HTML_PATH = 'index.html'
 _STATIC_URL_PATH = '/static'
 
+
+def _parse_bool(value: str) -> bool:
+    normalized = value.strip().lower()
+    if normalized in {'1', 'true', 't', 'yes', 'y', 'on'}:
+        return True
+    if normalized in {'0', 'false', 'f', 'no', 'n', 'off'}:
+        return False
+    raise ValueError(f'Invalid boolean value: {value}')
+
+
+def _set_nested_config(config: dict[str, Any], path: tuple[str, ...], value: Any) -> None:
+    target: dict[str, Any] = config
+    for key in path[:-1]:
+        nested = target.get(key)
+        if not isinstance(nested, dict):
+            nested = {}
+            target[key] = nested
+        target = nested
+    target[path[-1]] = value
+
+
+def _get_env_override(env_names: tuple[str, ...]) -> str | None:
+    for env_name in env_names:
+        env_value = os.environ.get(env_name)
+        if env_value is not None:
+            return env_value
+    return None
+
+
+def _load_config_with_env_overrides(config_path: str) -> dict[str, Any]:
+    with open(config_path) as f_cfg:
+        config: dict[str, Any] = json.load(f_cfg)
+
+    override_specs: list[tuple[tuple[str, ...], tuple[str, ...], Callable[[str], Any]]] = [
+        (('SECRET_KEY',), ('SECRET_KEY',), str),
+        (('SQLALCHEMY_DATABASE_URI',), ('DB_URL', 'SQLALCHEMY_DATABASE_URI'), str),
+        (('SITE', 'root_url'), ('SITE_ROOT_URL',), str),
+        (('SITE', 'base_url'), ('SITE_BASE_URL',), str),
+        (('SITE', 'behind_proxy'), ('SITE_BEHIND_PROXY',), _parse_bool),
+        (('ADMIN', 'name'), ('ADMIN_NAME',), str),
+        (('ADMIN', 'email'), ('ADMIN_EMAIL',), str),
+        (('ADMIN', 'password'), ('ADMIN_PASSWORD',), str),
+        (('MAIL', 'from'), ('MAIL_FROM',), str),
+        (('MAIL', 'display_name'), ('MAIL_DISPLAY_NAME',), str),
+        (('MAIL', 'reply_to'), ('MAIL_REPLY_TO',), str),
+        (('MAIL', 'reply_to_name'), ('MAIL_REPLY_TO_NAME',), str),
+        (('UPLOAD', 'root_folder'), ('UPLOAD_ROOT_FOLDER',), str),
+        (('DEBUG',), ('FLASK_DEBUG',), _parse_bool),
+    ]
+    for config_path_keys, env_names, parser in override_specs:
+        env_value = _get_env_override(env_names)
+        if env_value is None:
+            continue
+        _set_nested_config(config, config_path_keys, parser(env_value))
+
+    return config
+
+
 app = MyFlask(__name__, static_folder=_STATIC_ROOT_PATH, static_url_path=_STATIC_URL_PATH)
-with open('config.json') as _f_cfg:
-    app.config.from_mapping(json.load(_f_cfg))
+app.config.from_mapping(_load_config_with_env_overrides('config.json'))
 
 db.init_app(app)
 upload.init_app(app)

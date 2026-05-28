@@ -7,6 +7,21 @@ import { defineConfig } from 'vitest/config'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
+function normalizeBasePath(rawBase: string | undefined): string {
+  const fallback = '/'
+  if (!rawBase || rawBase.trim() === '') {
+    return fallback
+  }
+  let base = rawBase.trim()
+  if (!base.startsWith('/')) {
+    base = `/${base}`
+  }
+  if (!base.endsWith('/')) {
+    base = `${base}/`
+  }
+  return base
+}
+
 /**
  * Browser hits Vite; these paths forward to Flask (`VITE_FLASK_ORIGIN`).
  * - `/api`, `/oauth` — APIs and OAuth pages
@@ -25,7 +40,7 @@ function flaskDevProxy(target: string): Record<string, { target: string; changeO
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '')
   const flaskOrigin = env.VITE_FLASK_ORIGIN ?? 'http://127.0.0.1:8077'
-  const base = mode === 'production' ? '/static/' : '/'
+  const base = mode === 'production' ? normalizeBasePath(env.VITE_BASE_URL) : '/'
   const proxy = flaskDevProxy(flaskOrigin)
 
   return {

@@ -7,6 +7,11 @@ from utils.session import requires_login
 meta = Blueprint('meta_api', __name__)
 
 
+@meta.route('/health')
+def health():
+    return jsonify(status='ok')
+
+
 @meta.route('/version')
 @requires_login
 def get_version():

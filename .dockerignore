@@ -1,0 +1,53 @@
+# VCS and editor artifacts
+.git
+.gitignore
+.idea
+.cursor
+*.iml
+*.swp
+*.swo
+
+# Python caches and local envs
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+env/
+
+# Logs and local runtime files
+*.log
+stdout.log
+stderr.log
+.env
+.env.*
+!.env.example
+instance/
+mailbox/
+
+# Local databases and generated artifacts
+*.db
+test.db
+auth.db
+static/
+static_*/
+upload/
+
+# Frontend dependencies/cache
+frontend/node_modules/
+frontend/.vite/
+frontend/dist/
+frontend/.cache/
+angular/node_modules/
+angular/dist/
+mail_templates/mjml/node_modules/
+
+# Build-only caches (optional local mirrors)
+pip_cache/
+
+# Keep config.prod.json available for backend build-time preference logic.
+# Keep config.json available for fallback when config.prod.json is absent.
