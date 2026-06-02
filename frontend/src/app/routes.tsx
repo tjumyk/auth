@@ -34,7 +34,16 @@ import { RequestResetPasswordPage } from '@/pages/RequestResetPasswordPage'
 import { TwoFactorSettingsPage } from '@/pages/TwoFactorSettingsPage'
 import type { AppLocationScrollState } from '@/models/locationScrollState'
 
-export const router = createBrowserRouter([
+function routerBasename(): string | undefined {
+  const base = import.meta.env.BASE_URL
+  if (!base || base === '/') {
+    return undefined
+  }
+  return base.replace(/\/$/, '')
+}
+
+export const router = createBrowserRouter(
+  [
   {
     path: '/',
     children: [
@@ -171,4 +180,6 @@ export const router = createBrowserRouter([
       { path: '*', element: <NotFoundPage /> },
     ],
   },
-])
+  ],
+  { basename: routerBasename() },
+)

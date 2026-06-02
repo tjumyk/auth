@@ -31,9 +31,8 @@ server {
     }
 
     location ^~ __BASE_PATH__ {
-        rewrite ^__BASE_PATH__(.*)$ /$1 break;
-        root /usr/share/nginx/html;
-        try_files $uri $uri/ /index.html;
+        alias /usr/share/nginx/html/;
+        try_files $uri $uri/ __BASE_PATH__index.html;
     }
 
     location = / {
