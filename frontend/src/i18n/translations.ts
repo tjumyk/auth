@@ -347,6 +347,8 @@ export const translations: Record<Locale, Record<string, string>> = {
     profileNav: 'Profile',
     accountMenu: 'Account menu',
     appearanceAndLanguage: 'Theme & language',
+    theme: 'Theme',
+    language: 'Language',
     admin2faHeroTitle: 'Enable two-factor authentication',
     admin2faHeroBody:
       'Administrator accounts have elevated access. We strongly recommend turning on two-factor authentication to protect your account and the platform.',
@@ -752,6 +754,8 @@ export const translations: Record<Locale, Record<string, string>> = {
     profileNav: '个人资料',
     accountMenu: '账户菜单',
     appearanceAndLanguage: '主题与语言',
+    theme: '主题',
+    language: '语言',
     admin2faHeroTitle: '请启用两步验证',
     admin2faHeroBody:
       '管理员账户权限较高，强烈建议启用两步验证（2FA），以保护您的账户和系统安全。',

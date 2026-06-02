@@ -2,19 +2,18 @@ import { Flex, Group, Paper, Stack, rem, type FlexProps, type StackProps } from 
 
 import { ThemeLocaleToolbar } from '@/components/layout/ThemeLocaleToolbar'
 import { useLoginBackdropStyle } from '@/hooks/useLoginBackdropStyle'
-
-const TOOLBAR = (
-  <Group justify="flex-end" px="md" pt="md" pb={0} wrap="nowrap" style={{ flexShrink: 0 }}>
-    <ThemeLocaleToolbar />
-  </Group>
-)
+import { isThemeLocaleToolbarVisible } from '@/models/uiConfig'
 
 /** Full-viewport auth-style backdrop with theme/locale toolbar. Put body content in `children`. */
 export function PublicAuthShell({ children }: { children: React.ReactNode }): React.ReactElement {
   const shellStyle = useLoginBackdropStyle()
   return (
     <Flex direction="column" component="main" style={shellStyle}>
-      {TOOLBAR}
+      {isThemeLocaleToolbarVisible ? (
+        <Group justify="flex-end" px="md" pt="md" pb={0} wrap="nowrap" style={{ flexShrink: 0 }}>
+          <ThemeLocaleToolbar />
+        </Group>
+      ) : null}
       {children}
     </Flex>
   )

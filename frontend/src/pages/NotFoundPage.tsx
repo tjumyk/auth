@@ -4,6 +4,7 @@ import { Link } from 'react-router'
 
 import { ThemeLocaleToolbar } from '@/components/layout/ThemeLocaleToolbar'
 import { useI18n } from '@/hooks/useI18n'
+import { isThemeLocaleToolbarVisible } from '@/models/uiConfig'
 
 export function NotFoundPage(): React.ReactElement {
   const { t } = useI18n()
@@ -11,9 +12,11 @@ export function NotFoundPage(): React.ReactElement {
 
   return (
     <Container size="sm" py="xl">
-      <Group justify="flex-end" mb="md">
-        <ThemeLocaleToolbar />
-      </Group>
+      {isThemeLocaleToolbarVisible ? (
+        <Group justify="flex-end" mb="md">
+          <ThemeLocaleToolbar />
+        </Group>
+      ) : null}
       <Stack gap="md">
         <Title order={2}>{t('notFoundHeading')}</Title>
         <Text c="dimmed">{t('notFoundMessage')}</Text>

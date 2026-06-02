@@ -6,6 +6,7 @@ import { Link } from 'react-router'
 import { ThemeLocaleToolbar } from '@/components/layout/ThemeLocaleToolbar'
 import { useAuthUser } from '@/hooks/useAuthUser'
 import { useI18n } from '@/hooks/useI18n'
+import { isLocaleForced, isThemeForced, isThemeLocaleToolbarVisible } from '@/models/uiConfig'
 import { userAvatarSrc } from '@/utils/siteAssetUrl'
 
 export function ShellHeaderAccountMenu({
@@ -21,10 +22,12 @@ export function ShellHeaderAccountMenu({
 
   return (
     <Group gap="xs" wrap="nowrap" align="center" justify="flex-end" style={{ flexShrink: 0 }}>
-      <Group gap="xs" wrap="nowrap" align="center" visibleFrom="sm">
-        <ThemeLocaleToolbar />
-        <Divider orientation="vertical" h={24} style={{ alignSelf: 'center' }} />
-      </Group>
+      {isThemeLocaleToolbarVisible ? (
+        <Group gap="xs" wrap="nowrap" align="center" visibleFrom="sm">
+          <ThemeLocaleToolbar />
+          <Divider orientation="vertical" h={24} style={{ alignSelf: 'center' }} />
+        </Group>
+      ) : null}
       <Menu
         shadow="md"
         width={260}
@@ -60,11 +63,23 @@ export function ShellHeaderAccountMenu({
         </Menu.Target>
         <Menu.Dropdown>
           <Box hiddenFrom="sm">
-            <Menu.Label>{t('appearanceAndLanguage')}</Menu.Label>
-            <Box px={6} py={6}>
-              <ThemeLocaleToolbar variant="menu" />
-            </Box>
-            <Menu.Divider />
+            {isThemeLocaleToolbarVisible ? (
+              <>
+                <Menu.Label>
+                  {t(
+                    isThemeForced && !isLocaleForced
+                      ? 'language'
+                      : isLocaleForced && !isThemeForced
+                        ? 'theme'
+                        : 'appearanceAndLanguage',
+                  )}
+                </Menu.Label>
+                <Box px={6} py={6}>
+                  <ThemeLocaleToolbar variant="menu" />
+                </Box>
+                <Menu.Divider />
+              </>
+            ) : null}
           </Box>
           <Menu.Item
             component={Link}

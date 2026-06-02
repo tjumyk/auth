@@ -6,6 +6,10 @@ interface ImportMetaEnv {
   readonly VITE_SITE_BASE_URL?: string
   /** Dev only: extra milliseconds after each API response (success or error) for slow-network UX debugging. */
   readonly VITE_DEV_API_DELAY_MS?: string
+  /** Optional build-time override; takes precedence over config.json UI.force_theme. */
+  readonly VITE_FORCE_THEME?: string
+  /** Optional build-time override; takes precedence over config.json UI.force_locale. */
+  readonly VITE_FORCE_LOCALE?: string
 }
 
 interface ImportMeta {

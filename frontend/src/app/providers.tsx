@@ -6,7 +6,12 @@ import { Provider } from 'react-redux'
 
 import { store } from '@/app/store'
 import { I18nProvider } from '@/i18n'
+import { forcedColorScheme } from '@/models/uiConfig'
 import { theme } from '@/theme'
+
+const colorSchemeProviderProps = forcedColorScheme
+  ? { forceColorScheme: forcedColorScheme }
+  : { defaultColorScheme: 'auto' as const }
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -21,8 +26,8 @@ export function AppProviders({ children }: { children: ReactNode }): React.React
   return (
     <Provider store={store}>
       <QueryClientProvider client={queryClient}>
-        <ColorSchemeScript defaultColorScheme="auto" />
-        <MantineProvider theme={theme} defaultColorScheme="auto">
+        <ColorSchemeScript {...colorSchemeProviderProps} />
+        <MantineProvider theme={theme} {...colorSchemeProviderProps}>
           <Notifications position="top-right" autoClose={4000} zIndex={4000} />
           <I18nProvider>{children}</I18nProvider>
         </MantineProvider>

@@ -5,6 +5,7 @@ import { Link } from 'react-router'
 
 import { ThemeLocaleToolbar } from '@/components/layout/ThemeLocaleToolbar'
 import { useI18n } from '@/hooks/useI18n'
+import { isThemeLocaleToolbarVisible } from '@/models/uiConfig'
 import { siteConfig } from '@/models/siteConfig'
 
 export function ForbiddenPage(): React.ReactElement {
@@ -13,9 +14,11 @@ export function ForbiddenPage(): React.ReactElement {
 
   return (
     <Container size="sm" py="xl">
-      <Group justify="flex-end" mb="md">
-        <ThemeLocaleToolbar />
-      </Group>
+      {isThemeLocaleToolbarVisible ? (
+        <Group justify="flex-end" mb="md">
+          <ThemeLocaleToolbar />
+        </Group>
+      ) : null}
       <Stack gap="lg" align="center" ta="center">
         <IconLockX size={48} stroke={1.25} aria-hidden />
         <Title order={2}>{t('forbiddenHeading')}</Title>

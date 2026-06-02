@@ -15,6 +15,7 @@ import { fetchWhoami } from '@/api/account'
 import { AuthUserProvider } from '@/components/auth/AuthUserProvider'
 import { ThemeLocaleToolbar } from '@/components/layout/ThemeLocaleToolbar'
 import { useI18n } from '@/hooks/useI18n'
+import { isThemeLocaleToolbarVisible } from '@/models/uiConfig'
 import { siteConfig } from '@/models/siteConfig'
 
 export function RequireAuth({ children }: { children: ReactNode }): React.ReactElement {
@@ -33,9 +34,11 @@ export function RequireAuth({ children }: { children: ReactNode }): React.ReactE
   if (q.isPending) {
     return (
       <Stack gap="md" p="md">
-        <Group justify="flex-end">
-          <ThemeLocaleToolbar />
-        </Group>
+        {isThemeLocaleToolbarVisible ? (
+          <Group justify="flex-end">
+            <ThemeLocaleToolbar />
+          </Group>
+        ) : null}
         <Center mih="50vh">
           <Loader />
         </Center>
@@ -46,9 +49,11 @@ export function RequireAuth({ children }: { children: ReactNode }): React.ReactE
   if (q.isError) {
     return (
       <Stack gap="md" p="md">
-        <Group justify="flex-end">
-          <ThemeLocaleToolbar />
-        </Group>
+        {isThemeLocaleToolbarVisible ? (
+          <Group justify="flex-end">
+            <ThemeLocaleToolbar />
+          </Group>
+        ) : null}
         <Center mih="60vh">
           <Stack>
             <Alert color="red" title={t('sessionVerifyFailed')}>

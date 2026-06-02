@@ -3,8 +3,12 @@ FROM node:20-alpine AS builder
 ARG ALPINE_MIRROR=mirrors.tuna.tsinghua.edu.cn
 ARG NPM_REGISTRY=https://registry.npmmirror.com
 ARG VITE_BASE_URL=/
+ARG VITE_FORCE_THEME=
+ARG VITE_FORCE_LOCALE=
 
 ENV VITE_BASE_URL=${VITE_BASE_URL}
+ENV VITE_FORCE_THEME=${VITE_FORCE_THEME}
+ENV VITE_FORCE_LOCALE=${VITE_FORCE_LOCALE}
 
 RUN if [ -n "${ALPINE_MIRROR}" ]; then \
       sed -i "s/dl-cdn.alpinelinux.org/${ALPINE_MIRROR}/g" /etc/apk/repositories; \

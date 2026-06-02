@@ -3,11 +3,15 @@ import { useCallback, useMemo, useState, type ReactNode } from 'react'
 import { I18nContext } from '@/i18n/context'
 import { getDefaultLocale, STORAGE_KEY, translations } from '@/i18n/translations'
 import type { I18nContextValue, Locale } from '@/i18n/types'
+import { forcedLocale, isLocaleForced } from '@/models/uiConfig'
 
 export function I18nProvider({ children }: { children: ReactNode }): React.ReactElement {
-  const [locale, setLocaleState] = useState<Locale>(getDefaultLocale)
+  const [locale, setLocaleState] = useState<Locale>(() => forcedLocale ?? getDefaultLocale())
 
   const setLocale = useCallback((next: Locale) => {
+    if (isLocaleForced) {
+      return
+    }
     setLocaleState(next)
     localStorage.setItem(STORAGE_KEY, next)
   }, [])

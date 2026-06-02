@@ -45,6 +45,7 @@
       "size_limit": 262144
     }
   },
+  "UI": {},
   "EXTERNAL_USER_INFO": [
     {
       "id": "local_pwd_agent",

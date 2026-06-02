@@ -9,6 +9,7 @@ import {
 import { IconMoon, IconSun } from '@tabler/icons-react'
 
 import { useI18n } from '@/hooks/useI18n'
+import { isLocaleForced, isThemeForced } from '@/models/uiConfig'
 
 export function ThemeLocaleToolbar({
   variant = 'inline',
@@ -68,19 +69,26 @@ export function ThemeLocaleToolbar({
     />
   )
 
+  const showTheme = !isThemeForced
+  const showLocale = !isLocaleForced
+
+  if (!showTheme && !showLocale) {
+    return null
+  }
+
   if (variant === 'menu') {
     return (
       <Stack gap={6} w="100%">
-        {themeControl}
-        {localeControl}
+        {showTheme ? themeControl : null}
+        {showLocale ? localeControl : null}
       </Stack>
     )
   }
 
   return (
     <Group gap="sm" wrap="nowrap">
-      {themeControl}
-      {localeControl}
+      {showTheme ? themeControl : null}
+      {showLocale ? localeControl : null}
     </Group>
   )
 }
