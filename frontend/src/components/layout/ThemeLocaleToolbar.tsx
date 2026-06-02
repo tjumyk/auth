@@ -16,7 +16,7 @@ export function ThemeLocaleToolbar({
 }: {
   /** `menu`: vertical, full-width — for account dropdown on narrow screens. */
   variant?: 'inline' | 'menu'
-}): React.ReactElement {
+}): React.ReactElement | null {
   const { t, locale, setLocale } = useI18n()
   const { setColorScheme } = useMantineColorScheme()
   const computedColorScheme = useComputedColorScheme('light')
