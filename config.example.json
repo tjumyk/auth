@@ -21,9 +21,9 @@
   },
   "SITE": {
     "name": "Identity",
-    "root_url": "http://localhost:8077",
+    "root_url": "http://localhost:8080",
     "base_url": "/",
-    "behind_proxy": false,
+    "behind_proxy": true,
     "organization_name": "Default Organization",
     "group_name": "Default Group",
     "copyright": "&copy; 2024 Yukai (Kelvin) Miao."
@@ -47,41 +47,11 @@
     }
   },
   "UI": {},
-  "EXTERNAL_USER_INFO": [
-    {
-      "id": "local_pwd_agent",
-      "name": "Local pwd agent",
-      "type": "pwd_agent",
-      "host": "localhost",
-      "port": 6391
-    }
-  ],
-  "EXTERNAL_AUTH_PROVIDERS": [
-    {
-      "id": "provider",
-      "name": "Provider Name",
-      "type": "kerberos",
-      "endpoint_url": "krbtgt/EXAMPLE.COM",
-      "default_realm": "EXAMPLE.COM",
-      "update_password_url": "example.com/change-pass",
-      "reset_password_url": "example.com/reset-pass"
-    }
-  ],
+  "EXTERNAL_USER_INFO": [],
+  "EXTERNAL_AUTH_PROVIDERS": [],
   "ACCOUNT_REGISTER": {
     "free_register": false,
-    "email_domain_register": [
-      {
-        "accept_domains": [
-          "mails.tsinghua.edu.cn"
-        ],
-        "add_to_groups": [
-          "thu_student"
-        ]
-      }
-    ]
+    "email_domain_register": []
   },
-  "IP_CHECK": {
-    "url": "http://127.0.0.1:6373",
-    "secret": "secretSECRET"
-  }
+  "IP_CHECK": {}
 }
