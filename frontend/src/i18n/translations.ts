@@ -206,8 +206,6 @@ export const translations: Record<Locale, Record<string, string>> = {
     adminUserInvalidId: 'Invalid user id.',
     adminUserLoadFailed: 'Could not load user.',
     adminUserEmailActions: 'Email',
-    adminUserEmailConfirmedHint:
-      'This account is confirmed. These actions reset it to unconfirmed and issue a new link. The user must open the link to set a password before they can sign in again.',
     adminUserReconfirmEmail: 'Send confirmation email',
     adminUserResetConfirmUrl: 'Reset confirmation link',
     adminUserResetConfirmTitle: 'Reset confirmation link?',
@@ -642,8 +640,6 @@ export const translations: Record<Locale, Record<string, string>> = {
     adminUserInvalidId: '用户编号无效。',
     adminUserLoadFailed: '无法加载用户。',
     adminUserEmailActions: '邮箱',
-    adminUserEmailConfirmedHint:
-      '该账号已确认。以下操作会将其重置为未确认并生成新链接；用户须打开链接设置密码后才能再次登录。',
     adminUserReconfirmEmail: '发送确认邮件',
     adminUserResetConfirmUrl: '重置确认链接',
     adminUserResetConfirmTitle: '重置确认链接？',

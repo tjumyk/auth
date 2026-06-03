@@ -18,6 +18,7 @@ import {
 } from '@mantine/core'
 import { useForm } from '@mantine/form'
 import { useDisclosure } from '@mantine/hooks'
+import { notifications } from '@mantine/notifications'
 import { IconArrowLeft } from '@tabler/icons-react'
 import { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router'
@@ -168,7 +169,14 @@ export function AdminUserEditPage(): React.ReactElement {
       setPageError(null)
       setRevealedConfirmUrl(url)
     },
-    onError: (e) => setPageError(getBasicErrorFromUnknown(e)),
+    onError: (e) => {
+      const err = getBasicErrorFromUnknown(e) ?? { msg: 'Request failed' }
+      notifications.show({
+        color: 'red',
+        title: err.msg,
+        message: err.detail ?? undefined,
+      })
+    },
   })
 
   const deleteM = useMutation({
@@ -353,11 +361,6 @@ export function AdminUserEditPage(): React.ReactElement {
           <Title order={4} mb="sm">
             {t('adminUserEmailActions')}
           </Title>
-          {user.is_email_confirmed ? (
-            <Text size="sm" c="dimmed" mb="sm">
-              {t('adminUserEmailConfirmedHint')}
-            </Text>
-          ) : null}
           <Stack gap="sm">
             <Group>
               <Button variant="light" loading={reconfirmM.isPending} onClick={openResetConfirm}>
