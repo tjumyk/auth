@@ -28,18 +28,9 @@ docker compose exec backend flask init-db
 
 Open [http://localhost:8080/](http://localhost:8080/) and sign in as `admin` / `PASSword` (from baked-in `config.example.json`).
 
-**For production or anything beyond a local trial**, copy and edit `.env` (and optionally `config.json`):
-
-```bash
-cp .env.example .env
-cp config.example.json config.json   # optional; only for settings .env cannot override
-```
-
-Set at least `SECRET_KEY`, `POSTGRES_PASSWORD`, `SQLALCHEMY_DATABASE_URI` (password must match `POSTGRES_PASSWORD`), and `ADMIN_PASSWORD` in `.env`. See [Config files](#1-config-files).
-
 **Logs:** `docker compose logs -f frontend backend db` · **Stop:** `docker compose down`
 
-Geo IP, subpath deployment, outbound email, and host installs — see [Deployment](#deployment) and [Development](#development).
+For production setup, geo IP, subpath, email, and host install — see [Deployment](#deployment) and [Development](#development).
 
 ---
 
