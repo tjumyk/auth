@@ -24,6 +24,7 @@ import {
   findGateClient,
 } from '@/utils/enrichOAuthClientsWithIpCheck'
 import { isAdmin } from '@/utils/isAdmin'
+import { siteAssetSrc } from '@/utils/siteAssetUrl'
 
 export function HomePage(): React.ReactElement {
   const { t } = useI18n()
@@ -156,7 +157,12 @@ export function HomePage(): React.ReactElement {
                   <Anchor href={gateClient.home_url} underline="hover" style={{ textDecoration: 'none' }}>
                     <Group gap="xs" wrap="nowrap">
                       {gateClient.icon ? (
-                        <Avatar src={gateClient.icon} alt="" size={28} radius="sm" />
+                        <Avatar
+                          src={siteAssetSrc(gateClient.icon) ?? undefined}
+                          alt=""
+                          size={28}
+                          radius="sm"
+                        />
                       ) : null}
                       <Text size="sm" fw={500}>
                         {t('ipUntrustedGateCta', { name: gateClient.name })}

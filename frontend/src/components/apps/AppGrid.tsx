@@ -4,6 +4,7 @@ import { IconApps, IconLock } from '@tabler/icons-react'
 import classes from '@/components/apps/AppGrid.module.css'
 import { getBasicErrorFromUnknown } from '@/api/client'
 import { useI18n } from '@/hooks/useI18n'
+import { siteAssetSrc } from '@/utils/siteAssetUrl'
 import type { BasicError } from '@/models/apiError'
 import type { OAuthClient } from '@/models/oauthClient'
 
@@ -39,7 +40,7 @@ function ClientCard({
       <div className={classes.cardTop}>
         {hasIcon && icon ? (
           <Avatar
-            src={icon}
+            src={siteAssetSrc(icon) ?? undefined}
             alt=""
             size={48}
             radius="md"

@@ -65,5 +65,22 @@
       "update_password_url": "example.com/change-pass",
       "reset_password_url": "example.com/reset-pass"
     }
-  ]
+  ],
+  "ACCOUNT_REGISTER": {
+    "free_register": false,
+    "email_domain_register": [
+      {
+        "accept_domains": [
+          "mails.tsinghua.edu.cn"
+        ],
+        "add_to_groups": [
+          "thu_student"
+        ]
+      }
+    ]
+  },
+  "IP_CHECK": {
+    "url": "http://127.0.0.1:6373",
+    "secret": "secretSECRET"
+  }
 }

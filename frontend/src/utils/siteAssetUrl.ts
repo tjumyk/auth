@@ -6,8 +6,11 @@
 
 function getSiteBaseUrl(): string {
   const raw = import.meta.env.VITE_SITE_BASE_URL
-  if (typeof raw === 'string' && raw.trim() !== '') {
-    return raw.trim()
+  if (typeof raw === 'string') {
+    const trimmed = raw.trim()
+    if (trimmed !== '' && trimmed !== '/') {
+      return trimmed
+    }
   }
   const base = import.meta.env.BASE_URL
   return typeof base === 'string' && base.trim() !== '' ? base.trim() : '/'
