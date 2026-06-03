@@ -247,7 +247,7 @@ docker compose exec backend flask init-db
 ### 5. Access the service
 
 - Default: `http://localhost:8080/`
-- API is routed through frontend nginx to backend (`/api`, `/oauth`, `/upload`).
+- API is routed through frontend nginx to backend (`/api`, `/oauth/connect`, `/upload`); other `/oauth/*` paths are SPA routes.
 
 ### 6. Optional subpath deployment (e.g. `/id/`)
 
