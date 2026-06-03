@@ -1,21 +1,18 @@
 
-<p align="center">
-  <a href="README.md"><img src="frontend/public/assets/images/logo-256.png" width="100" height="100" alt="Identity logo"></a>
-</p>
 
-<div align="center">
+
 
 # Identity
 
-_OAuth-based Identity Management System_
+*OAuth-based Identity Management System*
 
-</div>
 
-<div align="center">
 
-**[Quick Start](#quick-start)** · [Deployment](#deployment) · [Development](#development) · [Reference](#reference)
 
-</div>
+
+**[Quick Start](#quick-start)** · [Deployment](#deployment) · [Development](#development) · [Client SDK](#client-sdk) · [Reference](#reference)
+
+
 
 ---
 
@@ -29,7 +26,7 @@ docker compose exec backend flask create-db
 docker compose exec backend flask init-db
 ```
 
-Open [http://localhost:8080/](http://localhost:8080/) and sign in as `admin` / `PASSword` (from `config.example.json`).
+Open [http://localhost:8080/](http://localhost:8080/) and sign in as `admin` / `PASSword` (from baked-in `config.example.json`).
 
 **For production or anything beyond a local trial**, copy and edit `.env` (and optionally `config.json`):
 
@@ -78,24 +75,10 @@ Without `.env`, compose uses inline defaults (e.g. DB password `change_me`) and 
 | `SQLALCHEMY_DATABASE_URI` | Backend DB URL — user, password, and db name must match `POSTGRES_*` |
 | `ADMIN_PASSWORD`          | Initial admin account password                                       |
 | `SITE_ROOT_URL`           | Public URL users open in the browser (e.g. `http://localhost:8080`)  |
+| `SITE_BEHIND_PROXY`       | `true` when nginx (or similar) sits in front of the backend — see [Advanced config](#advanced-config) |
 
 
-See [.env.example](.env.example) for all options. Environment variables override `config.json` at runtime.
-
-**Subpath (e.g. `/id/`).** In `.env` set `FRONTEND_BASE_PATH=/id/`, `SITE_BASE_URL=/id/`, and `SITE_ROOT_URL` accordingly. Set these before building the frontend image; after changes run `docker compose up -d --build frontend`.
-
-**Outbound email.** The backend image includes **msmtp** as a sendmail-compatible MTA. When `MAIL_SMTP_HOST` is set in `.env`, the container writes msmtp config at startup and sends mail through your SMTP relay (instead of `mail_catcher` in `config.json`):
-
-```bash
-MAIL_ENABLED=true
-MAIL_FROM=noreply@example.com
-MAIL_SMTP_HOST=smtp.example.com
-MAIL_SMTP_PORT=587
-MAIL_SMTP_USER=your-user
-MAIL_SMTP_PASSWORD=your-password
-```
-
-Optional: `MAIL_SMTP_TLS`, `MAIL_SMTP_STARTTLS`, and `MAIL_SMTP_AUTH` (each `on` or `off`; defaults `on`). Rebuild the frontend when toggling `MAIL_ENABLED` so registration and admin send-email UI stay in sync.
+See [.env.example](.env.example) for all options. Environment variables override `config.json` at runtime. For subpath deployment, outbound email, Kerberos, and other settings not covered here, see [Advanced config](#advanced-config).
 
 #### 2. GeoLite databases (optional)
 
@@ -127,6 +110,96 @@ docker compose exec backend flask init-db
 **Logs:** `docker compose logs -f frontend backend db`  
 **Stop:** `docker compose down`
 
+#### Advanced config
+
+Optional settings beyond the minimal trial. Some use `.env`; others require `config.json` (not overridable via environment variables).
+
+**Subpath (e.g. `/id/`).** In `.env` set `FRONTEND_BASE_PATH=/id/`, `SITE_BASE_URL=/id/`, and `SITE_ROOT_URL` accordingly. Set these before building the frontend image; after changes run `docker compose up -d --build frontend`.
+
+**Reverse proxy (`SITE.behind_proxy`).** Set `SITE_BEHIND_PROXY=true` in `.env` when the backend is reached through nginx or another reverse proxy (Docker Compose default). Identity then reads the client IP from the `X-Real-IP` header the proxy sets, instead of the proxy's own address — used for login records, geo region detection, and IP check. The frontend nginx config already forwards `X-Real-IP` to the backend. For host install with direct `flask run` and no proxy in front, set `SITE_BEHIND_PROXY=false`.
+
+**Outbound email.** The backend image includes **msmtp** as a sendmail-compatible MTA. When `MAIL_SMTP_HOST` is set in `.env`, the container writes msmtp config at startup and sends mail through your SMTP relay (instead of `mail_catcher` in `config.json`):
+
+```bash
+MAIL_ENABLED=true
+MAIL_FROM=noreply@example.com
+MAIL_SMTP_HOST=smtp.example.com
+MAIL_SMTP_PORT=587
+MAIL_SMTP_USER=your-user
+MAIL_SMTP_PASSWORD=your-password
+```
+
+Optional: `MAIL_SMTP_TLS`, `MAIL_SMTP_STARTTLS`, and `MAIL_SMTP_AUTH` (each `on` or `off`; defaults `on`). Rebuild the frontend when toggling `MAIL_ENABLED` so registration and admin send-email UI stay in sync. For development without SMTP, see [Mail debugging](#mail-debugging).
+
+**External Kerberos authentication** — add to `config.json`. Requires the `kerberos` Python package and system libraries (`libkrb5-dev`, `krb5-config`). Not included in the default Docker image; use host install or extend the Dockerfile.
+
+```json
+"EXTERNAL_AUTH_PROVIDERS": [
+  {
+    "id": "provider",
+    "name": "Provider Name",
+    "type": "kerberos",
+    "endpoint_url": "krbtgt/EXAMPLE.COM",
+    "default_realm": "EXAMPLE.COM",
+    "update_password_url": "example.com/change-pass",
+    "reset_password_url": "example.com/reset-pass"
+  }
+]
+```
+
+**External user info sources** — add to `config.json`. Optional admin-only lookup: on a user's edit page, admins can **Load external info** to query external directory services. This does not affect login (`EXTERNAL_AUTH_PROVIDERS` is separate).
+
+The only supported source type today is `pwd_agent` — a small HTTP service (not shipped with Identity) that exposes passwd-style account records. Identity calls:
+
+```http
+GET http://<host>:<port>/api?names=<username>
+```
+
+Expects JSON shaped like `{ "<username>": { ... } }`. The response is shown in the admin UI as raw JSON; connection or lookup errors are surfaced there too.
+
+```json
+"EXTERNAL_USER_INFO": [
+  {
+    "id": "local_pwd_agent",
+    "name": "Local pwd agent",
+    "type": "pwd_agent",
+    "host": "localhost",
+    "port": 6391
+  }
+]
+```
+
+Run the pwd agent where Identity can reach it (`host` / `port`). Multiple entries are allowed — each is queried and listed separately.
+
+**Registration rules** — add to `config.json`. Controls **self-service** sign-up (`POST /api/account/register`). Admin invite is unaffected.
+
+If `ACCOUNT_REGISTER` is omitted or `null`, registration is disabled. The same applies when it is present but `free_register` is false and `email_domain_register` is empty — the default in `config.example.json`. Set `free_register` to true and/or add domain rules to allow sign-up.
+
+```json
+"ACCOUNT_REGISTER": {
+  "free_register": false,
+  "email_domain_register": [
+    {
+      "accept_domains": ["mails.example.edu"],
+      "add_to_groups": ["student"]
+    }
+  ]
+}
+```
+
+When `free_register` is true, any email domain may register. When false, only addresses matching an `accept_domains` entry are allowed; matching users are added to the listed `add_to_groups`.
+
+**IP check** — add to `config.json`. Optional integration with an external IP authorization service (a private project, not shipped with Identity). When configured, the logged-in home page calls `{url}/api/auth-check-ip` with the user's IP and `AuthSecretKey: {secret}`. The service should return `{ "check_pass": true/false, "guarded_ports": [ ... ] }`. If the check fails, OAuth app tiles whose `home_url` uses a port in `guarded_ports` are marked as blocked for the current network.
+
+```json
+"IP_CHECK": {
+  "url": "http://127.0.0.1:6373",
+  "secret": "secretSECRET"
+}
+```
+
+Leave `IP_CHECK` empty (`{}`) or omit it to disable. Identity backend must be able to reach `url`.
+
 #### After you change settings
 
 - Runtime backend values in `.env` (including mail SMTP settings) — restart: `docker compose up -d`
@@ -144,16 +217,14 @@ Requirements and setup
 - PostgreSQL (or SQLite in `config.json` for trials)
 - `cd mail_templates/mjml && npm ci && npm run build` (email HTML)
 - `./scripts/download-mmdb.sh` if you need geo IP
-- msmtp or another MTA if you send mail from the host — or [MailCatcher](#mail-debugging-with-mailcatcher) for debugging
+- msmtp or another MTA if you send mail from the host — or [mail debugging](#mail-debugging) (mock folder / MailCatcher)
 
 ```bash
 cp config.example.json config.json
-# edit config.json, then:
+# edit config.json — set SITE.root_url to your Flask URL (e.g. http://127.0.0.1:8077/) and SITE.behind_proxy to false
 flask create-db
 flask init-db
 ```
-
-
 
 **Build the frontend** (`VITE_SITE_BASE_URL` must match `SITE.base_url` in `config.json`):
 
@@ -190,9 +261,7 @@ Requirements
 - `cp config.example.json config.json` and `flask create-db && flask init-db`
 - `cd frontend && npm ci`
 - `cp frontend/.env.example frontend/.env` (set `VITE_FLASK_ORIGIN` if Flask is not on `http://127.0.0.1:8077`)
-- [MailCatcher](#mail-debugging-with-mailcatcher) (optional) to inspect outbound mail
-
-
+- [Mail debugging](#mail-debugging) (optional) — `MAIL.mock_folder` or MailCatcher
 
 **Terminal 1:**
 
@@ -213,11 +282,29 @@ Use [http://localhost:5173](http://localhost:5173). Do not set `VITE_STATIC_PATH
 cd frontend && npm run test && npm run lint
 ```
 
-### Mail debugging with MailCatcher
+### Mail debugging
 
-Inspect outbound mail without a real SMTP server or MTA. Not for production deployment.
+Inspect outbound mail without a real SMTP server or MTA. Not for production deployment. In `config.json`, delivery is chosen in this order: `MAIL.mock_folder` → `MAIL.mail_catcher` → sendmail/msmtp (see `utils/mail.py`). Do not set `MAIL_SMTP_HOST` in `.env` while debugging — that enables msmtp and clears `mail_catcher`.
 
-[MailCatcher](https://github.com/sj26/mailcatcher) runs a fake SMTP server and a web inbox. When `MAIL.mail_catcher` is set in `config.json`, the backend delivers outbound mail to MailCatcher over SMTP (see `utils/mail.py`) instead of msmtp/sendmail — nothing is sent to the internet.
+#### Mock folder
+
+Write each message to disk instead of sending it. Set `MAIL.mock_folder` to a directory path (create it on the host, or use a path inside a mounted volume in Docker). Each recipient gets a subfolder; each message is a `.txt` file named with a timestamp:
+
+```json
+"MAIL": {
+  "enabled": true,
+  "display_name": "Identity",
+  "from": "example@example.com",
+  "mock_folder": "mailbox",
+  "mail_catcher": null
+}
+```
+
+Set `mock_folder` to `null` (the default in `config.example.json`) to disable. Clear `mail_catcher` or set it to `null` when using the mock folder — `mock_folder` takes precedence if both are set.
+
+#### MailCatcher
+
+[MailCatcher](https://github.com/sj26/mailcatcher) runs a fake SMTP server and a web inbox. When `MAIL.mail_catcher` is set, the backend delivers outbound mail to MailCatcher over SMTP — nothing is sent to the internet.
 
 **1. Install and start MailCatcher** (Ruby gem):
 
@@ -269,6 +356,18 @@ Omit `MAIL_SMTP_HOST` from `.env`. Open [http://localhost:1080](http://localhost
 
 ---
 
+## Client SDK
+
+[auth_connect](https://github.com/tjumyk/auth_connect) is a separate OAuth 2.0 **client** library for apps that authenticate against Identity. It targets Flask backends: login redirect, token exchange, session storage, `@requires_login` / `@requires_admin` decorators, and optional admin API helpers. A small TypeScript package provides Zod schemas for OAuth callback and error payloads.
+
+1. Register an OAuth client in the Identity admin console.
+2. Copy `oauth.config.example.json` to `oauth.config.json` in your app and set `server.url` to your Identity deployment, plus `client.id`, `client.secret`, and callback paths.
+3. `pip install` from the repo and call `oauth.init_app(app, config_file="oauth.config.json")`.
+
+See the [auth_connect README](https://github.com/tjumyk/auth_connect) for config fields, mock server setup, and frontend schema usage.
+
+---
+
 ## Reference
 
 
@@ -278,8 +377,9 @@ Omit `MAIL_SMTP_HOST` from `.env`. Open [http://localhost:1080](http://localhost
 | Frontend asset base     | `VITE_STATIC_PATH=static/` for Flask-direct only; **empty** for Docker/nginx (`/assets/…`)           |
 | Offline images          | [docker-compose.offline.yml](docker-compose.offline.yml)                                             |
 | GeoLite files           | [mmdb/source.txt](mmdb/source.txt), [scripts/download-mmdb.sh](scripts/download-mmdb.sh)             |
-| Outbound email (Docker) | Set `MAIL_SMTP_`* in `.env`; backend uses msmtp — see [Config files](#1-config-files)                |
-| Mail debugging          | [MailCatcher](#mail-debugging-with-mailcatcher) via `MAIL.mail_catcher` in `config.json`             |
+| Outbound email (Docker) | Set `MAIL_SMTP_`* in `.env`; backend uses msmtp — see [Advanced config](#advanced-config)            |
+| Mail debugging          | [Mail debugging](#mail-debugging) — `MAIL.mock_folder` or `MAIL.mail_catcher` in `config.json`       |
 | Mail disabled           | `MAIL_ENABLED=false` in `.env`; rebuild frontend to hide registration / send-email UI                |
+| OAuth client apps       | [auth_connect](https://github.com/tjumyk/auth_connect) — Flask client SDK; see [Client SDK](#client-sdk) |
 
 
