@@ -33,13 +33,10 @@ import { RequestReconfirmEmailPage } from '@/pages/RequestReconfirmEmailPage'
 import { RequestResetPasswordPage } from '@/pages/RequestResetPasswordPage'
 import { TwoFactorSettingsPage } from '@/pages/TwoFactorSettingsPage'
 import type { AppLocationScrollState } from '@/models/locationScrollState'
+import { appBasePathname } from '@/utils/appPaths'
 
 function routerBasename(): string | undefined {
-  const base = import.meta.env.BASE_URL
-  if (!base || base === '/') {
-    return undefined
-  }
-  return base.replace(/\/$/, '')
+  return appBasePathname()
 }
 
 export const router = createBrowserRouter(

@@ -15,15 +15,14 @@ describe('joinSiteBaseWithPath', () => {
 describe('siteAssetSrc', () => {
   it('prefixes upload path with VITE_SITE_BASE_URL', () => {
     vi.stubEnv('VITE_SITE_BASE_URL', '/id/')
-    vi.stubEnv('BASE_URL', '/id/')
     expect(siteAssetSrc('upload/icon/x.png')).toBe('/id/upload/icon/x.png')
     vi.unstubAllEnvs()
   })
 
-  it('falls back to BASE_URL when VITE_SITE_BASE_URL is root', () => {
+  it('uses root app base when VITE_SITE_BASE_URL is unset', () => {
     vi.stubEnv('VITE_SITE_BASE_URL', '/')
-    vi.stubEnv('BASE_URL', '/id/')
-    expect(siteAssetSrc('upload/icon/x.png')).toBe('/id/upload/icon/x.png')
+    vi.stubEnv('BASE_URL', '/static/')
+    expect(siteAssetSrc('upload/icon/x.png')).toBe('/upload/icon/x.png')
     vi.unstubAllEnvs()
   })
 

@@ -5,6 +5,11 @@ import react from '@vitejs/plugin-react'
 import { loadEnv } from 'vite'
 import { defineConfig } from 'vitest/config'
 
+import {
+  resolveAppBaseFromEnv,
+  resolveAssetBaseFromEnv,
+} from './src/utils/pathBases'
+
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const repoRoot = path.resolve(__dirname, '..')
 
@@ -27,6 +32,13 @@ function buildSiteEnvDefines(env: Record<string, string>): Record<string, string
   return defines
 }
 
+/** Normalize app base from env and inject for builds that only set SITE_BASE_URL at repo root. */
+function buildAppBaseDefine(env: Record<string, string>): Record<string, string> {
+  return {
+    'import.meta.env.VITE_SITE_BASE_URL': JSON.stringify(resolveAppBaseFromEnv(env)),
+  }
+}
+
 /** Map MAIL_ENABLED (or VITE_MAIL_ENABLED) into import.meta.env.VITE_MAIL_ENABLED. */
 function buildMailEnvDefines(env: Record<string, string>): Record<string, string> {
   if ('VITE_MAIL_ENABLED' in env || 'MAIL_ENABLED' in env) {
@@ -39,27 +51,19 @@ function buildMailEnvDefines(env: Record<string, string>): Record<string, string
   return {}
 }
 
-function normalizeBasePath(rawBase: string | undefined): string {
-  const fallback = '/'
-  if (!rawBase || rawBase.trim() === '') {
-    return fallback
-  }
-  let base = rawBase.trim()
-  if (!base.startsWith('/')) {
-    base = `/${base}`
-  }
-  if (!base.endsWith('/')) {
-    base = `${base}/`
-  }
-  return base
-}
-
 function flaskDevProxy(
   target: string,
-  basePath: string,
+  appBase: string,
 ): Record<string, { target: string; changeOrigin: boolean }> {
   const opts = { target, changeOrigin: true as const }
-  const prefix = basePath === '/' ? '' : basePath.replace(/\/+$/, '')
+  if (appBase === '/') {
+    return {
+      '/api': opts,
+      '/oauth': opts,
+      '/upload': opts,
+    }
+  }
+  const prefix = appBase.replace(/\/+$/, '')
   return {
     [`${prefix}/api`]: opts,
     [`${prefix}/oauth`]: opts,
@@ -71,12 +75,17 @@ function flaskDevProxy(
 export default defineConfig(({ mode }) => {
   const env = loadMergedEnv(mode)
   const flaskOrigin = env.VITE_FLASK_ORIGIN ?? 'http://127.0.0.1:8077'
-  const base = mode === 'production' ? normalizeBasePath(env.VITE_BASE_URL) : '/'
-  const proxy = flaskDevProxy(flaskOrigin, base)
+  const appBase = resolveAppBaseFromEnv(env)
+  const base = resolveAssetBaseFromEnv(env, { production: mode === 'production' })
+  const proxy = flaskDevProxy(flaskOrigin, appBase)
 
   return {
     plugins: [react()],
-    define: { ...buildSiteEnvDefines(env), ...buildMailEnvDefines(env) },
+    define: {
+      ...buildSiteEnvDefines(env),
+      ...buildAppBaseDefine(env),
+      ...buildMailEnvDefines(env),
+    },
     base,
     resolve: {
       alias: {

@@ -281,6 +281,17 @@ docker compose up -d
 docker compose up -d --build
 ```
 
+### Flask-direct frontend build (no Docker nginx)
+
+When you run `npm run build` in `frontend/` and serve the SPA with `flask run`, Flask exposes hashed assets under `/static/…` while the app and API stay at the site root (or `SITE.base_url`). Set at build time:
+
+```bash
+cd frontend
+VITE_STATIC_PATH=static/ npm run build
+```
+
+Keep `VITE_SITE_BASE_URL` (or root `SITE_BASE_URL`) aligned with `SITE.base_url` in `config.json`. Docker Compose builds omit `VITE_STATIC_PATH` so assets load from `/assets/…` at the nginx document root.
+
 ### Notes
 
 - Backend gunicorn uses sync workers with threads (`GUNICORN_WORKERS`, `GUNICORN_THREADS`), not eventlet.

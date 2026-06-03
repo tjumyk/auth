@@ -1,13 +1,15 @@
+import { getAppBase } from '@/utils/appPaths'
+
 /**
- * Prefix absolute app paths with the Vite base (e.g. `/id/`) for subpath deployment.
+ * Prefix absolute app paths with SITE.base_url (e.g. `/id/`) for subpath deployment.
  * React Router basename handles page routes; API/upload paths need this explicitly.
  */
 export function withAppBasePath(path: string): string {
   if (!path.startsWith('/')) {
     return path
   }
-  const base = import.meta.env.BASE_URL
-  if (!base || base === '/') {
+  const base = getAppBase()
+  if (base === '/') {
     return path
   }
   const prefix = base.replace(/\/+$/, '')

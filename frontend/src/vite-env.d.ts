@@ -2,8 +2,16 @@
 
 interface ImportMetaEnv {
   readonly VITE_FLASK_ORIGIN?: string
-  /** Must match SITE.base_url in backend config.json; default "/" when unset. */
+  /**
+   * App mount path (router, API, uploads). Must match SITE.base_url in backend config.json.
+   * Distinct from Vite `BASE_URL`, which also includes VITE_STATIC_PATH for hashed assets.
+   */
   readonly VITE_SITE_BASE_URL?: string
+  /**
+   * Production-only extra segment before hashed assets (e.g. `static/` when Flask serves
+   * `static/browser` at `/static/…`). Leave empty for Docker/nginx (assets at document root).
+   */
+  readonly VITE_STATIC_PATH?: string
   /** Optional build-time override; takes precedence over config.json SITE.name. */
   readonly VITE_SITE_NAME?: string
   /** Optional build-time override; takes precedence over config.json SITE.organization_name. */

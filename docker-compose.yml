@@ -52,8 +52,8 @@ services:
       args:
         ALPINE_MIRROR: ${ALPINE_MIRROR:-mirrors.tuna.tsinghua.edu.cn}
         NPM_REGISTRY: ${NPM_REGISTRY:-https://registry.npmmirror.com}
-        VITE_BASE_URL: ${FRONTEND_BASE_PATH:-/}
         VITE_SITE_BASE_URL: ${FRONTEND_BASE_PATH:-/}
+        VITE_STATIC_PATH: ${VITE_STATIC_PATH:-}
         VITE_FORCE_THEME: ${VITE_FORCE_THEME:-}
         VITE_FORCE_LOCALE: ${VITE_FORCE_LOCALE:-}
         VITE_SITE_NAME: ${SITE_NAME-__UNSET__}
