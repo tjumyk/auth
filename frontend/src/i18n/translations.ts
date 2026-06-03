@@ -370,6 +370,9 @@ export const translations: Record<Locale, Record<string, string>> = {
     admin2faHeroBody:
       'Administrator accounts have elevated access. We strongly recommend turning on two-factor authentication to protect your account and the platform.',
     admin2faHeroCta: 'Set up two-factor',
+    adminInsecureHttpHeroTitle: 'Connection is not secure',
+    adminInsecureHttpHeroBody:
+      'This site is being served over HTTP. Credentials and session data can be intercepted on the network. Enable HTTPS for production and set SITE_ROOT_URL to https://.',
     ipUntrustedHeroTitle: 'Your IP is not trusted for some apps',
     ipUntrustedHeroBody:
       'Some applications below are shown as limited because your current IP is not allowed to reach their services (IP allowlist).',
@@ -790,6 +793,9 @@ export const translations: Record<Locale, Record<string, string>> = {
     admin2faHeroBody:
       '管理员账户权限较高，强烈建议启用两步验证（2FA），以保护您的账户和系统安全。',
     admin2faHeroCta: '前往设置',
+    adminInsecureHttpHeroTitle: '当前连接不安全',
+    adminInsecureHttpHeroBody:
+      '本系统正通过 HTTP 提供服务，凭据和会话数据可能在传输过程中被窃听。生产环境请启用 HTTPS，并将 SITE_ROOT_URL 配置为 https://。',
     ipUntrustedHeroTitle: '当前网络下部分应用受限',
     ipUntrustedHeroBody:
       '以下部分应用因 IP 访问限制显示为受限状态；您的 IP 可能不在对应服务的白名单中。',

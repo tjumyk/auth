@@ -24,6 +24,7 @@ import {
   findGateClient,
 } from '@/utils/enrichOAuthClientsWithIpCheck'
 import { isAdmin } from '@/utils/isAdmin'
+import { shouldWarnAdminInsecureHttp } from '@/utils/isHttpHostedPage'
 import { siteAssetSrc } from '@/utils/siteAssetUrl'
 
 export function HomePage(): React.ReactElement {
@@ -63,6 +64,7 @@ export function HomePage(): React.ReactElement {
 
   const displayName = user.nickname?.trim() || user.name
   const showAdmin2faWarning = isAdmin(user) && !user.is_two_factor_enabled
+  const showAdminInsecureHttpWarning = isAdmin(user) && shouldWarnAdminInsecureHttp()
 
   const refetchApps = (): void => {
     void clientsQ.refetch()
@@ -130,6 +132,28 @@ export function HomePage(): React.ReactElement {
                   {t('admin2faHeroCta')}
                 </Button>
               </div>
+            </Stack>
+          </Paper>
+        ) : null}
+
+        {showAdminInsecureHttpWarning ? (
+          <Paper
+            shadow="xs"
+            p="md"
+            radius="md"
+            withBorder
+            style={{
+              background: 'light-dark(var(--mantine-color-red-0), rgba(250, 82, 82, 0.12))',
+              borderColor: 'light-dark(var(--mantine-color-red-3), var(--mantine-color-dark-4))',
+            }}
+          >
+            <Stack gap="sm">
+              <Text fw={600} size="sm">
+                {t('adminInsecureHttpHeroTitle')}
+              </Text>
+              <Text size="sm" c="dimmed">
+                {t('adminInsecureHttpHeroBody')}
+              </Text>
             </Stack>
           </Paper>
         ) : null}
