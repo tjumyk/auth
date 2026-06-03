@@ -1,14 +1,21 @@
 
+<p align="center">
+  <a href="README.md"><img src="frontend/public/assets/images/logo-256.png" width="100" height="100" alt="Identity logo"></a>
+</p>
 
-
+<div align="center">
 
 # Identity
 
-*OAuth-based Identity Management System*
+_OAuth-based Identity Management System_
 
+</div>
 
+<div align="center">
 
 **[Quick Start](#quick-start)** · [Deployment](#deployment) · [Development](#development) · [Reference](#reference)
+
+</div>
 
 ---
 
