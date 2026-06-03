@@ -3,11 +3,13 @@ import { Alert, Button, Checkbox, Group, Modal, Select, Stack, TextInput } from 
 import { useForm } from '@mantine/form'
 import { useEffect, useState } from 'react'
 
-import { ADMIN_USERS_QK, postAdminInviteUser } from '@/api/admin'
+import { ADMIN_USERS_QK, postAdminInviteUser, type AdminInviteResult } from '@/api/admin'
 import { fetchExternalAuthProviders } from '@/api/account'
 import { getBasicErrorFromUnknown } from '@/api/client'
+import { ConfirmEmailUrlField } from '@/components/admin/ConfirmEmailUrlField'
 import { useI18n } from '@/hooks/useI18n'
 import type { BasicError } from '@/models/apiError'
+import { mailEnabled } from '@/models/mailConfig'
 
 export function AdminUserInviteModal({
   opened,
@@ -19,6 +21,7 @@ export function AdminUserInviteModal({
   const { t, locale } = useI18n()
   const queryClient = useQueryClient()
   const [error, setError] = useState<BasicError | null>(null)
+  const [inviteResult, setInviteResult] = useState<AdminInviteResult | null>(null)
 
   const providersQ = useQuery({
     queryKey: ['externalAuthProviders'],
@@ -55,6 +58,7 @@ export function AdminUserInviteModal({
     if (!opened) {
       form.reset()
       setError(null)
+      setInviteResult(null)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- reset when modal closes
   }, [opened])
@@ -69,10 +73,15 @@ export function AdminUserInviteModal({
         skip_email_confirmation: Boolean(ext) && form.values.skip_email_confirmation,
       })
     },
-    onSuccess: () => {
+    onSuccess: (result) => {
       setError(null)
       void queryClient.invalidateQueries({ queryKey: ADMIN_USERS_QK })
+      if (result.confirm_email_url) {
+        setInviteResult(result)
+        return
+      }
       form.reset()
+      setInviteResult(null)
       onClose()
     },
     onError: (err) => {
@@ -83,6 +92,31 @@ export function AdminUserInviteModal({
   const providerOptions =
     providersQ.data?.map((p) => ({ value: p.id, label: p.name })) ?? []
   const showProviderFields = (providersQ.data?.length ?? 0) > 0
+
+  const handleDone = (): void => {
+    form.reset()
+    setInviteResult(null)
+    onClose()
+  }
+
+  if (inviteResult?.confirm_email_url) {
+    return (
+      <Modal opened={opened} onClose={handleDone} title={t('adminTitleInviteUser')} size="md">
+        <Stack gap="md">
+          <Alert color="green" title={t('adminInviteConfirmUrlTitle')}>
+            {t('adminBatchStatusInvited')}
+          </Alert>
+          <ConfirmEmailUrlField
+            url={inviteResult.confirm_email_url}
+            hint={!mailEnabled ? t('mailDisabledConfirmUrlHint') : undefined}
+          />
+          <Group justify="flex-end">
+            <Button onClick={handleDone}>{t('back')}</Button>
+          </Group>
+        </Stack>
+      </Modal>
+    )
+  }
 
   return (
     <Modal opened={opened} onClose={onClose} title={t('adminTitleInviteUser')} size="md">

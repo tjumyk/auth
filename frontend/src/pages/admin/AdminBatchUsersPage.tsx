@@ -37,6 +37,8 @@ import { fetchExternalAuthProviders } from '@/api/account'
 import { getBasicErrorFromUnknown } from '@/api/client'
 import { useI18n } from '@/hooks/useI18n'
 import type { BasicError } from '@/models/apiError'
+import { ConfirmEmailUrlField } from '@/components/admin/ConfirmEmailUrlField'
+import { mailEnabled } from '@/models/mailConfig'
 import {
   type BatchListFormat,
   type BatchUserListRow,
@@ -235,6 +237,7 @@ export function AdminBatchUsersPage(): React.ReactElement {
                 processing: false,
                 user: u,
                 success: t('adminBatchStatusInvited'),
+                confirm_email_url: u.confirm_email_url ?? null,
               }
               return n
             })
@@ -537,6 +540,12 @@ export function AdminBatchUsersPage(): React.ReactElement {
                           <Text size="sm" c="teal">
                             {item.success}
                           </Text>
+                        ) : null}
+                        {item.confirm_email_url ? (
+                          <ConfirmEmailUrlField
+                            url={item.confirm_email_url}
+                            hint={!mailEnabled ? t('mailDisabledConfirmUrlHint') : undefined}
+                          />
                         ) : null}
                         {item.serverError ? (
                           <Stack gap={2}>

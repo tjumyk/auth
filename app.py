@@ -134,6 +134,7 @@ def _load_config_with_env_overrides(config_path: str) -> dict[str, Any]:
         (('ADMIN', 'name'), ('ADMIN_NAME',), str),
         (('ADMIN', 'email'), ('ADMIN_EMAIL',), str),
         (('ADMIN', 'password'), ('ADMIN_PASSWORD',), str),
+        (('MAIL', 'enabled'), ('MAIL_ENABLED',), _parse_bool),
         (('MAIL', 'from'), ('MAIL_FROM',), str),
         (('MAIL', 'display_name'), ('MAIL_DISPLAY_NAME',), str),
         (('MAIL', 'reply_to'), ('MAIL_REPLY_TO',), str),

@@ -9,7 +9,7 @@ from services.group import GroupServiceError, GroupService
 from services.oauth import OAuthService, OAuthServiceError
 from services.user import UserService, UserServiceError
 from utils.external_auth.provider import get_provider, get_providers
-from utils.mail import send_email
+from utils.mail import send_email, is_mail_enabled
 from utils.qr_code import build_qr_code, img_to_base64
 from utils.session import get_session_user, requires_login, clear_current_user, set_current_user, get_current_user, \
     start_two_factor, get_two_factor_user
@@ -51,6 +51,13 @@ def _get_client_ip():
 @account.route('/register', methods=['POST'])
 def account_register():
     try:
+        if not is_mail_enabled():
+            return jsonify(
+                msg='Registration Unavailable',
+                detail='Account registration requires outbound email, which is disabled on this server. '
+                       'Please contact an administrator.',
+            ), 403
+
         _json = request.json
         name = _json.get('name')
         email = _json.get('email')

@@ -13,7 +13,7 @@ import { AdminGroupsPage } from '@/pages/admin/AdminGroupsPage'
 import { AdminOAuthClientEditPage } from '@/pages/admin/AdminOAuthClientEditPage'
 import { AdminOAuthClientNewPage } from '@/pages/admin/AdminOAuthClientNewPage'
 import { AdminOAuthClientsPage } from '@/pages/admin/AdminOAuthClientsPage'
-import { AdminSendEmailPage } from '@/pages/admin/AdminSendEmailPage'
+import { AdminSendEmailRoute } from '@/pages/admin/AdminSendEmailRoute'
 import { AdminUserEditPage } from '@/pages/admin/AdminUserEditPage'
 import { AdminUserInvitePage } from '@/pages/admin/AdminUserInvitePage'
 import { AdminUsersPage } from '@/pages/admin/AdminUsersPage'
@@ -142,7 +142,7 @@ export const router = createBrowserRouter(
               { index: true, element: <Navigate to="send" replace /> },
               {
                 path: 'send',
-                element: <AdminSendEmailPage />,
+                element: <AdminSendEmailRoute />,
               },
             ],
           },

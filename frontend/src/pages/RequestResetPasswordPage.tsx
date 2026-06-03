@@ -13,6 +13,7 @@ import { PublicAuthCard } from '@/components/layout/PublicAuthShell'
 import { useI18n } from '@/hooks/useI18n'
 import type { BasicError } from '@/models/apiError'
 import type { ExternalAuthProvider } from '@/models/externalAuthProvider'
+import { mailEnabled } from '@/models/mailConfig'
 import { siteConfig } from '@/models/siteConfig'
 
 export function RequestResetPasswordPage(): React.ReactElement {
@@ -40,6 +41,20 @@ export function RequestResetPasswordPage(): React.ReactElement {
     },
   })
 
+  if (!mailEnabled) {
+    return (
+      <PublicAuthCard stackGap="md">
+        <SiteLogoImage placement="login" />
+        <Alert color="yellow" title={t('requestResetPasswordUnavailableTitle')}>
+          <Text size="sm">{t('requestResetPasswordUnavailableBody')}</Text>
+        </Alert>
+        <Anchor component={Link} to="/account/login" size="sm">
+          {t('registerBackToSignIn')}
+        </Anchor>
+      </PublicAuthCard>
+    )
+  }
+
   if (requestM.isSuccess && requestM.data?.kind === 'email_sent') {
     return (
       <PublicAuthCard stackGap="md">
@@ -47,7 +62,7 @@ export function RequestResetPasswordPage(): React.ReactElement {
           {t('requestResetPasswordSuccessTitle')}
         </Title>
         <Text size="sm" c="dimmed">
-          {t('requestResetPasswordSuccessBody')}
+          {mailEnabled ? t('requestResetPasswordSuccessBody') : t('requestResetPasswordSuccessBodyNoMail')}
         </Text>
         <Anchor component={Link} to="/account/login" size="sm">
           {t('signInAgain')}

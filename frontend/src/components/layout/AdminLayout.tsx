@@ -23,6 +23,7 @@ import { ShellHeaderAccountMenu } from '@/components/layout/ShellHeaderAccountMe
 import { ShellHeaderBrand } from '@/components/layout/ShellHeaderBrand'
 import { useAppShellBackdropStyles } from '@/components/layout/useAppShellBackdropStyles'
 import { useI18n } from '@/hooks/useI18n'
+import { mailEnabled } from '@/models/mailConfig'
 import { siteConfig } from '@/models/siteConfig'
 
 function AdminSidebarLink({
@@ -136,14 +137,18 @@ export function AdminLayout(): React.ReactElement {
               leftSection={<IconWindow size={18} stroke={1.5} />}
               onClick={closeMobile}
             />
-            <NavSectionLabel>{t('adminNavEmail')}</NavSectionLabel>
-            <AdminSidebarLink
-              to="/admin/email/send"
-              end
-              label={t('adminNavSendEmail')}
-              leftSection={<IconMail size={18} stroke={1.5} />}
-              onClick={closeMobile}
-            />
+            {mailEnabled ? (
+              <>
+                <NavSectionLabel>{t('adminNavEmail')}</NavSectionLabel>
+                <AdminSidebarLink
+                  to="/admin/email/send"
+                  end
+                  label={t('adminNavSendEmail')}
+                  leftSection={<IconMail size={18} stroke={1.5} />}
+                  onClick={closeMobile}
+                />
+              </>
+            ) : null}
             <AdminSidebarLink
               to="/admin/about"
               end

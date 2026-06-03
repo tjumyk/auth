@@ -70,12 +70,25 @@ export const translations: Record<Locale, Record<string, string>> = {
     requestReconfirmSuccessTitle: 'Confirmation email requested',
     requestReconfirmSuccessBody:
       'If an account matches, we sent a message with a confirmation link. Check your inbox.',
+    requestReconfirmSuccessBodyNoMail:
+      'If an account matches, a new confirmation token was issued. Contact an administrator for the confirmation link.',
+    requestReconfirmUnavailableTitle: 'Email delivery disabled',
+    requestReconfirmUnavailableBody:
+      'This server cannot send confirmation emails. Contact an administrator.',
+    registerUnavailableTitle: 'Registration unavailable',
+    registerUnavailableBody:
+      'Self-registration requires outbound email, which is disabled on this server. Contact an administrator.',
     requestResetPasswordPageTitle: 'Reset password',
     requestResetPasswordHeading: 'Request a password reset',
     requestResetPasswordSubmit: 'Request password reset',
     requestResetPasswordSuccessTitle: 'Password reset requested',
     requestResetPasswordSuccessBody:
       'If an account matches, we sent an email with a reset link. Check your inbox.',
+    requestResetPasswordSuccessBodyNoMail:
+      'If an account matches, a reset token was issued. Contact an administrator for the reset link.',
+    requestResetPasswordUnavailableTitle: 'Email delivery disabled',
+    requestResetPasswordUnavailableBody:
+      'This server cannot send password reset emails. Contact an administrator.',
     requestResetPasswordExternalHeading: 'Reset password externally',
     requestResetPasswordExternalIntro:
       'This account signs in with {name}. Open the link below to reset your password there.',
@@ -195,6 +208,10 @@ export const translations: Record<Locale, Record<string, string>> = {
     adminUserEmailActions: 'Email',
     adminUserReconfirmEmail: 'Send confirmation email',
     adminUserCopyConfirmUrl: 'Copy confirmation link',
+    adminUserShowConfirmUrl: 'Show confirmation link',
+    mailDisabledConfirmUrlHint:
+      'Outbound email is disabled. Share this link with the user so they can confirm their address.',
+    adminInviteConfirmUrlTitle: 'Share this confirmation link with the user',
     copyToClipboardSuccess: 'Copied to clipboard.',
     copyToClipboardFailed: 'Could not copy to clipboard.',
     adminUserLoginRecords: 'Login history',
@@ -482,11 +499,21 @@ export const translations: Record<Locale, Record<string, string>> = {
     requestReconfirmSubmit: '发送确认邮件',
     requestReconfirmSuccessTitle: '已申请发送确认邮件',
     requestReconfirmSuccessBody: '若存在对应账户，我们已发送含确认链接的邮件，请查收邮箱。',
+    requestReconfirmSuccessBodyNoMail:
+      '若存在对应账户，已生成新的确认令牌。请联系管理员获取确认链接。',
+    requestReconfirmUnavailableTitle: '邮件发送已关闭',
+    requestReconfirmUnavailableBody: '本服务器无法发送确认邮件，请联系管理员。',
+    registerUnavailableTitle: '无法注册',
+    registerUnavailableBody: '本服务器已关闭邮件发送，无法自助注册，请联系管理员。',
     requestResetPasswordPageTitle: '重置密码',
     requestResetPasswordHeading: '申请重置密码',
     requestResetPasswordSubmit: '申请重置密码',
     requestResetPasswordSuccessTitle: '已申请重置密码',
     requestResetPasswordSuccessBody: '若存在对应账户，我们已发送含重置链接的邮件，请查收邮箱。',
+    requestResetPasswordSuccessBodyNoMail:
+      '若存在对应账户，已生成重置令牌。请联系管理员获取重置链接。',
+    requestResetPasswordUnavailableTitle: '邮件发送已关闭',
+    requestResetPasswordUnavailableBody: '本服务器无法发送密码重置邮件，请联系管理员。',
     requestResetPasswordExternalHeading: '在外部服务重置密码',
     requestResetPasswordExternalIntro:
       '该账户通过 {name} 登录。请点击下方链接前往对应服务重置密码。',
@@ -605,6 +632,9 @@ export const translations: Record<Locale, Record<string, string>> = {
     adminUserEmailActions: '邮箱',
     adminUserReconfirmEmail: '发送确认邮件',
     adminUserCopyConfirmUrl: '复制确认链接',
+    adminUserShowConfirmUrl: '显示确认链接',
+    mailDisabledConfirmUrlHint: '邮件发送已关闭。请将此链接提供给用户以确认邮箱。',
+    adminInviteConfirmUrlTitle: '请将此确认链接提供给用户',
     copyToClipboardSuccess: '已复制到剪贴板。',
     copyToClipboardFailed: '无法复制到剪贴板。',
     adminUserLoginRecords: '登录记录',

@@ -60,6 +60,7 @@ services:
         VITE_SITE_ORGANIZATION_NAME: ${SITE_ORGANIZATION_NAME-__UNSET__}
         VITE_SITE_GROUP_NAME: ${SITE_GROUP_NAME-__UNSET__}
         VITE_SITE_COPYRIGHT: ${SITE_COPYRIGHT-__UNSET__}
+        VITE_MAIL_ENABLED: ${MAIL_ENABLED-__UNSET__}
     restart: unless-stopped
     env_file:
       - .env

@@ -9,7 +9,7 @@ from services.oauth import OAuthServiceError, OAuthService
 from services.user import UserService, UserServiceError
 from utils.external_user_info import get_external_user_info
 from utils.ip import get_ip_info, get_ip_country_info
-from utils.mail import send_email, send_emails
+from utils.mail import send_email, send_emails, is_mail_enabled, build_confirm_email_url
 from utils.session import requires_admin, set_current_user, get_session_user, clear_current_user, get_current_user
 from utils.upload import handle_upload, handle_post_upload, UploadError
 
@@ -55,7 +55,11 @@ def admin_user_list():
 
             if not skip_email_confirmation:
                 send_email(name, email, 'confirm_email', user=user, site=app.config['SITE'])
-            return jsonify(user.to_dict(with_advanced_fields=True)), 201
+            payload = user.to_dict(with_advanced_fields=True)
+            if (not is_mail_enabled() and not skip_email_confirmation
+                    and user.email_confirm_token is not None):
+                payload['confirm_email_url'] = build_confirm_email_url(user)
+            return jsonify(payload), 201
     except (UserServiceError, GroupServiceError) as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
 
@@ -196,11 +200,7 @@ def admin_user_confirm_email_url(uid):
         if user is None:
             return jsonify(msg='user not found'), 404
 
-        site_cfg = app.config['SITE']
-        url = (f"{site_cfg['root_url']}{site_cfg['base_url']}account/confirm-email"
-               f"?uid={user.id}&token={user.email_confirm_token}")
-
-        return jsonify(dict(url=url))
+        return jsonify(dict(url=build_confirm_email_url(user)))
     except UserServiceError as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
 
@@ -567,6 +567,12 @@ def lookup_ip_info(ip_addr):
 @requires_admin
 def send_email_api():
     try:
+        if not is_mail_enabled():
+            return jsonify(
+                msg='email disabled',
+                detail='Outbound email is disabled on this server (MAIL.enabled is false).',
+            ), 503
+
         user = get_current_user()
         params = request.json
         subject = params.get('subject')

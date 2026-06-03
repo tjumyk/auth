@@ -17,7 +17,6 @@ import {
   Title,
 } from '@mantine/core'
 import { useForm } from '@mantine/form'
-import { notifications } from '@mantine/notifications'
 import { useDisclosure } from '@mantine/hooks'
 import { IconArrowLeft } from '@tabler/icons-react'
 import { useEffect, useState } from 'react'
@@ -40,7 +39,9 @@ import {
   setAdminUserActive,
 } from '@/api/admin'
 import { getBasicErrorFromUnknown } from '@/api/client'
+import { ConfirmEmailUrlField } from '@/components/admin/ConfirmEmailUrlField'
 import { useI18n } from '@/hooks/useI18n'
+import { mailEnabled } from '@/models/mailConfig'
 import type { BasicError } from '@/models/apiError'
 import type { AdminUser } from '@/models/admin'
 import { userAvatarSrc } from '@/utils/siteAssetUrl'
@@ -143,22 +144,22 @@ export function AdminUserEditPage(): React.ReactElement {
     onError: (e) => setPageError(getBasicErrorFromUnknown(e)),
   })
 
+  const [revealedConfirmUrl, setRevealedConfirmUrl] = useState<string | null>(null)
+
   const reconfirmM = useMutation({
     mutationFn: () => postAdminUserReconfirmEmail(uid),
-    onSuccess: () => setPageError(null),
+    onSuccess: () => {
+      setPageError(null)
+      setRevealedConfirmUrl(null)
+    },
     onError: (e) => setPageError(getBasicErrorFromUnknown(e)),
   })
 
-  const copyUrlM = useMutation({
+  const showConfirmUrlM = useMutation({
     mutationFn: () => getAdminConfirmEmailUrl(uid),
-    onSuccess: async (url) => {
+    onSuccess: (url) => {
       setPageError(null)
-      try {
-        await navigator.clipboard.writeText(url)
-        notifications.show({ color: 'teal', message: t('copyToClipboardSuccess') })
-      } catch {
-        notifications.show({ color: 'red', message: t('copyToClipboardFailed') })
-      }
+      setRevealedConfirmUrl(url)
     },
     onError: (e) => setPageError(getBasicErrorFromUnknown(e)),
   })
@@ -340,19 +341,35 @@ export function AdminUserEditPage(): React.ReactElement {
         </Group>
       </Paper>
 
-      <Paper p="md" withBorder shadow="xs">
-        <Title order={4} mb="sm">
-          {t('adminUserEmailActions')}
-        </Title>
-        <Group>
-          <Button variant="light" loading={reconfirmM.isPending} onClick={() => reconfirmM.mutate()}>
-            {t('adminUserReconfirmEmail')}
-          </Button>
-          <Button variant="light" loading={copyUrlM.isPending} onClick={() => copyUrlM.mutate()}>
-            {t('adminUserCopyConfirmUrl')}
-          </Button>
-        </Group>
-      </Paper>
+      {user && !user.is_email_confirmed ? (
+        <Paper p="md" withBorder shadow="xs">
+          <Title order={4} mb="sm">
+            {t('adminUserEmailActions')}
+          </Title>
+          <Stack gap="sm">
+            <Group>
+              {mailEnabled ? (
+                <Button variant="light" loading={reconfirmM.isPending} onClick={() => reconfirmM.mutate()}>
+                  {t('adminUserReconfirmEmail')}
+                </Button>
+              ) : null}
+              <Button
+                variant="light"
+                loading={showConfirmUrlM.isPending}
+                onClick={() => showConfirmUrlM.mutate()}
+              >
+                {t('adminUserShowConfirmUrl')}
+              </Button>
+            </Group>
+            {revealedConfirmUrl ? (
+              <ConfirmEmailUrlField
+                url={revealedConfirmUrl}
+                hint={!mailEnabled ? t('mailDisabledConfirmUrlHint') : undefined}
+              />
+            ) : null}
+          </Stack>
+        </Paper>
+      ) : null}
 
       <Paper p="md" withBorder shadow="xs">
         <Title order={4} mb="sm">

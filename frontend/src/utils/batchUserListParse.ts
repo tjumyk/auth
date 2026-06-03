@@ -11,6 +11,7 @@ export type BatchUserListRow = {
   user?: AdminUser | null
   serverError?: BasicError | null
   success?: string | null
+  confirm_email_url?: string | null
   processing?: boolean
   waiting?: boolean
 }

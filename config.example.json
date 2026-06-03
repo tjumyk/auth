@@ -8,6 +8,7 @@
   "DETECT_REQUEST_REGIONS": [],
 
   "MAIL": {
+    "enabled": true,
     "display_name": "Identity",
     "from": "example@example.com",
     "reply_to_name": "Do Not Reply",

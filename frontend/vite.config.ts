@@ -27,6 +27,18 @@ function buildSiteEnvDefines(env: Record<string, string>): Record<string, string
   return defines
 }
 
+/** Map MAIL_ENABLED (or VITE_MAIL_ENABLED) into import.meta.env.VITE_MAIL_ENABLED. */
+function buildMailEnvDefines(env: Record<string, string>): Record<string, string> {
+  if ('VITE_MAIL_ENABLED' in env || 'MAIL_ENABLED' in env) {
+    return {
+      'import.meta.env.VITE_MAIL_ENABLED': JSON.stringify(
+        env.VITE_MAIL_ENABLED ?? env.MAIL_ENABLED ?? '',
+      ),
+    }
+  }
+  return {}
+}
+
 function normalizeBasePath(rawBase: string | undefined): string {
   const fallback = '/'
   if (!rawBase || rawBase.trim() === '') {
@@ -64,7 +76,7 @@ export default defineConfig(({ mode }) => {
 
   return {
     plugins: [react()],
-    define: buildSiteEnvDefines(env),
+    define: { ...buildSiteEnvDefines(env), ...buildMailEnvDefines(env) },
     base,
     resolve: {
       alias: {

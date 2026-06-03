@@ -12,6 +12,7 @@ import { PublicAuthCard, PublicAuthCenter } from '@/components/layout/PublicAuth
 import { useRedirectAfterLogin } from '@/hooks/useRedirectAfterLogin'
 import { useI18n } from '@/hooks/useI18n'
 import type { BasicError } from '@/models/apiError'
+import { mailEnabled } from '@/models/mailConfig'
 import { siteConfig } from '@/models/siteConfig'
 
 const USERNAME_PATTERN = /^\w{3,16}$/
@@ -69,6 +70,20 @@ export function RegisterPage(): React.ReactElement {
           {t('checkingUserStatus')}
         </Text>
       </PublicAuthCenter>
+    )
+  }
+
+  if (!mailEnabled) {
+    return (
+      <PublicAuthCard stackGap="md">
+        <SiteLogoImage placement="login" />
+        <Alert color="yellow" title={t('registerUnavailableTitle')}>
+          <Text size="sm">{t('registerUnavailableBody')}</Text>
+        </Alert>
+        <Anchor component={Link} to="/account/login" size="sm">
+          {t('registerBackToSignIn')}
+        </Anchor>
+      </PublicAuthCard>
     )
   }
 

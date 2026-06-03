@@ -1,3 +1,4 @@
+import logging
 import os
 import re
 import smtplib
@@ -10,6 +11,20 @@ from typing import List
 from flask import current_app as app
 
 _templates = {}
+_logger = logging.getLogger(__name__)
+
+
+def is_mail_enabled() -> bool:
+    mail_config = app.config.get('MAIL') or {}
+    return bool(mail_config.get('enabled', True))
+
+
+def build_confirm_email_url(user) -> str:
+    site_cfg = app.config['SITE']
+    return (
+        f"{site_cfg['root_url']}{site_cfg['base_url']}account/confirm-email"
+        f"?uid={user.id}&token={user.email_confirm_token}"
+    )
 
 
 def _build_address_list(recipient_list: list) -> List[Address]:
@@ -25,6 +40,10 @@ def send_email(to_name, to_email, template, **kwargs):
 
 
 def send_emails(to_list, cc_list, bcc_list, template, **kwargs):
+    if not is_mail_enabled():
+        _logger.debug('Outbound email skipped (MAIL.enabled is false)')
+        return
+
     mail_config = app.config['MAIL']
 
     msg = EmailMessage()

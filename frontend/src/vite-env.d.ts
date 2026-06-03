@@ -18,6 +18,8 @@ interface ImportMetaEnv {
   readonly VITE_FORCE_THEME?: string
   /** Optional build-time override; takes precedence over config.json UI.force_locale. */
   readonly VITE_FORCE_LOCALE?: string
+  /** Optional build-time override; takes precedence over config.json MAIL.enabled. Root MAIL_ENABLED is mapped here in vite.config. */
+  readonly VITE_MAIL_ENABLED?: string
 }
 
 interface ImportMeta {

@@ -11,6 +11,7 @@ import { SiteLogoImage } from '@/components/branding/SiteLogoImage'
 import { PublicAuthCard } from '@/components/layout/PublicAuthShell'
 import { useI18n } from '@/hooks/useI18n'
 import type { BasicError } from '@/models/apiError'
+import { mailEnabled } from '@/models/mailConfig'
 import { siteConfig } from '@/models/siteConfig'
 
 export function RequestReconfirmEmailPage(): React.ReactElement {
@@ -32,6 +33,20 @@ export function RequestReconfirmEmailPage(): React.ReactElement {
     },
   })
 
+  if (!mailEnabled) {
+    return (
+      <PublicAuthCard stackGap="md">
+        <SiteLogoImage placement="login" />
+        <Alert color="yellow" title={t('requestReconfirmUnavailableTitle')}>
+          <Text size="sm">{t('requestReconfirmUnavailableBody')}</Text>
+        </Alert>
+        <Anchor component={Link} to="/account/login" size="sm">
+          {t('registerBackToSignIn')}
+        </Anchor>
+      </PublicAuthCard>
+    )
+  }
+
   if (requestM.isSuccess) {
     return (
       <PublicAuthCard stackGap="md">
@@ -39,7 +54,7 @@ export function RequestReconfirmEmailPage(): React.ReactElement {
           {t('requestReconfirmSuccessTitle')}
         </Title>
         <Text size="sm" c="dimmed">
-          {t('requestReconfirmSuccessBody')}
+          {mailEnabled ? t('requestReconfirmSuccessBody') : t('requestReconfirmSuccessBodyNoMail')}
         </Text>
         <Anchor component={Link} to="/account/login" size="sm">
           {t('signInAgain')}

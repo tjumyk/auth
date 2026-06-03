@@ -83,9 +83,15 @@ export type AdminInviteBody = {
   skip_email_confirmation?: boolean
 }
 
-export async function postAdminInviteUser(body: AdminInviteBody): Promise<AdminUser> {
+const AdminInviteUserResponseSchema = AdminUserSchema.extend({
+  confirm_email_url: z.string().optional(),
+})
+
+export type AdminInviteResult = z.infer<typeof AdminInviteUserResponseSchema>
+
+export async function postAdminInviteUser(body: AdminInviteBody): Promise<AdminInviteResult> {
   const res = await apiClient.post<unknown>('/api/admin/users', body)
-  const parsed = AdminUserSchema.safeParse(res.data)
+  const parsed = AdminInviteUserResponseSchema.safeParse(res.data)
   if (!parsed.success) {
     console.error('admin invite parse error', parsed.error.flatten())
     throw new Error('Invalid admin user payload from server')
