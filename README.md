@@ -1,303 +1,278 @@
-# Identity Management System
 
-## Requirements
 
-1. nodejs
-2. postgresql
-3. msmtp-mta (for sending e-mails, also need to setup an smtp provider in `/etc/msmtprc`, e.g. [Setup Aliyun DirectMail](https://gist.github.com/tjumyk/342611a2b2e7c5f12a9ea9d1162c8b26))
 
-## Setup
 
-1. prepare python environment
-```bash
-# prepare a python virtual environment first
-pip install -r requirements.txt
-```
+# Identity
 
-2. build front-end
+*OAuth-based Identity Management System*
 
-For node version >= 17:
-```bash
-cd angular
-npm i
-NODE_OPTIONS=--openssl-legacy-provider npm run build
-cd ..
-```
 
-For node version < 17:
-```bash
-cd angular
-npm i
-npm run build
-cd ..
-```
 
-**Note:** the above commands only build the development package. You may replace `npm run build` with `npm run build-prod` to build the production (minimized) package. 
+**[Quick Start](#quick-start)** · [Deployment](#deployment) · [Development](#development) · [Reference](#reference)
 
-3. setup database
-```bash
-createuser auth -P
-# put a new password when prompt
+---
 
-createdb auth -O auth
-```
+## Quick Start
 
-**Note:** You need to be a database superuser or switch to the `postgres` user to run the commands above.
-
-4. download GeoLite data files (required for geo IP features; also before Docker backend build)
+Requires [Docker](https://docs.docker.com/get-docker/) and Docker Compose — no config to copy for a local trial.
 
 ```bash
-./scripts/download-mmdb.sh
+docker compose up -d --build
+docker compose exec backend flask create-db
+docker compose exec backend flask init-db
 ```
 
-This fetches `GeoLite2-Country.mmdb`, `GeoLite2-City.mmdb`, and `GeoLite2-ASN.mmdb` from [P3TERX/GeoLite.mmdb](https://github.com/P3TERX/GeoLite.mmdb) releases into `mmdb/`. See `mmdb/source.txt` for what each file is used for. The backend Docker image copies any `mmdb/*.mmdb` files present in the build context; it does not download them during the build.
+Open [http://localhost:8080/](http://localhost:8080/) and sign in as `admin` / `PASSword` (from `config.example.json`).
 
-5. build email templates
-
-```bash
-cd mail_templates/mjml
-npm i
-npm run build
-cd ../..
-```
-
-## Configuration
-
-### 1. Create server configuration file `config.json`
-
-First, you may copy the example file to obtain a default configuration file.
-
-```bash
-cp config.example.json config.json
-```
-
-Then, please update the following settings.
-
-1. Update `SECRET_KEY` with a good random string, e.g. using the following script to generate one:
-```bash
-python3 -c 'import secrets; print(secrets.token_urlsafe(8))'
-```
-
-2. Update `SQLALCHEMY_DATABASE_URI` with a postgresql db connection url, `postgresql://auth:PASSWORD@127.0.0.1:5432/auth`. (replace `PASSWORD` with real password)
-3. Delete `EXTERNAL_USER_INFO`, `EXTERNAL_AUTH_PROVIDERS`
-4. Update `ADMIN` with real username, email address and password for admin.
-5. Delete `mail_catcher` in `MAIL`, edit other fields according to real setup
-6. Edit `SITE` according to real setup
-
-### 2. Edit front-end environment variables
-
-Update the variables (except `production`) in the following environment files.
-
-1. [angular/src/environments/environment.ts](angular/src/environments/environment.ts) (for debugging) 
-2. [angular/src/environments/environment.prod.ts](angular/src/environments/environment.prod.ts) (for production)
-
-**Note:** After any update, you must re-build the front-end to apply the changes.
-
-### 3. Update static title of front-end (optional)
-
-The titles of the webpages are updated according to the environment variables mentioned above, but this update is done at runtime, requiring running the Javascript.
-For SEO purpose, you need to ensure the **static** HTML title is also the correct one. To achieve this, please update the `<title>` tag in [angular/src/index.html](angular/src/index.html).
-
-**Note:** After any update, you must re-build the front-end to apply the changes.
-
-### 4. Replace the default image assets (optional)
-
-Replace the following image/icon files according to your need.
-
-1. [angular/src/assets/images/banner.png](angular/src/assets/images/banner.png)
-2. [angular/src/assets/images/logo-64.png](angular/src/assets/images/logo-64.png)
-3. [angular/src/assets/images/logo-128.png](angular/src/assets/images/logo-128.png)
-4. [angular/src/assets/images/logo-256.png](angular/src/assets/images/logo-256.png)
-5. [angular/src/favicon.ico](angular/src/favicon.ico)
-
-**Note:** After any update, you must re-build the front-end to apply the changes.
-
-### 5. Update contents in email templates
-
-Update the contents of the following files according to your need.
-
-1. [mail_templates/confirm_email.txt](mail_templates/confirm_email.txt)
-2. [mail_templates/mjml/src/confirm_email.mjml](mail_templates/mjml/src/confirm_email.mjml)
-3. [mail_templates/mjml/src/include/header.mjml](mail_templates/mjml/src/include/header.mjml)
-4. [mail_templates/mjml/src/include/footer.mjml](mail_templates/mjml/src/include/footer.mjml)
-
-**Note:** After any update, you must re-build the email templates **and restart the server** to apply the changes.
-
-## Initialization
-
-```bash
-flask create-db
-flask init-db
-```
-
-## Run
-```bash
-flask run -p 8077
-```
-### Notes for running in production environment
-1. use a better server than flask, e.g. `gunicorn`
-
-```bash
-gunicorn --worker-class eventlet -w 4 -b 127.0.0.1:8077 --log-file - --access-logfile - app:app
-```
-2. use a reverse proxy (e.g. nginx) and HTTPS certificate (e.g. certbot) for public endpoint
-3. register system service to auto-start the server after each system reboot, e.g.
-
-(option 1) add a systemd configuration file in `/etc/systemd/system/`, e.g. `idm.service`:
-```
-[Unit]
-Description=idm system daemon
-After=syslog.target network.target
-Wants=network.target
-
-[Service]
-Type=simple
-User=kelvin
-Group=kelvin
-ExecStart=/home/kelvin/miniconda3/envs/idm/bin/gunicorn --worker-class eventlet -w 4 -b '127.0.0.1:8077' --log-file - --access-logfile - app:app
-WorkingDirectory=/home/kelvin/projects/auth
-StandardOutput=append:/home/kelvin/projects/auth/stdout.log
-StandardError=append:/home/kelvin/projects/auth/stderr.log
-Restart=always
-RestartSec=1min
-
-[Install]
-WantedBy=multi-user.target
-```
-
-Then, start and enable the service:
-```bash
-sudo systemctl start idm.service
-sudo systemctl enable idm.service
-```
-
-(option 2) install `supervisor` and add a configuration in `/etc/supervisor/conf.d`, e.g. `idm.conf`:
-```
-[program:idm]
-user=kelvin
-command=/home/kelvin/miniconda3/envs/idm/bin/gunicorn -w 4 -b '127.0.0.1:8077' app:app
-directory=/home/kelvin/projects/idm
-autostart=true
-autorestart=true
-```
-
-Then, enable the service with supervisor controller:
-```bash
-sudo supervisorctl update
-```
-
-## Docker Deployment (Backend + Frontend + PostgreSQL)
-
-This repository now supports production-style deployment with Docker Compose:
-
-- `backend`: Flask + gunicorn (`python:3.11-slim`)
-- `frontend`: React/Vite static build served by nginx (`node:20-alpine` + `nginx:alpine`)
-- `db`: PostgreSQL (`postgres:15`)
-
-### 1. Prepare environment variables
-
-Copy example env file and update required values:
+**For production or anything beyond a local trial**, copy and edit `.env` (and optionally `config.json`):
 
 ```bash
 cp .env.example .env
+cp config.example.json config.json   # optional; only for settings .env cannot override
 ```
 
-At minimum, update:
+Set at least `SECRET_KEY`, `POSTGRES_PASSWORD`, `SQLALCHEMY_DATABASE_URI` (password must match `POSTGRES_PASSWORD`), and `ADMIN_PASSWORD` in `.env`. See [Config files](#1-config-files).
 
-- `POSTGRES_PASSWORD`
-- `SQLALCHEMY_DATABASE_URI`
-- `SECRET_KEY`
-- `ADMIN_PASSWORD`
-- `SITE_ROOT_URL`
+**Logs:** `docker compose logs -f frontend backend db` · **Stop:** `docker compose down`
 
-### 2. Configure backend runtime config file
+Geo IP, subpath deployment, outbound email, and host installs — see [Deployment](#deployment) and [Development](#development).
 
-Container build config selection:
+---
 
-1. If `config.prod.json` exists, it is copied into backend image as `config.json`.
-2. Otherwise backend build falls back to `config.json`.
+## Deployment
 
-Runtime precedence is: **environment variables > config.json**.
+Choose **Docker Compose** (recommended) or **host install** (Python/Node on the machine).
 
-Supported backend env overrides include:
+### Docker Compose
 
-- `SECRET_KEY`
-- `SQLALCHEMY_DATABASE_URI` (or alias `DB_URL`)
-- `SITE_ROOT_URL`, `SITE_BASE_URL`, `SITE_BEHIND_PROXY`, `SITE_NAME`, `SITE_ORGANIZATION_NAME`, `SITE_GROUP_NAME`, `SITE_COPYRIGHT` (the `SITE_NAME` / org / group / copyright values are also baked into the frontend static build via `docker compose` — rebuild `frontend` after changing them)
-- `ADMIN_NAME`, `ADMIN_EMAIL`, `ADMIN_PASSWORD`
-- `MAIL_ENABLED` (also baked into frontend via `VITE_MAIL_ENABLED` at build — rebuild `frontend` after changing)
-- `MAIL_FROM`, `MAIL_DISPLAY_NAME`, `MAIL_REPLY_TO`, `MAIL_REPLY_TO_NAME`
-- `UPLOAD_ROOT_FOLDER`
-- `FLASK_DEBUG`
+Full guide for production-style deployment. Python, Node, and PostgreSQL are provided by the compose stack — nothing to install on the host beyond Docker.
 
-### 3. Build and start
+#### Prerequisites
 
-Before building the backend image, run `./scripts/download-mmdb.sh` so `mmdb/*.mmdb` are included in the image (~87 MB). Without them, the container still starts but geo IP lookup and login-record countries will fail when used.
+- [Docker](https://docs.docker.com/get-docker/) and Docker Compose
+- Copy and edit config before the first build (see below)
+
+#### 1. Config files
+
+Both files are **optional for a local trial** — compose defaults plus baked-in `config.example.json` are enough. Copy them for production or custom settings:
+
+```bash
+cp .env.example .env                # recommended for production
+cp config.example.json config.json  # optional; for settings beyond .env overrides
+```
+
+Without `.env`, compose uses inline defaults (e.g. DB password `change_me`) and the backend falls back to values in `config.example.json`. With `.env`, those variables override `config.json` at runtime. At minimum set in `.env` for deployment:
+
+
+| Variable                  | Purpose                                                              |
+| ------------------------- | -------------------------------------------------------------------- |
+| `SECRET_KEY`              | Flask session signing                                                |
+| `POSTGRES_PASSWORD`       | Database password                                                    |
+| `SQLALCHEMY_DATABASE_URI` | Backend DB URL — user, password, and db name must match `POSTGRES_*` |
+| `ADMIN_PASSWORD`          | Initial admin account password                                       |
+| `SITE_ROOT_URL`           | Public URL users open in the browser (e.g. `http://localhost:8080`)  |
+
+
+See [.env.example](.env.example) for all options. Environment variables override `config.json` at runtime.
+
+**Subpath (e.g. `/id/`).** In `.env` set `FRONTEND_BASE_PATH=/id/`, `SITE_BASE_URL=/id/`, and `SITE_ROOT_URL` accordingly. Set these before building the frontend image; after changes run `docker compose up -d --build frontend`.
+
+**Outbound email.** The backend image includes **msmtp** as a sendmail-compatible MTA. When `MAIL_SMTP_HOST` is set in `.env`, the container writes msmtp config at startup and sends mail through your SMTP relay (instead of `mail_catcher` in `config.json`):
+
+```bash
+MAIL_ENABLED=true
+MAIL_FROM=noreply@example.com
+MAIL_SMTP_HOST=smtp.example.com
+MAIL_SMTP_PORT=587
+MAIL_SMTP_USER=your-user
+MAIL_SMTP_PASSWORD=your-password
+```
+
+Optional: `MAIL_SMTP_TLS`, `MAIL_SMTP_STARTTLS`, and `MAIL_SMTP_AUTH` (each `on` or `off`; defaults `on`). Rebuild the frontend when toggling `MAIL_ENABLED` so registration and admin send-email UI stay in sync.
+
+#### 2. GeoLite databases (optional)
+
+For geo IP features, download databases before building the backend image (they are copied in at build time):
 
 ```bash
 ./scripts/download-mmdb.sh
+```
+
+Skip this for a minimal trial — the app runs without geo IP.
+
+#### 3. Build and start
+
+```bash
 docker compose up -d --build
 ```
 
-View logs:
-
-```bash
-docker compose logs -f frontend backend db
-```
-
-### 4. Initialize database (first run only)
+#### 4. Initialize the database (first time only)
 
 ```bash
 docker compose exec backend flask create-db
 docker compose exec backend flask init-db
 ```
 
-### 5. Access the service
+#### 5. Open the app
 
-- Default: `http://localhost:8080/`
-- API is routed through frontend nginx to backend (`/api`, `/oauth/connect`, `/upload`); other `/oauth/*` paths are SPA routes.
+[http://localhost:8080/](http://localhost:8080/) (or the port in `FRONTEND_PORT` / `.env`).
 
-### 6. Optional subpath deployment (e.g. `/id/`)
+**Logs:** `docker compose logs -f frontend backend db`  
+**Stop:** `docker compose down`
 
-Set in `.env`:
+#### After you change settings
+
+- Runtime backend values in `.env` (including mail SMTP settings) — restart: `docker compose up -d`
+- `SITE_NAME`, branding, or `MAIL_ENABLED` in the UI — rebuild frontend: `docker compose up -d --build frontend`
+- Email MJML sources — rebuild backend (templates are built in the backend image)
+
+### Host install
+
+Flask serves the built React app from `static/browser` at `/static/…`. Use this for a single-server install without containers.
+
+Requirements and setup
+
+- Python 3.11+, `pip install -r requirements.txt`
+- Node.js 20+, `cd frontend && npm ci`
+- PostgreSQL (or SQLite in `config.json` for trials)
+- `cd mail_templates/mjml && npm ci && npm run build` (email HTML)
+- `./scripts/download-mmdb.sh` if you need geo IP
+- msmtp or another MTA if you send mail from the host — or [MailCatcher](#mail-debugging-with-mailcatcher) for debugging
 
 ```bash
-FRONTEND_BASE_PATH=/id/
-SITE_BASE_URL=/id/
-SITE_ROOT_URL=http://example.com/id/
+cp config.example.json config.json
+# edit config.json, then:
+flask create-db
+flask init-db
 ```
 
-Then rebuild frontend image:
 
-```bash
-docker compose up -d --build frontend
-```
 
-### 7. Stop / restart / update
-
-```bash
-docker compose down
-docker compose up -d
-docker compose up -d --build
-```
-
-### Flask-direct frontend build (no Docker nginx)
-
-When you run `npm run build` in `frontend/` and serve the SPA with `flask run`, Flask exposes hashed assets under `/static/…` while the app and API stay at the site root (or `SITE.base_url`). Set at build time:
+**Build the frontend** (`VITE_SITE_BASE_URL` must match `SITE.base_url` in `config.json`):
 
 ```bash
 cd frontend
 VITE_STATIC_PATH=static/ npm run build
+cd ..
 ```
 
-Keep `VITE_SITE_BASE_URL` (or root `SITE_BASE_URL`) aligned with `SITE.base_url` in `config.json`. Docker Compose builds omit `VITE_STATIC_PATH` so assets load from `/assets/…` at the nginx document root.
+**Run:**
 
-### Notes
+```bash
+flask run -p 8077
+# or production:
+gunicorn -w 4 -b 127.0.0.1:8077 --log-file - --access-logfile - app:app
+```
 
-- Backend gunicorn uses sync workers with threads (`GUNICORN_WORKERS`, `GUNICORN_THREADS`), not eventlet.
-- Backend runs as non-root user `appuser` (UID 1000) via entrypoint.
-- Health checks: backend `GET /api/meta/health`, frontend nginx on `/`.
-- Email HTML templates are built from MJML during backend image build (`mail_templates/mjml`).
-- PostgreSQL data is persisted in volume `postgres_data`.
-- Upload files are persisted in volume `backend_upload`.
-- Backend container does not include frontend source/assets; nginx frontend is a separate service.
+Open `SITE.root_url` (e.g. `http://127.0.0.1:8077/`). API and uploads use `/api/…` and `/upload/…`, not the `/static/` asset prefix.
+
+Subpath build example: `VITE_SITE_BASE_URL=/id/ VITE_STATIC_PATH=static/ npm run build`
+
+---
+
+## Development
+
+### Develop the frontend locally
+
+Hot reload with Vite; Flask provides the API. No Docker and no production frontend build required.
+
+Requirements
+
+- Python 3.11+, Node.js 20+
+- `pip install -r requirements.txt`
+- `cp config.example.json config.json` and `flask create-db && flask init-db`
+- `cd frontend && npm ci`
+- `cp frontend/.env.example frontend/.env` (set `VITE_FLASK_ORIGIN` if Flask is not on `http://127.0.0.1:8077`)
+- [MailCatcher](#mail-debugging-with-mailcatcher) (optional) to inspect outbound mail
+
+
+
+**Terminal 1:**
+
+```bash
+flask run -p 8077
+```
+
+**Terminal 2:**
+
+```bash
+cd frontend
+npm run dev
+```
+
+Use [http://localhost:5173](http://localhost:5173). Do not set `VITE_STATIC_PATH` for dev.
+
+```bash
+cd frontend && npm run test && npm run lint
+```
+
+### Mail debugging with MailCatcher
+
+Inspect outbound mail without a real SMTP server or MTA. Not for production deployment.
+
+[MailCatcher](https://github.com/sj26/mailcatcher) runs a fake SMTP server and a web inbox. When `MAIL.mail_catcher` is set in `config.json`, the backend delivers outbound mail to MailCatcher over SMTP (see `utils/mail.py`) instead of msmtp/sendmail — nothing is sent to the internet.
+
+**1. Install and start MailCatcher** (Ruby gem):
+
+```bash
+gem install mailcatcher
+mailcatcher --foreground
+```
+
+- Web UI: [http://127.0.0.1:1080](http://127.0.0.1:1080)
+- SMTP listen: `127.0.0.1:1025` (default)
+
+**2. Point the app at it** in `config.json` (`config.example.json` already uses these defaults):
+
+```json
+"MAIL": {
+  "enabled": true,
+  "mail_catcher": {
+    "host": "127.0.0.1",
+    "port": 1025
+  }
+}
+```
+
+**3. Avoid production mail settings while debugging**
+
+- Do **not** set `MAIL_SMTP_HOST` in `.env` — that enables msmtp and clears `mail_catcher`.
+- Keep `MAIL_ENABLED` unset or `true` so mail flows are active.
+
+Trigger any mail action (register, password reset, admin send email, etc.) and open the MailCatcher web UI to read captured messages.
+
+Works with `flask run`, [local frontend development](#develop-the-frontend-locally), or a local Docker stack. For Docker, add a MailCatcher service and set `mail_catcher.host` to its service name (e.g. in `config.json` or `config.prod.json` before building the backend image):
+
+```yaml
+  mailcatcher:
+    image: sj26/mailcatcher
+    ports:
+      - "1080:1080"
+      - "1025:1025"
+```
+
+```json
+"mail_catcher": {
+  "host": "mailcatcher",
+  "port": 1025
+}
+```
+
+Omit `MAIL_SMTP_HOST` from `.env`. Open [http://localhost:1080](http://localhost:1080) on the host to view mail.
+
+---
+
+## Reference
+
+
+| Topic                   | Notes                                                                                                |
+| ----------------------- | ---------------------------------------------------------------------------------------------------- |
+| Frontend app base       | `VITE_SITE_BASE_URL` / `FRONTEND_BASE_PATH` — router, `/api`, `/upload` (must match `SITE.base_url`) |
+| Frontend asset base     | `VITE_STATIC_PATH=static/` for Flask-direct only; **empty** for Docker/nginx (`/assets/…`)           |
+| Offline images          | [docker-compose.offline.yml](docker-compose.offline.yml)                                             |
+| GeoLite files           | [mmdb/source.txt](mmdb/source.txt), [scripts/download-mmdb.sh](scripts/download-mmdb.sh)             |
+| Outbound email (Docker) | Set `MAIL_SMTP_`* in `.env`; backend uses msmtp — see [Config files](#1-config-files)                |
+| Mail debugging          | [MailCatcher](#mail-debugging-with-mailcatcher) via `MAIL.mail_catcher` in `config.json`             |
+| Mail disabled           | `MAIL_ENABLED=false` in `.env`; rebuild frontend to hide registration / send-email UI                |
+
+
