@@ -8,16 +8,13 @@
   "DETECT_REQUEST_REGIONS": [],
 
   "MAIL": {
-    "enabled": true,
+    "enabled": false,
     "display_name": "Identity",
     "from": "example@example.com",
     "reply_to_name": "Do Not Reply",
     "reply_to": "noreply@example.com",
     "mock_folder": null,
-    "mail_catcher": {
-      "host": "127.0.0.1",
-      "port": 1025
-    }
+    "mail_catcher": null
   },
   "SITE": {
     "name": "Identity",

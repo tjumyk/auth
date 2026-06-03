@@ -26,7 +26,7 @@ docker compose exec backend flask create-db
 docker compose exec backend flask init-db
 ```
 
-Open [http://localhost:8080/](http://localhost:8080/) and sign in as `admin` / `PASSword` (from baked-in `config.example.json`).
+Open [http://localhost:8080/](http://localhost:8080/) and sign in as `admin` / `PASSword` (from baked-in `config.example.json`). Outbound email is **off** in that default config — no msmtp setup required for the trial.
 
 **Logs:** `docker compose logs -f frontend backend db` · **Stop:** `docker compose down`
 
@@ -109,7 +109,7 @@ Optional settings beyond the minimal trial. Some use `.env`; others require `con
 
 **Reverse proxy (`SITE.behind_proxy`).** Set `SITE_BEHIND_PROXY=true` in `.env` when the backend is reached through nginx or another reverse proxy (Docker Compose default). Identity then reads the client IP from the `X-Real-IP` header the proxy sets, instead of the proxy's own address — used for login records, geo region detection, and IP check. The frontend nginx config already forwards `X-Real-IP` to the backend. For host install with direct `flask run` and no proxy in front, set `SITE_BEHIND_PROXY=false`.
 
-**Outbound email.** The backend image includes **msmtp** as a sendmail-compatible MTA. When `MAIL_SMTP_HOST` is set in `.env`, the container writes msmtp config at startup and sends mail through your SMTP relay (instead of `mail_catcher` in `config.json`):
+**Outbound email.** Disabled by default in `config.example.json` (`MAIL.enabled: false`). For production, set `MAIL_ENABLED=true` in `.env` and configure SMTP. The backend image includes **msmtp**; when `MAIL_SMTP_HOST` is set, the container writes msmtp config at startup and sends mail through your relay:
 
 ```bash
 MAIL_ENABLED=true
@@ -291,7 +291,7 @@ Write each message to disk instead of sending it. Set `MAIL.mock_folder` to a di
 }
 ```
 
-Set `mock_folder` to `null` (the default in `config.example.json`) to disable. Clear `mail_catcher` or set it to `null` when using the mock folder — `mock_folder` takes precedence if both are set.
+Set `mock_folder` to `null` (the default in `config.example.json`) to disable. Clear `mail_catcher` or set it to `null` when using the mock folder — `mock_folder` takes precedence if both are set. With both `null`, mail uses sendmail/msmtp (configure via `MAIL_SMTP_*` in `.env` for Docker, or enable MailCatcher/mock folder locally — see below).
 
 #### MailCatcher
 
@@ -307,7 +307,7 @@ mailcatcher --foreground
 - Web UI: [http://127.0.0.1:1080](http://127.0.0.1:1080)
 - SMTP listen: `127.0.0.1:1025` (default)
 
-**2. Point the app at it** in `config.json` (`config.example.json` already uses these defaults):
+**2. Point the app at it** in `config.json` (copy from `config.example.json` and add a `mail_catcher` block — the baked-in example leaves it `null` for Docker quick start):
 
 ```json
 "MAIL": {
@@ -370,7 +370,7 @@ See the [auth_connect README](https://github.com/tjumyk/auth_connect) for config
 | GeoLite files           | [mmdb/source.txt](mmdb/source.txt), [scripts/download-mmdb.sh](scripts/download-mmdb.sh)             |
 | Outbound email (Docker) | Set `MAIL_SMTP_`* in `.env`; backend uses msmtp — see [Advanced config](#advanced-config)            |
 | Mail debugging          | [Mail debugging](#mail-debugging) — `MAIL.mock_folder` or `MAIL.mail_catcher` in `config.json`       |
-| Mail disabled           | `MAIL_ENABLED=false` in `.env`; rebuild frontend to hide registration / send-email UI                |
+| Mail disabled           | Default in `config.example.json`; set `MAIL_ENABLED=true` in `.env` + `MAIL_SMTP_*` to enable — see [Advanced config](#advanced-config) |
 | OAuth client apps       | [auth_connect](https://github.com/tjumyk/auth_connect) — Flask client SDK; see [Client SDK](#client-sdk) |
 
 
