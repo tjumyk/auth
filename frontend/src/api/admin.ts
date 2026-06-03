@@ -183,8 +183,17 @@ export async function putAdminUserAvatar(uid: number, file: File): Promise<Admin
   return parsed.data
 }
 
-export async function postAdminUserReconfirmEmail(uid: number): Promise<void> {
-  await apiClient.post(`/api/admin/users/${uid}/reconfirm-email`)
+export async function postAdminUserReconfirmEmail(uid: number): Promise<{ url?: string }> {
+  const res = await apiClient.post<unknown>(`/api/admin/users/${uid}/reconfirm-email`)
+  if (res.data === '' || res.data == null) {
+    return {}
+  }
+  const parsed = ConfirmEmailUrlResponseSchema.safeParse(res.data)
+  if (!parsed.success) {
+    console.error('reconfirm email parse error', parsed.error.flatten())
+    throw new Error('Invalid reconfirm-email payload from server')
+  }
+  return { url: parsed.data.url }
 }
 
 export async function getAdminConfirmEmailUrl(uid: number): Promise<string> {

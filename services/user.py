@@ -340,6 +340,31 @@ class UserService:
         user.email_confirmed_at = None
 
     @staticmethod
+    def admin_reset_email_confirmation(user):
+        if user is None:
+            raise UserServiceError('user is required')
+        if not user.is_active:
+            raise UserServiceError('inactive user')
+
+        user.is_email_confirmed = False
+        user.email_confirm_token = token_urlsafe()
+        user.email_confirm_token_expire_at = datetime.utcnow() + UserService.email_confirm_token_valid
+        user.email_confirmed_at = None
+
+    @staticmethod
+    def require_pending_email_confirmation(user):
+        if user is None:
+            raise UserServiceError('user is required')
+        if not user.is_active:
+            raise UserServiceError('inactive user')
+        if (user.is_email_confirmed or user.email_confirm_token is None
+                or user.email_confirm_token_expire_at < datetime.utcnow()):
+            raise UserServiceError(
+                'no active confirmation link',
+                'Use "Reset confirmation link" to generate a new link.',
+            )
+
+    @staticmethod
     def confirm_email(user: User, token, new_password, check_only=False):
         if user is None:
             raise UserServiceError('user is required')

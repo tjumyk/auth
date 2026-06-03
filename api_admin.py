@@ -183,10 +183,12 @@ def admin_user_reconfirm_email(uid):
         if user is None:
             return jsonify(msg='user not found'), 404
 
-        UserService.reconfirm_email(user)
+        UserService.admin_reset_email_confirmation(user)
         db.session.commit()
 
         send_email(user.name, user.email, 'confirm_email', user=user, site=app.config['SITE'])
+        if not is_mail_enabled() and user.email_confirm_token is not None:
+            return jsonify(dict(url=build_confirm_email_url(user)))
         return "", 204
     except UserServiceError as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
@@ -200,6 +202,7 @@ def admin_user_confirm_email_url(uid):
         if user is None:
             return jsonify(msg='user not found'), 404
 
+        UserService.require_pending_email_confirmation(user)
         return jsonify(dict(url=build_confirm_email_url(user)))
     except UserServiceError as e:
         return jsonify(msg=e.msg, detail=e.detail), 400

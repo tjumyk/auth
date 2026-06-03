@@ -72,6 +72,7 @@ export function AdminUserEditPage(): React.ReactElement {
   const [avatarErr, setAvatarErr] = useState<string | null>(null)
   const [deleteOpened, { open: openDelete, close: closeDelete }] = useDisclosure(false)
   const [impersonateOpened, { open: openImpersonate, close: closeImpersonate }] = useDisclosure(false)
+  const [resetConfirmOpened, { open: openResetConfirm, close: closeResetConfirm }] = useDisclosure(false)
 
   const userQ = useQuery({
     queryKey: ADMIN_USER_QK(uid, true),
@@ -148,9 +149,15 @@ export function AdminUserEditPage(): React.ReactElement {
 
   const reconfirmM = useMutation({
     mutationFn: () => postAdminUserReconfirmEmail(uid),
-    onSuccess: () => {
+    onSuccess: (result) => {
+      closeResetConfirm()
       setPageError(null)
-      setRevealedConfirmUrl(null)
+      invalidateUser()
+      if (result.url) {
+        setRevealedConfirmUrl(result.url)
+      } else {
+        setRevealedConfirmUrl(null)
+      }
     },
     onError: (e) => setPageError(getBasicErrorFromUnknown(e)),
   })
@@ -341,18 +348,21 @@ export function AdminUserEditPage(): React.ReactElement {
         </Group>
       </Paper>
 
-      {user && !user.is_email_confirmed ? (
+      {user && user.is_active ? (
         <Paper p="md" withBorder shadow="xs">
           <Title order={4} mb="sm">
             {t('adminUserEmailActions')}
           </Title>
+          {user.is_email_confirmed ? (
+            <Text size="sm" c="dimmed" mb="sm">
+              {t('adminUserEmailConfirmedHint')}
+            </Text>
+          ) : null}
           <Stack gap="sm">
             <Group>
-              {mailEnabled ? (
-                <Button variant="light" loading={reconfirmM.isPending} onClick={() => reconfirmM.mutate()}>
-                  {t('adminUserReconfirmEmail')}
-                </Button>
-              ) : null}
+              <Button variant="light" loading={reconfirmM.isPending} onClick={openResetConfirm}>
+                {mailEnabled ? t('adminUserReconfirmEmail') : t('adminUserResetConfirmUrl')}
+              </Button>
               <Button
                 variant="light"
                 loading={showConfirmUrlM.isPending}
@@ -493,6 +503,26 @@ export function AdminUserEditPage(): React.ReactElement {
           </Button>
         </Group>
       </Paper>
+
+      <Modal
+        opened={resetConfirmOpened}
+        onClose={closeResetConfirm}
+        title={mailEnabled ? t('adminUserResetConfirmTitleMail') : t('adminUserResetConfirmTitle')}
+      >
+        <Text size="sm" mb="md">
+          {mailEnabled
+            ? t('adminUserResetConfirmBodyMail', { name: user.name })
+            : t('adminUserResetConfirmBody', { name: user.name })}
+        </Text>
+        <Group justify="flex-end">
+          <Button variant="default" onClick={closeResetConfirm}>
+            {t('back')}
+          </Button>
+          <Button loading={reconfirmM.isPending} onClick={() => reconfirmM.mutate()}>
+            {mailEnabled ? t('adminUserReconfirmEmail') : t('adminUserResetConfirmUrl')}
+          </Button>
+        </Group>
+      </Modal>
 
       <Modal opened={deleteOpened} onClose={closeDelete} title={t('adminUserDeleteConfirmTitle')}>
         <Text size="sm" mb="md">
