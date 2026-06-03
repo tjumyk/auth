@@ -1,3 +1,20 @@
 # Source: https://github.com/P3TERX/GeoLite.mmdb
-
-# Need 'City' and 'ASN'
+#
+# Download (manual):  ./scripts/download-mmdb.sh
+# Docker: place the same files in mmdb/ before `docker compose build backend`; the Dockerfile
+# copies any *.mmdb present in the build context (optional — geo features need them).
+#
+# Download these three files into this directory (see README.md). They are gitignored (*.mmdb).
+# The backend loads them from mmdb/ at runtime (utils/ip.py).
+#
+# GeoLite2-Country.mmdb
+#   - Regional static UI when DETECT_REQUEST_REGIONS is set (app.py → get_geo_country)
+#   - Admin user login history country column (GET .../login-records?country=true)
+#
+# GeoLite2-City.mmdb
+#   - Admin IP lookup tool: city, region, coordinates, postal (GET /api/admin/ip-info/<ip>)
+#
+# GeoLite2-ASN.mmdb
+#   - Admin IP lookup tool: autonomous system number and organization (same endpoint as City)
+#
+# Login records only need Country; the IP-info endpoint needs City and ASN as well.

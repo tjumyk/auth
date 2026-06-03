@@ -9,7 +9,8 @@
 #   docker compose -f docker-compose.offline.yml up -d
 #
 # Runtime config still comes from .env (backend env overrides, nginx subpath, etc.).
-# Frontend branding/theme/locale are baked into auth-frontend:latest at image build time.
+# Frontend branding/theme/locale are baked into images at build time.
+# Backend GeoLite MMDB: run ./scripts/download-mmdb.sh before building auth-backend:latest.
 
 services:
   db:

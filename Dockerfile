@@ -27,7 +27,6 @@ ARG APT_MIRROR=mirrors.tuna.tsinghua.edu.cn
 ARG PIP_CACHE_DIR
 ARG PIP_INDEX_URL=https://pypi.tuna.tsinghua.edu.cn/simple
 ARG PIP_TRUSTED_HOST=pypi.tuna.tsinghua.edu.cn
-
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1
 
@@ -58,6 +57,19 @@ COPY utils ./utils
 COPY --from=mail_templates_builder /app/mail_templates/*.txt ./mail_templates/
 COPY --from=mail_templates_builder /app/mail_templates/*.html ./mail_templates/
 COPY config.example.json config*.json ./
+
+# GeoLite MMDB: optional at build time. Run ./scripts/download-mmdb.sh locally first;
+# only *.mmdb present in the build context are copied (gitignored, not in git clone).
+COPY mmdb/ /tmp/mmdb-in/
+RUN mkdir -p mmdb && \
+    cp -f /tmp/mmdb-in/source.txt /tmp/mmdb-in/.gitignore mmdb/ 2>/dev/null || true; \
+    if compgen -G "/tmp/mmdb-in/*.mmdb" > /dev/null; then \
+      cp /tmp/mmdb-in/*.mmdb mmdb/; \
+      echo "GeoLite MMDB: included $(ls -1 mmdb/*.mmdb | wc -l) file(s) in image"; \
+    else \
+      echo "GeoLite MMDB: none in build context — run ./scripts/download-mmdb.sh before docker build for geo IP features"; \
+    fi; \
+    rm -rf /tmp/mmdb-in
 
 RUN if [ -f config.prod.json ]; then \
       cp config.prod.json config.json; \

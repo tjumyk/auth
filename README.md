@@ -44,9 +44,13 @@ createdb auth -O auth
 
 **Note:** You need to be a database superuser or switch to the `postgres` user to run the commands above.
 
-4. download GeoLite data files
+4. download GeoLite data files (required for geo IP features; also before Docker backend build)
 
-Please refer to [this repo](https://github.com/P3TERX/GeoLite.mmdb) to download `GeoLite2-ASN.mmdb`, `GeoLite2-City.mmdb` and `GeoLite2-Country.mmdb`, and save them in `mmdb` folder under the project root.
+```bash
+./scripts/download-mmdb.sh
+```
+
+This fetches `GeoLite2-Country.mmdb`, `GeoLite2-City.mmdb`, and `GeoLite2-ASN.mmdb` from [P3TERX/GeoLite.mmdb](https://github.com/P3TERX/GeoLite.mmdb) releases into `mmdb/`. See `mmdb/source.txt` for what each file is used for. The backend Docker image copies any `mmdb/*.mmdb` files present in the build context; it does not download them during the build.
 
 5. build email templates
 
@@ -228,7 +232,10 @@ Supported backend env overrides include:
 
 ### 3. Build and start
 
+Before building the backend image, run `./scripts/download-mmdb.sh` so `mmdb/*.mmdb` are included in the image (~87 MB). Without them, the container still starts but geo IP lookup and login-record countries will fail when used.
+
 ```bash
+./scripts/download-mmdb.sh
 docker compose up -d --build
 ```
 
