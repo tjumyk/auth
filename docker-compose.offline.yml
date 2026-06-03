@@ -8,7 +8,7 @@
 # Usage:
 #   docker compose -f docker-compose.offline.yml up -d
 #
-# Runtime config still comes from .env (backend env overrides, nginx subpath, etc.).
+# Runtime config can come from .env (optional); compose defaults and baked config.json apply otherwise.
 # Frontend branding/theme/locale are baked into images at build time.
 # Backend GeoLite MMDB: run ./scripts/download-mmdb.sh before building auth-backend:latest.
 
@@ -18,7 +18,8 @@ services:
     pull_policy: never
     restart: unless-stopped
     env_file:
-      - .env
+      - path: .env
+        required: false
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-auth}
       POSTGRES_USER: ${POSTGRES_USER:-auth}
@@ -36,7 +37,8 @@ services:
     pull_policy: never
     restart: unless-stopped
     env_file:
-      - .env
+      - path: .env
+        required: false
     environment:
       BACKEND_PORT: ${BACKEND_PORT:-8077}
       SQLALCHEMY_DATABASE_URI: ${SQLALCHEMY_DATABASE_URI:-postgresql://auth:change_me@db:5432/auth}
@@ -57,7 +59,8 @@ services:
     pull_policy: never
     restart: unless-stopped
     env_file:
-      - .env
+      - path: .env
+        required: false
     environment:
       FRONTEND_BASE_PATH: ${FRONTEND_BASE_PATH:-/}
       BACKEND_UPSTREAM: backend:${BACKEND_PORT:-8077}

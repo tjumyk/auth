@@ -77,8 +77,11 @@ RUN if [ -f config.prod.json ]; then \
       cp config.prod.json config.json; \
     elif [ -f config.json ]; then \
       echo "Using config.json from build context"; \
+    elif [ -f config.example.json ]; then \
+      cp config.example.json config.json; \
+      echo "Using config.example.json as config.json"; \
     else \
-      echo "config.json is required when config.prod.json is not provided" >&2; \
+      echo "No config file found (config.prod.json, config.json, or config.example.json)" >&2; \
       exit 1; \
     fi
 

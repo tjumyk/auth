@@ -3,7 +3,8 @@ services:
     image: postgres:15
     restart: unless-stopped
     env_file:
-      - .env
+      - path: .env
+        required: false
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-auth}
       POSTGRES_USER: ${POSTGRES_USER:-auth}
@@ -29,7 +30,8 @@ services:
         PIP_CACHE_DIR: ${PIP_CACHE_DIR:-}
     restart: unless-stopped
     env_file:
-      - .env
+      - path: .env
+        required: false
     environment:
       BACKEND_PORT: ${BACKEND_PORT:-8077}
       SQLALCHEMY_DATABASE_URI: ${SQLALCHEMY_DATABASE_URI:-postgresql://auth:change_me@db:5432/auth}
@@ -63,7 +65,8 @@ services:
         VITE_MAIL_ENABLED: ${MAIL_ENABLED-__UNSET__}
     restart: unless-stopped
     env_file:
-      - .env
+      - path: .env
+        required: false
     environment:
       FRONTEND_BASE_PATH: ${FRONTEND_BASE_PATH:-/}
       BACKEND_UPSTREAM: backend:${BACKEND_PORT:-8077}
