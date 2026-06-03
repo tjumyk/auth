@@ -148,6 +148,11 @@ def _load_config_with_env_overrides(config_path: str) -> dict[str, Any]:
             continue
         _set_nested_config(config, config_path_keys, parser(env_value))
 
+    if _get_env_override(('MAIL_SMTP_HOST',)):
+        mail_cfg = config.get('MAIL')
+        if isinstance(mail_cfg, dict):
+            mail_cfg.pop('mail_catcher', None)
+
     return config
 
 

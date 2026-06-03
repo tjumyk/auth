@@ -36,8 +36,10 @@ RUN if [ -n "${APT_MIRROR}" ]; then \
     fi
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
+    ca-certificates \
     gcc \
     gosu \
+    msmtp-mta \
     && rm -rf /var/lib/apt/lists/*
 
 COPY requirements.txt ./
@@ -82,8 +84,8 @@ RUN if [ -f config.prod.json ]; then \
 
 RUN useradd -m -u 1000 appuser
 
-COPY docker-entrypoint.sh /usr/local/bin/
-RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+COPY docker-entrypoint.sh scripts/configure-msmtp.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh /usr/local/bin/configure-msmtp.sh
 
 EXPOSE 8077
 
