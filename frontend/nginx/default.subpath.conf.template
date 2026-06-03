@@ -2,24 +2,24 @@ server {
     listen 80;
     server_name _;
 
-    location /api/ {
-        proxy_pass http://__BACKEND_UPSTREAM__;
+    location ^~ __BASE_PATH__api/ {
+        proxy_pass http://__BACKEND_UPSTREAM__/api/;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
     }
 
-    location /oauth/ {
-        proxy_pass http://__BACKEND_UPSTREAM__;
+    location ^~ __BASE_PATH__oauth/ {
+        proxy_pass http://__BACKEND_UPSTREAM__/oauth/;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
     }
 
-    location /upload/ {
-        proxy_pass http://__BACKEND_UPSTREAM__;
+    location ^~ __BASE_PATH__upload/ {
+        proxy_pass http://__BACKEND_UPSTREAM__/upload/;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;

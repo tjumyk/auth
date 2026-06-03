@@ -42,17 +42,16 @@ function normalizeBasePath(rawBase: string | undefined): string {
   return base
 }
 
-/**
- * Browser hits Vite; these paths forward to Flask (`VITE_FLASK_ORIGIN`).
- * - `/api`, `/oauth` — APIs and OAuth pages
- * - `/upload` — uploaded files (e.g. avatars stored as `upload/avatar/…` in JSON → requested as `/upload/avatar/…`)
- */
-function flaskDevProxy(target: string): Record<string, { target: string; changeOrigin: boolean }> {
+function flaskDevProxy(
+  target: string,
+  basePath: string,
+): Record<string, { target: string; changeOrigin: boolean }> {
   const opts = { target, changeOrigin: true as const }
+  const prefix = basePath === '/' ? '' : basePath.replace(/\/+$/, '')
   return {
-    '/api': opts,
-    '/oauth': opts,
-    '/upload': opts,
+    [`${prefix}/api`]: opts,
+    [`${prefix}/oauth`]: opts,
+    [`${prefix}/upload`]: opts,
   }
 }
 
@@ -61,7 +60,7 @@ export default defineConfig(({ mode }) => {
   const env = loadMergedEnv(mode)
   const flaskOrigin = env.VITE_FLASK_ORIGIN ?? 'http://127.0.0.1:8077'
   const base = mode === 'production' ? normalizeBasePath(env.VITE_BASE_URL) : '/'
-  const proxy = flaskDevProxy(flaskOrigin)
+  const proxy = flaskDevProxy(flaskOrigin, base)
 
   return {
     plugins: [react()],

@@ -1,6 +1,7 @@
 import axios, { type AxiosInstance, isAxiosError } from 'axios'
 
 import { parseBasicErrorFromUnknown, type BasicError } from '@/models/apiError'
+import { withAppBasePath } from '@/utils/appBasePath'
 
 export type AxiosErrorWithBasic = Error & {
   basicError?: BasicError
@@ -44,6 +45,13 @@ export const apiClient: AxiosInstance = axios.create({
     Accept: 'application/json',
     'Content-Type': 'application/json',
   },
+})
+
+apiClient.interceptors.request.use((config) => {
+  if (config.url) {
+    config.url = withAppBasePath(config.url)
+  }
+  return config
 })
 
 apiClient.interceptors.response.use(

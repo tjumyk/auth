@@ -6,8 +6,11 @@
 
 function getSiteBaseUrl(): string {
   const raw = import.meta.env.VITE_SITE_BASE_URL
-  const s = typeof raw === 'string' && raw.trim() !== '' ? raw.trim() : '/'
-  return s
+  if (typeof raw === 'string' && raw.trim() !== '') {
+    return raw.trim()
+  }
+  const base = import.meta.env.BASE_URL
+  return typeof base === 'string' && base.trim() !== '' ? base.trim() : '/'
 }
 
 /** Join SITE.base_url with a stored relative path (e.g. upload/avatar/…). */
