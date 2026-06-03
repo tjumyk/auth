@@ -51,3 +51,5 @@ pip_cache/
 
 # Keep config.prod.json available for backend build-time preference logic.
 # Keep config.json available for fallback when config.prod.json is absent.
+
+docker-images/

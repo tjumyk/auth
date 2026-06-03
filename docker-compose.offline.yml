@@ -1,6 +1,20 @@
+# Offline deployment: run from pre-built local images (no build, no registry pull).
+#
+# Required local images:
+#   auth-backend:latest
+#   auth-frontend:latest
+#   postgres:15
+#
+# Usage:
+#   docker compose -f docker-compose.offline.yml up -d
+#
+# Runtime config still comes from .env (backend env overrides, nginx subpath, etc.).
+# Frontend branding/theme/locale are baked into auth-frontend:latest at image build time.
+
 services:
   db:
     image: postgres:15
+    pull_policy: never
     restart: unless-stopped
     env_file:
       - .env
@@ -17,16 +31,8 @@ services:
       - postgres_data:/var/lib/postgresql/data
 
   backend:
-    build:
-      context: .
-      dockerfile: Dockerfile
-      args:
-        APT_MIRROR: ${APT_MIRROR:-mirrors.tuna.tsinghua.edu.cn}
-        ALPINE_MIRROR: ${ALPINE_MIRROR:-mirrors.tuna.tsinghua.edu.cn}
-        NPM_REGISTRY: ${NPM_REGISTRY:-https://registry.npmmirror.com}
-        PIP_INDEX_URL: ${PIP_INDEX_URL:-https://pypi.tuna.tsinghua.edu.cn/simple}
-        PIP_TRUSTED_HOST: ${PIP_TRUSTED_HOST:-pypi.tuna.tsinghua.edu.cn}
-        PIP_CACHE_DIR: ${PIP_CACHE_DIR:-}
+    image: auth-backend:latest
+    pull_policy: never
     restart: unless-stopped
     env_file:
       - .env
@@ -46,20 +52,8 @@ services:
       - backend_upload:/app/upload
 
   frontend:
-    build:
-      context: .
-      dockerfile: frontend/Dockerfile
-      args:
-        ALPINE_MIRROR: ${ALPINE_MIRROR:-mirrors.tuna.tsinghua.edu.cn}
-        NPM_REGISTRY: ${NPM_REGISTRY:-https://registry.npmmirror.com}
-        VITE_BASE_URL: ${FRONTEND_BASE_PATH:-/}
-        VITE_SITE_BASE_URL: ${FRONTEND_BASE_PATH:-/}
-        VITE_FORCE_THEME: ${VITE_FORCE_THEME:-}
-        VITE_FORCE_LOCALE: ${VITE_FORCE_LOCALE:-}
-        VITE_SITE_NAME: ${SITE_NAME-__UNSET__}
-        VITE_SITE_ORGANIZATION_NAME: ${SITE_ORGANIZATION_NAME-__UNSET__}
-        VITE_SITE_GROUP_NAME: ${SITE_GROUP_NAME-__UNSET__}
-        VITE_SITE_COPYRIGHT: ${SITE_COPYRIGHT-__UNSET__}
+    image: auth-frontend:latest
+    pull_policy: never
     restart: unless-stopped
     env_file:
       - .env

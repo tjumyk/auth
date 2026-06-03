@@ -17,3 +17,4 @@ upload/
 /stdout.log
 /stderr.log
 /instance/
+/docker-images/

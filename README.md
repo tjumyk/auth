@@ -219,7 +219,7 @@ Supported backend env overrides include:
 
 - `SECRET_KEY`
 - `SQLALCHEMY_DATABASE_URI` (or alias `DB_URL`)
-- `SITE_ROOT_URL`, `SITE_BASE_URL`, `SITE_BEHIND_PROXY`
+- `SITE_ROOT_URL`, `SITE_BASE_URL`, `SITE_BEHIND_PROXY`, `SITE_NAME`, `SITE_ORGANIZATION_NAME`, `SITE_GROUP_NAME`, `SITE_COPYRIGHT` (the `SITE_NAME` / org / group / copyright values are also baked into the frontend static build via `docker compose` — rebuild `frontend` after changing them)
 - `ADMIN_NAME`, `ADMIN_EMAIL`, `ADMIN_PASSWORD`
 - `MAIL_FROM`, `MAIL_DISPLAY_NAME`, `MAIL_REPLY_TO`, `MAIL_REPLY_TO_NAME`
 - `UPLOAD_ROOT_FOLDER`
