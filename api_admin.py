@@ -223,7 +223,9 @@ def admin_user_login_records(uid):
                 info = country_info.get(r.ip)
                 if not info:
                     country_info[r.ip] = info = get_ip_country_info(r.ip)
-                result['country'] = info.to_dict()
+                country = info.to_dict()
+                if country:
+                    result['country'] = country
             results.append(result)
         return jsonify(results)
     except UserServiceError as e:
