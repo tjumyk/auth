@@ -400,7 +400,7 @@ See the [auth_connect README](https://github.com/tjumyk/auth_connect) for config
 | ----------------------- | ---------------------------------------------------------------------------------------------------- |
 | Frontend app base       | `VITE_SITE_BASE_URL` / `FRONTEND_BASE_PATH` — router, `/api`, `/upload` (must match `SITE.base_url`) |
 | Frontend asset base     | `VITE_STATIC_PATH=static/` for Flask-direct only; **empty** for Docker/nginx (`/assets/…`)           |
-| Offline images          | [docker-compose.offline.yml](docker-compose.offline.yml) — includes `auth-recaptcha:latest`, `redis:7-alpine` |
+| Offline bundle          | `./scripts/build-offline-package.sh <target>` → `docker-images/<target>/`; [docker-compose.offline.yml](docker-compose.offline.yml) on the air-gapped host |
 | Login CAPTCHA           | [recaptcha/](recaptcha/) + `CAPTCHA` in `config.json` / `CAPTCHA_*` in `.env` — see [Advanced config](#advanced-config) |
 | GeoLite files           | [mmdb/source.txt](mmdb/source.txt), [scripts/download-mmdb.sh](scripts/download-mmdb.sh)             |
 | Outbound email (Docker) | Set `MAIL_SMTP_`* in `.env`; backend uses msmtp — see [Advanced config](#advanced-config)            |
