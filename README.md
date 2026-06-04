@@ -28,7 +28,7 @@ docker compose exec backend flask init-db
 
 Open [http://localhost:8080/](http://localhost:8080/) and sign in as `admin` / `PASSword` (from baked-in `config.example.json`). Outbound email is **off** in that default config — no msmtp setup required for the trial.
 
-**Logs:** `docker compose logs -f frontend backend db` · **Stop:** `docker compose down`
+**Logs:** `docker compose logs -f frontend backend recaptcha redis db` · **Stop:** `docker compose down`
 
 For production setup, geo IP, subpath, email, and host install — see [Deployment](#deployment) and [Development](#development).
 
@@ -67,6 +67,8 @@ Without `.env`, compose uses inline defaults (e.g. DB password `change_me`) and 
 | `ADMIN_PASSWORD`          | Initial admin account password                                       |
 | `SITE_ROOT_URL`           | Public URL users open in the browser (e.g. `http://localhost:8080`)  |
 | `SITE_BEHIND_PROXY`       | `true` when nginx (or similar) sits in front of the backend — see [Advanced config](#advanced-config) |
+| `CAPTCHA_SECRET`          | Shared secret between backend and recaptcha service (change in production)                           |
+| `CAPTCHA_ENABLED`         | `true` / `false` — login image CAPTCHA after a failed attempt (default `true` in compose)           |
 
 
 See [.env.example](.env.example) for all options. Environment variables override `config.json` at runtime. For subpath deployment, outbound email, Kerberos, and other settings not covered here, see [Advanced config](#advanced-config).
@@ -98,7 +100,9 @@ docker compose exec backend flask init-db
 
 [http://localhost:8080/](http://localhost:8080/) (or the port in `FRONTEND_PORT` / `.env`).
 
-**Logs:** `docker compose logs -f frontend backend db`  
+The stack includes **redis** and **recaptcha** (image CAPTCHA microservice) in addition to `db`, `backend`, and `frontend`. The frontend nginx container proxies `/api/captcha/` to recaptcha; the backend verifies challenges over the internal Docker network only.
+
+**Logs:** `docker compose logs -f frontend backend recaptcha redis db`  
 **Stop:** `docker compose down`
 
 #### Advanced config
@@ -191,9 +195,31 @@ When `free_register` is true, any email domain may register. When false, only ad
 
 Leave `IP_CHECK` empty (`{}`) or omit it to disable. Identity backend must be able to reach `url`.
 
+**Login CAPTCHA (recaptcha service).** Optional image challenge on sign-in when `CAPTCHA.enabled` is true (default in `config.example.json`). After at least one failed login for the same user or client IP within 15 minutes, the login form loads a 4-digit code; the backend checks it before accepting the password. Configure in `config.json` and/or `.env`:
+
+```json
+"CAPTCHA": {
+  "enabled": true,
+  "service_url": "http://recaptcha:8090",
+  "secret": "change_me",
+  "ttl_seconds": 120
+}
+```
+
+| Variable / setting | Purpose |
+| ------------------ | ------- |
+| `CAPTCHA_ENABLED` | Enable or disable the feature (`config.json` → `CAPTCHA.enabled`) |
+| `CAPTCHA_SERVICE_URL` | Backend → recaptcha base URL (`http://recaptcha:8090` in Compose) |
+| `CAPTCHA_SECRET` | Must match recaptcha container; used for internal verify only |
+| `CAPTCHA_TTL_SECONDS` | Challenge lifetime in Redis (recaptcha service) |
+| `CAPTCHA_PORT` | Recaptcha listen port (default `8090`) |
+
+The recaptcha service is built from [`recaptcha/`](recaptcha/) (Flask + Redis + Pillow). Its **verify** endpoint is not exposed through nginx; only challenge creation and image fetch are public at `/api/captcha/v1/…`. For [local frontend development](#develop-the-frontend-locally), run `docker compose up -d redis recaptcha` and set `CAPTCHA_SERVICE_URL=http://127.0.0.1:8090` on the Flask process plus `VITE_CAPTCHA_ORIGIN` in `frontend/.env` (see that section).
+
 #### After you change settings
 
-- Runtime backend values in `.env` (including mail SMTP settings) — restart: `docker compose up -d`
+- Runtime backend values in `.env` (including mail SMTP and `CAPTCHA_*`) — restart: `docker compose up -d`
+- `CAPTCHA_SECRET` or recaptcha code — rebuild recaptcha: `docker compose up -d --build recaptcha`
 - `SITE_NAME`, branding, or `MAIL_ENABLED` in the UI — rebuild frontend: `docker compose up -d --build frontend`
 - Email MJML sources — rebuild backend (templates are built in the backend image)
 
@@ -268,6 +294,14 @@ npm run dev
 ```
 
 Use [http://localhost:5173](http://localhost:5173). Do not set `VITE_STATIC_PATH` for dev.
+
+**CAPTCHA in dev:** Vite proxies `/api/captcha` to the recaptcha service. Start Redis and recaptcha (easiest via Compose):
+
+```bash
+docker compose up -d redis recaptcha
+```
+
+In repo-root `.env` or your shell for `flask run`, set `CAPTCHA_ENABLED=true`, `CAPTCHA_SERVICE_URL=http://127.0.0.1:8090`, and the same `CAPTCHA_SECRET` as in `.env.example`. In `frontend/.env`, set `VITE_CAPTCHA_ORIGIN=http://127.0.0.1:8090` (see [frontend/.env.example](frontend/.env.example)). Merge the `CAPTCHA` block from `config.example.json` into `config.json` if you rely on file-based config.
 
 ```bash
 cd frontend && npm run test && npm run lint
@@ -366,7 +400,8 @@ See the [auth_connect README](https://github.com/tjumyk/auth_connect) for config
 | ----------------------- | ---------------------------------------------------------------------------------------------------- |
 | Frontend app base       | `VITE_SITE_BASE_URL` / `FRONTEND_BASE_PATH` — router, `/api`, `/upload` (must match `SITE.base_url`) |
 | Frontend asset base     | `VITE_STATIC_PATH=static/` for Flask-direct only; **empty** for Docker/nginx (`/assets/…`)           |
-| Offline images          | [docker-compose.offline.yml](docker-compose.offline.yml)                                             |
+| Offline images          | [docker-compose.offline.yml](docker-compose.offline.yml) — includes `auth-recaptcha:latest`, `redis:7-alpine` |
+| Login CAPTCHA           | [recaptcha/](recaptcha/) + `CAPTCHA` in `config.json` / `CAPTCHA_*` in `.env` — see [Advanced config](#advanced-config) |
 | GeoLite files           | [mmdb/source.txt](mmdb/source.txt), [scripts/download-mmdb.sh](scripts/download-mmdb.sh)             |
 | Outbound email (Docker) | Set `MAIL_SMTP_`* in `.env`; backend uses msmtp — see [Advanced config](#advanced-config)            |
 | Mail debugging          | [Mail debugging](#mail-debugging) — `MAIL.mock_folder` or `MAIL.mail_catcher` in `config.json`       |
