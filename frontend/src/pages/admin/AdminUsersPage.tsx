@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { Badge, Button, Group, Loader, Stack, Table, Text, TextInput, Title } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
-import { IconFileSpreadsheet, IconPencil, IconSearch, IconUserPlus } from '@tabler/icons-react'
+import { IconPencil, IconSearch, IconUserPlus } from '@tabler/icons-react'
 import { useEffect, useMemo, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router'
 
@@ -101,15 +101,6 @@ export function AdminUsersPage(): React.ReactElement {
             onClick={() => openInvite()}
           >
             {t('adminUsersInvite')}
-          </Button>
-          <Button
-            component={Link}
-            to="/admin/account/users/batch"
-            variant="light"
-            size="sm"
-            leftSection={<IconFileSpreadsheet size={18} />}
-          >
-            {t('adminTitleBatchUsers')}
           </Button>
         </Group>
       </Group>

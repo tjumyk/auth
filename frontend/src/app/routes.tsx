@@ -6,7 +6,6 @@ import { AdminLayout } from '@/components/layout/AdminLayout'
 import { AppShellLayout } from '@/components/layout/AppShellLayout'
 import { PublicAuthRouteLayout } from '@/components/layout/PublicAuthRouteLayout'
 import { AdminAboutPage } from '@/pages/admin/AdminAboutPage'
-import { AdminBatchUsersPage } from '@/pages/admin/AdminBatchUsersPage'
 import { AdminGroupEditPage } from '@/pages/admin/AdminGroupEditPage'
 import { AdminGroupNewPage } from '@/pages/admin/AdminGroupNewPage'
 import { AdminGroupsPage } from '@/pages/admin/AdminGroupsPage'
@@ -101,10 +100,6 @@ export const router = createBrowserRouter(
                   { path: 'u/:uid', element: <AdminUserEditPage /> },
                   /* Deprecated: use invite modal on AdminUsersPage; see AdminUserInvitePage. */
                   { path: 'invite', element: <AdminUserInvitePage /> },
-                  {
-                    path: 'batch',
-                    element: <AdminBatchUsersPage />,
-                  },
                 ],
               },
               {
