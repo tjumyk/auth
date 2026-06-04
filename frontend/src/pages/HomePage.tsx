@@ -26,6 +26,7 @@ import {
 import { isAdmin } from '@/utils/isAdmin'
 import { shouldWarnAdminInsecureHttp } from '@/utils/isHttpHostedPage'
 import { siteAssetSrc } from '@/utils/siteAssetUrl'
+import { getUserDisplayName } from '@/utils/userDisplayName'
 
 export function HomePage(): React.ReactElement {
   const { t } = useI18n()
@@ -62,7 +63,7 @@ export function HomePage(): React.ReactElement {
     [enrichedClients],
   )
 
-  const displayName = user.nickname?.trim() || user.name
+  const displayName = getUserDisplayName(user)
   const showAdmin2faWarning = isAdmin(user) && !user.is_two_factor_enabled
   const showAdminInsecureHttpWarning = isAdmin(user) && shouldWarnAdminInsecureHttp()
 

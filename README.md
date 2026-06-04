@@ -28,6 +28,8 @@ docker compose exec backend flask init-db
 
 Open [http://localhost:8080/](http://localhost:8080/) and sign in as `admin` / `PASSword` (from baked-in `config.example.json`). Outbound email is **off** in that default config — no msmtp setup required for the trial.
 
+`flask create-db` applies Alembic migrations (`alembic upgrade head`).
+
 **Logs:** `docker compose logs -f frontend backend recaptcha redis db` · **Stop:** `docker compose down`
 
 For production setup, geo IP, subpath, email, and host install — see [Deployment](#deployment) and [Development](#development).
@@ -275,7 +277,7 @@ Requirements
 
 - Python 3.11+, Node.js 20+
 - `pip install -r requirements.txt`
-- `cp config.example.json config.json` and `flask create-db && flask init-db`
+- `cp config.example.json config.json` and `alembic upgrade head && flask init-db` (or `flask create-db`, which runs the same migrations)
 - `cd frontend && npm ci`
 - `cp frontend/.env.example frontend/.env` (set `VITE_FLASK_ORIGIN` if Flask is not on `http://127.0.0.1:8077`)
 - [Mail debugging](#mail-debugging) (optional) — `MAIL.mock_folder` or MailCatcher
@@ -306,6 +308,26 @@ In repo-root `.env` or your shell for `flask run`, set `CAPTCHA_ENABLED=true`, `
 ```bash
 cd frontend && npm run test && npm run lint
 ```
+
+### Database migrations
+
+Schema is managed with [Alembic](https://alembic.sqlalchemy.org/) (`alembic/` at the repo root). From the project root:
+
+```bash
+alembic upgrade head    # new database
+flask init-db           # seed admin user and group
+```
+
+`flask create-db` is an alias for `alembic upgrade head`.
+
+**Existing database** created before Alembic (schema matches revision `0001_initial`, without `real_name` / `mobile`):
+
+```bash
+alembic stamp 0001_initial
+alembic upgrade head
+```
+
+**SQLite and `instance/`:** Relative URIs such as `sqlite:///auth.db` are resolved under Flask’s `instance/` folder (same as Flask-SQLAlchemy). Alembic uses the same resolution in `alembic/env.py`. If you still have an old `auth.db` at the repo root, move it to `instance/auth.db` before migrating.
 
 ### Mail debugging
 

@@ -33,6 +33,7 @@ import { getBasicErrorFromUnknown } from '@/api/client'
 import { useI18n } from '@/hooks/useI18n'
 import type { BasicError } from '@/models/apiError'
 import type { AdminUser } from '@/models/admin'
+import { getUserDisplayName } from '@/utils/userDisplayName'
 
 export function AdminGroupEditPage(): React.ReactElement {
   const { t, locale } = useI18n()
@@ -264,12 +265,12 @@ export function AdminGroupEditPage(): React.ReactElement {
               <Group key={u.id} justify="space-between" wrap="nowrap">
                 <Text size="sm" lineClamp={2} style={{ flex: 1, minWidth: 0 }}>
                   <Text component="span" fw={500}>
-                    {u.name}
+                    {getUserDisplayName(u)}
                   </Text>
-                  {u.nickname?.trim() ? (
+                  {getUserDisplayName(u) !== u.name ? (
                     <Text component="span" c="dimmed">
                       {' '}
-                      ({u.nickname})
+                      · {u.name}
                     </Text>
                   ) : null}
                   <Text component="span" c="dimmed">

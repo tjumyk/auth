@@ -1,6 +1,8 @@
 import json
 import os
 import re
+import subprocess
+import sys
 from typing import Any, Callable
 
 import click
@@ -200,7 +202,14 @@ def page_not_found(error):
 
 @app.cli.command()
 def create_db():
-    db.create_all()
+    """Apply Alembic migrations (alias for alembic upgrade head)."""
+    result = subprocess.run(
+        [sys.executable, '-m', 'alembic', 'upgrade', 'head'],
+        cwd=os.path.dirname(os.path.abspath(__file__)),
+        check=False,
+    )
+    if result.returncode != 0:
+        raise SystemExit(result.returncode)
 
 
 @app.cli.command()

@@ -9,7 +9,7 @@
     <mj-section background-color='#fff' padding='20px'>
       <mj-column>
         <mj-text>
-          <h2>Hi {{user.name}},</h2>
+          <h2>Hi {{user_display_name}},</h2>
         </mj-text>
         <mj-text padding-bottom="10px">
           A new account has been created for you.

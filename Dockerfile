@@ -54,6 +54,8 @@ RUN pip config set global.index-url "${PIP_INDEX_URL}" && \
     fi
 
 COPY app.py models.py error.py page_oauth.py api_account.py api_admin.py api_meta.py api_oauth.py ./
+COPY alembic.ini ./
+COPY alembic ./alembic
 COPY services ./services
 COPY utils ./utils
 COPY --from=mail_templates_builder /app/mail_templates/*.txt ./mail_templates/

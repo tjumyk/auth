@@ -68,9 +68,13 @@ export function AdminUsersPage(): React.ReactElement {
     }
     return q.data.filter((u) => {
       const nick = (u.nickname ?? '').toLowerCase()
+      const real = (u.real_name ?? '').toLowerCase()
+      const mobile = (u.mobile ?? '').toLowerCase()
       return (
         u.name.toLowerCase().includes(f) ||
         nick.includes(f) ||
+        real.includes(f) ||
+        mobile.includes(f) ||
         u.email.toLowerCase().includes(f) ||
         String(u.id).includes(f)
       )
@@ -134,6 +138,8 @@ export function AdminUsersPage(): React.ReactElement {
                 <Table.Th>{t('adminUsersColId')}</Table.Th>
                 <Table.Th>{t('adminUsersColName')}</Table.Th>
                 <Table.Th>{t('nickname')}</Table.Th>
+                <Table.Th>{t('realName')}</Table.Th>
+                <Table.Th>{t('mobile')}</Table.Th>
                 <Table.Th>{t('adminUsersColEmail')}</Table.Th>
                 <Table.Th>{t('adminUsersColActive')}</Table.Th>
                 <Table.Th>{t('adminUsersColEmailConfirmed')}</Table.Th>
@@ -149,6 +155,24 @@ export function AdminUsersPage(): React.ReactElement {
                   <Table.Td>
                     {u.nickname?.trim() ? (
                       <Text size="sm">{u.nickname}</Text>
+                    ) : (
+                      <Text size="sm" c="dimmed">
+                        —
+                      </Text>
+                    )}
+                  </Table.Td>
+                  <Table.Td>
+                    {u.real_name?.trim() ? (
+                      <Text size="sm">{u.real_name}</Text>
+                    ) : (
+                      <Text size="sm" c="dimmed">
+                        —
+                      </Text>
+                    )}
+                  </Table.Td>
+                  <Table.Td>
+                    {u.mobile?.trim() ? (
+                      <Text size="sm">{u.mobile}</Text>
                     ) : (
                       <Text size="sm" c="dimmed">
                         —

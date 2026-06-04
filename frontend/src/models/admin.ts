@@ -52,6 +52,8 @@ export const AdminUserSchema = z.object({
   name: z.string(),
   email: z.string(),
   nickname: z.string().nullable().optional(),
+  real_name: z.string().nullable().optional(),
+  mobile: z.string().nullable().optional(),
   avatar: z.string().nullable().optional(),
   is_active: z.boolean(),
   is_two_factor_enabled: z.boolean(),

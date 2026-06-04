@@ -81,6 +81,14 @@ export type AdminInviteBody = {
   email: string
   external_auth_provider_id?: string | null
   skip_email_confirmation?: boolean
+  real_name?: string
+  mobile?: string
+}
+
+export type AdminProfilePatch = {
+  nickname?: string
+  real_name?: string
+  mobile?: string
 }
 
 const AdminInviteUserResponseSchema = AdminUserSchema.extend({
@@ -159,14 +167,18 @@ export async function setAdminUserActive(uid: number, active: boolean): Promise<
   }
 }
 
-export async function putAdminUserNickname(uid: number, nickname: string): Promise<AdminUser> {
-  const res = await apiClient.put<unknown>(`/api/admin/users/${uid}`, { nickname })
+export async function putAdminUserProfile(uid: number, patch: AdminProfilePatch): Promise<AdminUser> {
+  const res = await apiClient.put<unknown>(`/api/admin/users/${uid}`, patch)
   const parsed = AdminUserSchema.safeParse(res.data)
   if (!parsed.success) {
     console.error('admin user update parse error', parsed.error.flatten())
     throw new Error('Invalid admin user payload from server')
   }
   return parsed.data
+}
+
+export async function putAdminUserNickname(uid: number, nickname: string): Promise<AdminUser> {
+  return putAdminUserProfile(uid, { nickname })
 }
 
 export async function putAdminUserAvatar(uid: number, file: File): Promise<AdminUser> {

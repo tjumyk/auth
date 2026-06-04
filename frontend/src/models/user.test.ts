@@ -9,6 +9,8 @@ describe('UserSchema', () => {
       name: 'alice',
       email: 'a@example.com',
       nickname: null,
+      real_name: null,
+      mobile: null,
       avatar: null,
       is_active: true,
       is_two_factor_enabled: false,

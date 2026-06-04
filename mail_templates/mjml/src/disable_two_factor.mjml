@@ -9,7 +9,7 @@
     <mj-section background-color='#fff' padding='20px'>
       <mj-column>
         <mj-text>
-          <h2>Hi {{user.name}},</h2>
+          <h2>Hi {{user_display_name}},</h2>
         </mj-text>
         <mj-text padding-bottom="10px">Please click the following button to disable the Two-Factor Authentication for your account.</mj-text>
         <mj-button href='{{site[root_url]}}{{site[base_url]}}account/disable-two-factor-by-email?uid={{user.id}}&token={{user.two_factor_disable_token}}'>Disable Two-Factor Authentication</mj-button>

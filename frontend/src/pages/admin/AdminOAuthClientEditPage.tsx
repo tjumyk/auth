@@ -42,6 +42,7 @@ import { useI18n } from '@/hooks/useI18n'
 import type { BasicError } from '@/models/apiError'
 import type { AdminGroup, AdminOAuthClient } from '@/models/admin'
 import { siteAssetSrc } from '@/utils/siteAssetUrl'
+import { getUserDisplayName } from '@/utils/userDisplayName'
 
 const ICON_MAX = 262_144
 
@@ -483,7 +484,11 @@ export function AdminOAuthClientEditPage(): React.ReactElement {
               {(authsQ.data ?? []).map((a) => (
                 <Table.Tr key={`${a.client_id}-${a.user_id}`}>
                   <Table.Td>{a.user_id}</Table.Td>
-                  <Table.Td>{a.user ? `${a.user.name} (${a.user.email})` : `#${a.user_id}`}</Table.Td>
+                  <Table.Td>
+                    {a.user
+                      ? `${getUserDisplayName(a.user)} (${a.user.email})`
+                      : `#${a.user_id}`}
+                  </Table.Td>
                   <Table.Td>
                     {new Date(a.created_at).toLocaleString(locale === 'zh-Hans' ? 'zh-CN' : 'en-US')}
                   </Table.Td>

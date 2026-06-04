@@ -7,6 +7,7 @@ import { ThemeLocaleToolbar } from '@/components/layout/ThemeLocaleToolbar'
 import { useAuthUser } from '@/hooks/useAuthUser'
 import { useI18n } from '@/hooks/useI18n'
 import { isLocaleForced, isThemeForced, isThemeLocaleToolbarVisible } from '@/models/uiConfig'
+import { getUserDisplayInitial, getUserDisplayName } from '@/utils/userDisplayName'
 import { userAvatarSrc } from '@/utils/siteAssetUrl'
 
 export function ShellHeaderAccountMenu({
@@ -40,7 +41,7 @@ export function ShellHeaderAccountMenu({
       >
         <Menu.Target>
           <UnstyledButton
-            aria-label={`${user.name}. ${t('accountMenu')}`}
+            aria-label={`${getUserDisplayName(user)}. ${t('accountMenu')}`}
             style={{
               borderRadius: 'var(--mantine-radius-md)',
               padding: '2px 6px 2px 2px',
@@ -48,11 +49,11 @@ export function ShellHeaderAccountMenu({
           >
             <Group gap={6} wrap="nowrap">
               <Avatar src={userAvatarSrc(user)} radius="md" size="sm" color="brand">
-                {(user.name.trim().slice(0, 1) || '?').toUpperCase()}
+                {getUserDisplayInitial(user)}
               </Avatar>
               <Box visibleFrom="sm" maw={160} style={{ minWidth: 0 }}>
                 <Text size="sm" fw={500} lineClamp={1}>
-                  {user.name}
+                  {getUserDisplayName(user)}
                 </Text>
               </Box>
               <Box visibleFrom="sm" style={{ display: 'flex', alignItems: 'center' }}>

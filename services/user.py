@@ -10,6 +10,12 @@ from error import BasicError
 from models import db, User
 from utils.email_validation import EMAIL_MAX_LENGTH, EMAIL_PATTERN, is_valid_email
 from utils.external_auth.provider import get_provider, ExternalAuthError
+from utils.profile_validation import (
+    ProfileValidationError,
+    validate_mobile,
+    validate_nickname,
+    validate_real_name,
+)
 
 
 class UserServiceError(BasicError):
@@ -18,7 +24,6 @@ class UserServiceError(BasicError):
 
 class UserService:
     name_pattern = re.compile('^[\w]{3,16}$')
-    nickname_pattern = re.compile('^[ \w\-]{3,16}$')
     password_pattern = re.compile('^.{8,20}$')
     email_pattern = EMAIL_PATTERN
     email_max_length = EMAIL_MAX_LENGTH
@@ -34,7 +39,9 @@ class UserService:
 
     profile_fields = {
         'nickname',
-        'avatar'
+        'avatar',
+        'real_name',
+        'mobile',
     }
 
     @staticmethod
@@ -91,7 +98,11 @@ class UserService:
             raise UserServiceError('name must not be empty')
 
         name_lower = name.lower()
-        _filter = or_(func.lower(User.name).contains(name_lower), func.lower(User.nickname).contains(name_lower))
+        _filter = or_(
+            func.lower(User.name).contains(name_lower),
+            func.lower(User.nickname).contains(name_lower),
+            func.lower(User.real_name).contains(name_lower),
+        )
         if limit is None:
             return User.query.filter(_filter).all()
         else:
@@ -221,7 +232,53 @@ class UserService:
                                    'and then try again' % recent_failures_minutes)
 
     @staticmethod
-    def invite(name, email, external_auth_provider_id: str = None, skip_email_confirmation: bool = False):
+    @staticmethod
+    def _check_duplicate_mobile(mobile: str, exclude_user_id: int | None = None) -> None:
+        query = db.session.query(func.count()).filter(User.mobile == mobile)
+        if exclude_user_id is not None:
+            query = query.filter(User.id != exclude_user_id)
+        if query.scalar():
+            raise UserServiceError('duplicate mobile')
+
+    @staticmethod
+    def _apply_profile_value(user: User, key: str, value) -> None:
+        if key == 'nickname':
+            if value is not None:
+                if isinstance(value, str) and len(value) == 0:
+                    value = None
+                else:
+                    try:
+                        value = validate_nickname(value)
+                    except ProfileValidationError:
+                        raise UserServiceError('invalid nickname format')
+                    if value is not None and value != user.nickname and db.session.query(func.count()). \
+                            filter(User.nickname == value).scalar():
+                        raise UserServiceError('duplicate nickname')
+        elif key == 'real_name':
+            if value is not None:
+                if isinstance(value, str) and len(value) == 0:
+                    value = None
+                else:
+                    try:
+                        value = validate_real_name(value)
+                    except ProfileValidationError:
+                        raise UserServiceError('invalid real name format')
+        elif key == 'mobile':
+            if value is not None:
+                if isinstance(value, str) and len(value) == 0:
+                    value = None
+                else:
+                    try:
+                        value = validate_mobile(value)
+                    except ProfileValidationError:
+                        raise UserServiceError('invalid mobile format')
+                    if value is not None:
+                        UserService._check_duplicate_mobile(value, exclude_user_id=user.id)
+        setattr(user, key, value)
+
+    @staticmethod
+    def invite(name, email, external_auth_provider_id: str = None, skip_email_confirmation: bool = False,
+               real_name: str = None, mobile: str = None):
         if name is None:
             raise UserServiceError('name is required')
         if email is None:
@@ -262,6 +319,11 @@ class UserService:
             user_args['email_confirm_token_expire_at'] = datetime.utcnow() + UserService.email_confirm_token_valid
         user = User(**user_args)
         db.session.add(user)
+        db.session.flush()
+        if real_name is not None:
+            UserService._apply_profile_value(user, 'real_name', real_name)
+        if mobile is not None:
+            UserService._apply_profile_value(user, 'mobile', mobile)
         return user
 
     @staticmethod
@@ -407,17 +469,10 @@ class UserService:
         old_values = {field: getattr(user, field) for field in kwargs}
 
         for key, value in kwargs.items():
-            if key == 'nickname':
-                if value is not None:
-                    if isinstance(value, str) and len(value) == 0:
-                        value = None  # set NULL
-                    else:
-                        if not UserService.nickname_pattern.match(value):
-                            raise UserServiceError('invalid nickname format')
-                        if value != user.nickname and db.session.query(func.count()). \
-                                filter(User.nickname == value).scalar():
-                            raise UserServiceError('duplicate nickname')
-            setattr(user, key, value)
+            if key in ('nickname', 'real_name', 'mobile'):
+                UserService._apply_profile_value(user, key, value)
+            else:
+                setattr(user, key, value)
         return old_values
 
     @staticmethod

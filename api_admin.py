@@ -50,7 +50,12 @@ def admin_user_list():
             email = _json.get('email')
             external_auth_provider_id = _json.get('external_auth_provider_id')
             skip_email_confirmation = _json.get('skip_email_confirmation', False)
-            user = UserService.invite(name, email, external_auth_provider_id, skip_email_confirmation)
+            real_name = _json.get('real_name')
+            mobile = _json.get('mobile')
+            user = UserService.invite(
+                name, email, external_auth_provider_id, skip_email_confirmation,
+                real_name=real_name, mobile=mobile,
+            )
             db.session.commit()
 
             if not skip_email_confirmation:

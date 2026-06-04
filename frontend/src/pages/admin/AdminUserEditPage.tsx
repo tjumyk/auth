@@ -36,15 +36,23 @@ import {
   getAdminUserLoginRecords,
   postAdminUserReconfirmEmail,
   putAdminUserAvatar,
-  putAdminUserNickname,
+  putAdminUserProfile,
   setAdminUserActive,
 } from '@/api/admin'
 import { getBasicErrorFromUnknown } from '@/api/client'
 import { ConfirmEmailUrlField } from '@/components/admin/ConfirmEmailUrlField'
 import { useI18n } from '@/hooks/useI18n'
+import { externalUserInfoEnabled } from '@/models/adminFeaturesConfig'
 import { mailEnabled } from '@/models/mailConfig'
 import type { BasicError } from '@/models/apiError'
 import type { AdminUser } from '@/models/admin'
+import {
+  normalizeMobile,
+  profileErrorFromUnknown,
+  validateMobile,
+  validateNickname,
+  validateRealName,
+} from '@/utils/profileValidation'
 import { userAvatarSrc } from '@/utils/siteAssetUrl'
 
 const AVATAR_MAX_BYTES = 262_144
@@ -99,33 +107,72 @@ export function AdminUserEditPage(): React.ReactElement {
       nickname: (v) => {
         const s = v.trim()
         if (s.length === 0) return null
-        if (s.length < 3) return t('nicknameMinLength')
-        if (s.length > 16) return t('nicknameMaxLength')
-        if (!/^[ \w-]{3,16}$/.test(s)) return t('nicknameInvalid')
-        return null
+        return validateNickname(v, t)
       },
+    },
+  })
+
+  const realNameForm = useForm({
+    initialValues: { real_name: '' },
+    validate: {
+      real_name: (v) => validateRealName(v, t),
+    },
+  })
+
+  const mobileForm = useForm({
+    initialValues: { mobile: '' },
+    validate: {
+      mobile: (v) => validateMobile(v, t),
     },
   })
 
   useEffect(() => {
     if (userQ.data) {
       nickForm.setValues({ nickname: userQ.data.nickname ?? '' })
+      realNameForm.setValues({ real_name: userQ.data.real_name ?? '' })
+      mobileForm.setValues({ mobile: userQ.data.mobile ?? '' })
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- hydrate when user loads
-  }, [userQ.data?.id, userQ.data?.nickname])
+  }, [userQ.data?.id, userQ.data?.nickname, userQ.data?.real_name, userQ.data?.mobile])
 
   const invalidateUser = (): void => {
     void queryClient.invalidateQueries({ queryKey: ADMIN_USERS_QK })
     void queryClient.invalidateQueries({ queryKey: ADMIN_USER_QK(uid, true) })
   }
 
+  const mapPageError = (e: unknown): void => {
+    setPageError(profileErrorFromUnknown(e, t))
+  }
+
   const nickM = useMutation({
-    mutationFn: (nickname: string) => putAdminUserNickname(uid, nickname.trim()),
+    mutationFn: (nickname: string) => putAdminUserProfile(uid, { nickname: nickname.trim() }),
     onSuccess: () => {
       setPageError(null)
       invalidateUser()
     },
-    onError: (e) => setPageError(getBasicErrorFromUnknown(e)),
+    onError: mapPageError,
+  })
+
+  const realNameM = useMutation({
+    mutationFn: (real_name: string) => putAdminUserProfile(uid, { real_name: real_name.trim() }),
+    onSuccess: () => {
+      setPageError(null)
+      invalidateUser()
+    },
+    onError: mapPageError,
+  })
+
+  const mobileM = useMutation({
+    mutationFn: (raw: string) => {
+      const trimmed = raw.trim()
+      const mobile = trimmed ? (normalizeMobile(trimmed) ?? trimmed) : ''
+      return putAdminUserProfile(uid, { mobile })
+    },
+    onSuccess: () => {
+      setPageError(null)
+      invalidateUser()
+    },
+    onError: mapPageError,
   })
 
   const avatarM = useMutation({
@@ -305,20 +352,58 @@ export function AdminUserEditPage(): React.ReactElement {
         <Title order={4} mb="sm">
           {t('profileHeading')}
         </Title>
-        <form
-          onSubmit={nickForm.onSubmit((v) => {
-            nickM.mutate(v.nickname)
-          })}
-        >
-          <Stack gap="sm" key={locale} maw={400}>
-            <TextInput label={t('profileName')} value={user.name} readOnly disabled />
-            <TextInput label={t('profileEmail')} value={user.email} readOnly disabled />
-            <TextInput label={t('nickname')} {...nickForm.getInputProps('nickname')} />
-            <Button type="submit" loading={nickM.isPending}>
-              {t('saveNickname')}
-            </Button>
-          </Stack>
-        </form>
+        <Stack gap="md" key={locale} maw={400}>
+          <TextInput label={t('profileName')} value={user.name} readOnly disabled />
+          <TextInput label={t('profileEmail')} value={user.email} readOnly disabled />
+          <form
+            onSubmit={nickForm.onSubmit((v) => {
+              nickM.mutate(v.nickname)
+            })}
+          >
+            <Stack gap="sm">
+              <TextInput
+                label={t('nickname')}
+                description={t('nicknameHint')}
+                {...nickForm.getInputProps('nickname')}
+              />
+              <Button type="submit" loading={nickM.isPending}>
+                {t('saveNickname')}
+              </Button>
+            </Stack>
+          </form>
+          <form
+            onSubmit={realNameForm.onSubmit((v) => {
+              realNameM.mutate(v.real_name)
+            })}
+          >
+            <Stack gap="sm">
+              <TextInput
+                label={t('realName')}
+                description={t('realNameHint')}
+                {...realNameForm.getInputProps('real_name')}
+              />
+              <Button type="submit" loading={realNameM.isPending}>
+                {t('saveRealName')}
+              </Button>
+            </Stack>
+          </form>
+          <form
+            onSubmit={mobileForm.onSubmit((v) => {
+              mobileM.mutate(v.mobile)
+            })}
+          >
+            <Stack gap="sm">
+              <TextInput
+                label={t('mobile')}
+                description={t('mobileHint')}
+                {...mobileForm.getInputProps('mobile')}
+              />
+              <Button type="submit" loading={mobileM.isPending}>
+                {t('saveMobile')}
+              </Button>
+            </Stack>
+          </form>
+        </Stack>
       </Paper>
 
       <Paper p="md" withBorder shadow="xs">
@@ -356,33 +441,60 @@ export function AdminUserEditPage(): React.ReactElement {
         </Group>
       </Paper>
 
-      {user && user.is_active ? (
-        <Paper p="md" withBorder shadow="xs">
-          <Title order={4} mb="sm">
-            {t('adminUserEmailActions')}
-          </Title>
-          <Stack gap="sm">
-            <Group>
-              <Button variant="light" loading={reconfirmM.isPending} onClick={openResetConfirm}>
-                {mailEnabled ? t('adminUserReconfirmEmail') : t('adminUserResetConfirmUrl')}
-              </Button>
-              <Button
-                variant="light"
-                loading={showConfirmUrlM.isPending}
-                onClick={() => showConfirmUrlM.mutate()}
-              >
-                {t('adminUserShowConfirmUrl')}
-              </Button>
+      <Paper p="md" withBorder shadow="xs">
+        <Title order={4} mb="sm">
+          {t('adminUserEmailActions')}
+        </Title>
+        <Stack gap="sm">
+          <Stack gap={4}>
+            <Group gap="xs">
+              <Text size="sm" c="dimmed">
+                {t('adminUsersColEmailConfirmed')}
+              </Text>
+              {user.is_email_confirmed ? (
+                <Badge color="teal" variant="light">
+                  {t('adminUsersYes')}
+                </Badge>
+              ) : (
+                <Badge color="orange" variant="light">
+                  {t('adminUsersNo')}
+                </Badge>
+              )}
             </Group>
-            {revealedConfirmUrl ? (
-              <ConfirmEmailUrlField
-                url={revealedConfirmUrl}
-                hint={!mailEnabled ? t('mailDisabledConfirmUrlHint') : undefined}
-              />
+            {user.is_email_confirmed && user.email_confirmed_at ? (
+              <Text size="sm" c="dimmed">
+                {t('adminUserEmailConfirmedAt', {
+                  date: new Date(user.email_confirmed_at).toLocaleString(
+                    locale === 'zh-Hans' ? 'zh-CN' : 'en-US',
+                  ),
+                })}
+              </Text>
             ) : null}
           </Stack>
-        </Paper>
-      ) : null}
+          {user.is_active ? (
+            <>
+              <Group>
+                <Button variant="light" loading={reconfirmM.isPending} onClick={openResetConfirm}>
+                  {mailEnabled ? t('adminUserReconfirmEmail') : t('adminUserResetConfirmUrl')}
+                </Button>
+                <Button
+                  variant="light"
+                  loading={showConfirmUrlM.isPending}
+                  onClick={() => showConfirmUrlM.mutate()}
+                >
+                  {t('adminUserShowConfirmUrl')}
+                </Button>
+              </Group>
+              {revealedConfirmUrl ? (
+                <ConfirmEmailUrlField
+                  url={revealedConfirmUrl}
+                  hint={!mailEnabled ? t('mailDisabledConfirmUrlHint') : undefined}
+                />
+              ) : null}
+            </>
+          ) : null}
+        </Stack>
+      </Paper>
 
       <Paper p="md" withBorder shadow="xs">
         <Title order={4} mb="sm">
@@ -464,34 +576,36 @@ export function AdminUserEditPage(): React.ReactElement {
         )}
       </Paper>
 
-      <Paper p="md" withBorder shadow="xs">
-        <Title order={4} mb="sm">
-          {t('adminUserExternalInfo')}
-        </Title>
-        <Button variant="light" mb="sm" onClick={loadExtInfo} loading={extInfoQ.isFetching}>
-          {t('adminUserLoadExternalInfo')}
-        </Button>
-        {extInfoQ.data ? (
-          <Stack gap="xs">
-            {extInfoQ.data.map((row) => (
-              <Paper key={row.id} p="sm" withBorder>
-                <Text fw={600}>
-                  {row.name} ({row.type})
-                </Text>
-                {row.error ? (
-                  <Text size="sm" c="red">
-                    {row.error.msg} {row.error.detail}
+      {externalUserInfoEnabled ? (
+        <Paper p="md" withBorder shadow="xs">
+          <Title order={4} mb="sm">
+            {t('adminUserExternalInfo')}
+          </Title>
+          <Button variant="light" mb="sm" onClick={loadExtInfo} loading={extInfoQ.isFetching}>
+            {t('adminUserLoadExternalInfo')}
+          </Button>
+          {extInfoQ.data ? (
+            <Stack gap="xs">
+              {extInfoQ.data.map((row) => (
+                <Paper key={row.id} p="sm" withBorder>
+                  <Text fw={600}>
+                    {row.name} ({row.type})
                   </Text>
-                ) : (
-                  <Text size="sm" component="pre" style={{ whiteSpace: 'pre-wrap' }}>
-                    {JSON.stringify(row.result, null, 2)}
-                  </Text>
-                )}
-              </Paper>
-            ))}
-          </Stack>
-        ) : null}
-      </Paper>
+                  {row.error ? (
+                    <Text size="sm" c="red">
+                      {row.error.msg} {row.error.detail}
+                    </Text>
+                  ) : (
+                    <Text size="sm" component="pre" style={{ whiteSpace: 'pre-wrap' }}>
+                      {JSON.stringify(row.result, null, 2)}
+                    </Text>
+                  )}
+                </Paper>
+              ))}
+            </Stack>
+          ) : null}
+        </Paper>
+      ) : null}
 
       <Paper p="md" withBorder shadow="xs">
         <Title order={4} mb="sm" c="red">

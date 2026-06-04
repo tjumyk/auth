@@ -126,14 +126,24 @@ export async function fetchAccountMe(): Promise<AccountMeUser> {
   return parsed.data
 }
 
-export async function putAccountNickname(nickname: string): Promise<User> {
-  const res = await apiClient.put<unknown>('/api/account/me', { nickname })
+export type AccountProfilePatch = {
+  nickname?: string
+  real_name?: string
+  mobile?: string
+}
+
+export async function putAccountProfile(patch: AccountProfilePatch): Promise<User> {
+  const res = await apiClient.put<unknown>('/api/account/me', patch)
   const parsed = UserSchema.safeParse(res.data)
   if (!parsed.success) {
     console.error('update profile parse error', parsed.error.flatten())
     throw new Error('Invalid user payload from server')
   }
   return parsed.data
+}
+
+export async function putAccountNickname(nickname: string): Promise<User> {
+  return putAccountProfile({ nickname })
 }
 
 export async function putAccountAvatar(file: File): Promise<User> {

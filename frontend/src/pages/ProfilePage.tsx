@@ -30,7 +30,7 @@ import {
   fetchAccountMe,
   fetchExternalAuthProvider,
   putAccountAvatar,
-  putAccountNickname,
+  putAccountProfile,
   putAccountPassword,
 } from '@/api/account'
 import { getBasicErrorFromUnknown } from '@/api/client'
@@ -41,24 +41,17 @@ import { siteConfig } from '@/models/siteConfig'
 import { groupNameToBadgeColor } from '@/utils/groupBadgeColor'
 import { validateNewPassword, validateRepeatNewPassword } from '@/utils/passwordValidation'
 import { PROFILE_SECTION_DOM_IDS, type AppLocationScrollState } from '@/models/locationScrollState'
+import {
+  normalizeMobile,
+  profileErrorFromUnknown,
+  validateMobile,
+  validateNickname,
+  validateRealName,
+} from '@/utils/profileValidation'
 import { userAvatarSrc } from '@/utils/siteAssetUrl'
 
 const AVATAR_ACCEPT = 'image/png,image/jpeg,image/jpg,image/gif'
 const AVATAR_MAX_BYTES = 262_144
-
-function nicknameValidator(value: string, t: (key: string) => string): string | null {
-  const v = value.trim()
-  if (v.length < 3) {
-    return t('nicknameMinLength')
-  }
-  if (v.length > 16) {
-    return t('nicknameMaxLength')
-  }
-  if (!/^[ \w-]{3,16}$/.test(v)) {
-    return t('nicknameInvalid')
-  }
-  return null
-}
 
 function validateAvatarFile(
   file: File,
@@ -128,6 +121,10 @@ export function ProfilePage(): React.ReactElement {
   const location = useLocation()
   const queryClient = useQueryClient()
   const [profileError, setProfileError] = useState<BasicError | null>(null)
+  const [realNameError, setRealNameError] = useState<BasicError | null>(null)
+  const [mobileError, setMobileError] = useState<BasicError | null>(null)
+  const [realNameOk, setRealNameOk] = useState(false)
+  const [mobileOk, setMobileOk] = useState(false)
   const [avatarError, setAvatarError] = useState<BasicError | null>(null)
   const [passwordError, setPasswordError] = useState<BasicError | null>(null)
   const [profileOk, setProfileOk] = useState(false)
@@ -151,7 +148,21 @@ export function ProfilePage(): React.ReactElement {
   const nickForm = useForm({
     initialValues: { nickname: '' },
     validate: {
-      nickname: (v) => nicknameValidator(v, t),
+      nickname: (v) => validateNickname(v, t),
+    },
+  })
+
+  const realNameForm = useForm({
+    initialValues: { real_name: '' },
+    validate: {
+      real_name: (v) => validateRealName(v, t),
+    },
+  })
+
+  const mobileForm = useForm({
+    initialValues: { mobile: '' },
+    validate: {
+      mobile: (v) => validateMobile(v, t),
     },
   })
 
@@ -160,8 +171,10 @@ export function ProfilePage(): React.ReactElement {
       return
     }
     nickForm.setValues({ nickname: meQ.data.nickname ?? '' })
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- hydrate from /me when server id or nickname changes
-  }, [meQ.isSuccess, meQ.data?.id, meQ.data?.nickname])
+    realNameForm.setValues({ real_name: meQ.data.real_name ?? '' })
+    mobileForm.setValues({ mobile: meQ.data.mobile ?? '' })
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- hydrate from /me when profile fields change
+  }, [meQ.isSuccess, meQ.data?.id, meQ.data?.nickname, meQ.data?.real_name, meQ.data?.mobile])
 
   const pwdForm = useForm({
     initialValues: {
@@ -176,17 +189,51 @@ export function ProfilePage(): React.ReactElement {
     },
   })
 
+  const onProfileFieldSuccess = (user: AccountMeUser): void => {
+    queryClient.setQueryData(['whoami'], user)
+    void queryClient.invalidateQueries({ queryKey: ACCOUNT_ME_QUERY_KEY })
+  }
+
   const nickM = useMutation({
-    mutationFn: (nickname: string) => putAccountNickname(nickname.trim()),
+    mutationFn: (nickname: string) => putAccountProfile({ nickname: nickname.trim() }),
     onSuccess: (user) => {
       setProfileError(null)
       setProfileOk(true)
-      queryClient.setQueryData(['whoami'], user)
-      void queryClient.invalidateQueries({ queryKey: ACCOUNT_ME_QUERY_KEY })
+      onProfileFieldSuccess(user)
     },
     onError: (err) => {
       setProfileOk(false)
-      setProfileError(getBasicErrorFromUnknown(err))
+      setProfileError(profileErrorFromUnknown(err, t))
+    },
+  })
+
+  const realNameM = useMutation({
+    mutationFn: (real_name: string) => putAccountProfile({ real_name: real_name.trim() }),
+    onSuccess: (user) => {
+      setRealNameError(null)
+      setRealNameOk(true)
+      onProfileFieldSuccess(user)
+    },
+    onError: (err) => {
+      setRealNameOk(false)
+      setRealNameError(profileErrorFromUnknown(err, t))
+    },
+  })
+
+  const mobileM = useMutation({
+    mutationFn: (raw: string) => {
+      const trimmed = raw.trim()
+      const mobile = trimmed ? (normalizeMobile(trimmed) ?? trimmed) : ''
+      return putAccountProfile({ mobile })
+    },
+    onSuccess: (user) => {
+      setMobileError(null)
+      setMobileOk(true)
+      onProfileFieldSuccess(user)
+    },
+    onError: (err) => {
+      setMobileOk(false)
+      setMobileError(profileErrorFromUnknown(err, t))
     },
   })
 
@@ -367,6 +414,74 @@ export function ProfilePage(): React.ReactElement {
                   />
                   <Button type="submit" loading={nickM.isPending}>
                     {t('saveNickname')}
+                  </Button>
+                </Stack>
+              </form>
+            </Paper>
+
+            <Paper id="profile-real-name" p="md" radius="md" withBorder shadow="xs">
+              <Title order={4} mb="md">
+                {t('realNameSection')}
+              </Title>
+              {realNameOk ? (
+                <Alert color="green" mb="md" onClose={() => setRealNameOk(false)} withCloseButton>
+                  {t('profileUpdated')}
+                </Alert>
+              ) : null}
+              {realNameError ? (
+                <Alert color="red" mb="md" title={realNameError.msg} onClose={() => setRealNameError(null)} withCloseButton>
+                  {realNameError.detail}
+                </Alert>
+              ) : null}
+              <form
+                key={`${locale}-real`}
+                onSubmit={realNameForm.onSubmit((values) => {
+                  setRealNameOk(false)
+                  realNameM.mutate(values.real_name)
+                })}
+              >
+                <Stack gap="md">
+                  <TextInput
+                    label={t('realName')}
+                    description={t('realNameHint')}
+                    {...realNameForm.getInputProps('real_name')}
+                  />
+                  <Button type="submit" loading={realNameM.isPending}>
+                    {t('saveRealName')}
+                  </Button>
+                </Stack>
+              </form>
+            </Paper>
+
+            <Paper id="profile-mobile" p="md" radius="md" withBorder shadow="xs">
+              <Title order={4} mb="md">
+                {t('mobileSection')}
+              </Title>
+              {mobileOk ? (
+                <Alert color="green" mb="md" onClose={() => setMobileOk(false)} withCloseButton>
+                  {t('profileUpdated')}
+                </Alert>
+              ) : null}
+              {mobileError ? (
+                <Alert color="red" mb="md" title={mobileError.msg} onClose={() => setMobileError(null)} withCloseButton>
+                  {mobileError.detail}
+                </Alert>
+              ) : null}
+              <form
+                key={`${locale}-mobile`}
+                onSubmit={mobileForm.onSubmit((values) => {
+                  setMobileOk(false)
+                  mobileM.mutate(values.mobile)
+                })}
+              >
+                <Stack gap="md">
+                  <TextInput
+                    label={t('mobile')}
+                    description={t('mobileHint')}
+                    {...mobileForm.getInputProps('mobile')}
+                  />
+                  <Button type="submit" loading={mobileM.isPending}>
+                    {t('saveMobile')}
                   </Button>
                 </Stack>
               </form>

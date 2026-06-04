@@ -5,12 +5,17 @@ import { useEffect, useState } from 'react'
 
 import { ADMIN_USERS_QK, postAdminInviteUser, type AdminInviteResult } from '@/api/admin'
 import { fetchExternalAuthProviders } from '@/api/account'
-import { getBasicErrorFromUnknown } from '@/api/client'
 import { ConfirmEmailUrlField } from '@/components/admin/ConfirmEmailUrlField'
 import { useI18n } from '@/hooks/useI18n'
 import type { BasicError } from '@/models/apiError'
 import { mailEnabled } from '@/models/mailConfig'
 import { EMAIL_MAX_LENGTH, isValidEmail } from '@/utils/emailValidation'
+import {
+  normalizeMobile,
+  profileErrorFromUnknown,
+  validateMobile,
+  validateRealName,
+} from '@/utils/profileValidation'
 
 export function AdminUserInviteModal({
   opened,
@@ -34,6 +39,8 @@ export function AdminUserInviteModal({
     initialValues: {
       name: '',
       email: '',
+      real_name: '',
+      mobile: '',
       external_auth_provider_id: '' as string | null,
       skip_email_confirmation: false,
     },
@@ -52,6 +59,8 @@ export function AdminUserInviteModal({
         if (!isValidEmail(s)) return t('registerEmailInvalid')
         return null
       },
+      real_name: (v) => validateRealName(v, t),
+      mobile: (v) => validateMobile(v, t),
     },
   })
 
@@ -67,12 +76,18 @@ export function AdminUserInviteModal({
   const inviteM = useMutation({
     mutationFn: () => {
       const ext = form.values.external_auth_provider_id
-      return postAdminInviteUser({
+      const realName = form.values.real_name.trim()
+      const mobileRaw = form.values.mobile.trim()
+      const mobileNorm = mobileRaw ? normalizeMobile(mobileRaw) : null
+      const body: Parameters<typeof postAdminInviteUser>[0] = {
         name: form.values.name.trim(),
         email: form.values.email.trim(),
         external_auth_provider_id: ext && ext.length > 0 ? ext : undefined,
         skip_email_confirmation: Boolean(ext) && form.values.skip_email_confirmation,
-      })
+      }
+      if (realName) body.real_name = realName
+      if (mobileNorm) body.mobile = mobileNorm
+      return postAdminInviteUser(body)
     },
     onSuccess: (result) => {
       setError(null)
@@ -86,7 +101,7 @@ export function AdminUserInviteModal({
       onClose()
     },
     onError: (err) => {
-      setError(getBasicErrorFromUnknown(err))
+      setError(profileErrorFromUnknown(err, t))
     },
   })
 
@@ -139,6 +154,16 @@ export function AdminUserInviteModal({
             type="email"
             required
             {...form.getInputProps('email')}
+          />
+          <TextInput
+            label={t('realName')}
+            description={t('realNameHint')}
+            {...form.getInputProps('real_name')}
+          />
+          <TextInput
+            label={t('mobile')}
+            description={t('mobileHint')}
+            {...form.getInputProps('mobile')}
           />
           {showProviderFields ? (
             <>

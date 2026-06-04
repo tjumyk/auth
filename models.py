@@ -20,6 +20,8 @@ class User(db.Model):
     password = db.Column(db.String(128), nullable=False)
     email = db.Column(db.String(64), unique=True, nullable=False)
     nickname = db.Column(db.String(16), unique=True)
+    real_name = db.Column(db.String(64))
+    mobile = db.Column(db.String(20), unique=True)
     avatar = db.Column(db.String(128))
 
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
@@ -48,7 +50,8 @@ class User(db.Model):
                                      cascade="all, delete-orphan")
 
     def to_dict(self, with_groups=True, with_group_ids=False, with_authorizations=False, with_advanced_fields=False):
-        _dict = dict(id=self.id, name=self.name, email=self.email, nickname=self.nickname, avatar=self.avatar,
+        _dict = dict(id=self.id, name=self.name, email=self.email, nickname=self.nickname,
+                     real_name=self.real_name, mobile=self.mobile, avatar=self.avatar,
                      is_active=self.is_active, is_two_factor_enabled=self.is_two_factor_enabled,
                      external_auth_provider_id=self.external_auth_provider_id,
                      external_auth_enforced=self.external_auth_enforced)

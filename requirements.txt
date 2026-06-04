@@ -1,5 +1,6 @@
 flask
 flask-sqlalchemy
+alembic
 psycopg2-binary
 passlib[bcrypt]
 Pillow

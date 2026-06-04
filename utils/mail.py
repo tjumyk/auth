@@ -10,6 +10,8 @@ from typing import List
 
 from flask import current_app as app
 
+from utils.profile_validation import display_name
+
 _templates = {}
 _logger = logging.getLogger(__name__)
 
@@ -52,7 +54,11 @@ def send_emails(to_list, cc_list, bcc_list, template, **kwargs):
 
     sender = kwargs.get('sender')
     if sender:  # if sender is specified, it's a personal email. Otherwise, it's a system email.
-        from_name = '%s via %s' % (sender.nickname or sender.name, from_name)
+        from_name = '%s via %s' % (display_name(sender), from_name)
+
+    user = kwargs.get('user')
+    if user is not None:
+        kwargs = {**kwargs, 'user_display_name': display_name(user)}
     msg['From'] = Address(from_name, from_user, from_domain)
 
     reply_to_address = mail_config.get('reply_to')
