@@ -14,6 +14,7 @@ import { useI18n } from '@/hooks/useI18n'
 import type { BasicError } from '@/models/apiError'
 import { mailEnabled } from '@/models/mailConfig'
 import { siteConfig } from '@/models/siteConfig'
+import { EMAIL_MAX_LENGTH, isValidEmail } from '@/utils/emailValidation'
 
 const USERNAME_PATTERN = /^\w{3,16}$/
 
@@ -55,8 +56,8 @@ export function RegisterPage(): React.ReactElement {
       email: (v) => {
         const s = v.trim()
         if (s.length === 0) return t('registerEmailRequired')
-        if (s.length > 64) return t('registerEmailMax')
-        if (!/^\S+@\S+\.\S+$/.test(s)) return t('registerEmailInvalid')
+        if (s.length > EMAIL_MAX_LENGTH) return t('registerEmailMax')
+        if (!isValidEmail(s)) return t('registerEmailInvalid')
         return null
       },
     },

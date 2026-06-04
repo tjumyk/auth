@@ -10,6 +10,7 @@ import { ConfirmEmailUrlField } from '@/components/admin/ConfirmEmailUrlField'
 import { useI18n } from '@/hooks/useI18n'
 import type { BasicError } from '@/models/apiError'
 import { mailEnabled } from '@/models/mailConfig'
+import { EMAIL_MAX_LENGTH, isValidEmail } from '@/utils/emailValidation'
 
 export function AdminUserInviteModal({
   opened,
@@ -47,8 +48,8 @@ export function AdminUserInviteModal({
       email: (v) => {
         const s = v.trim()
         if (!s) return t('registerEmailRequired')
-        if (s.length > 64) return t('registerEmailMax')
-        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s)) return t('registerEmailInvalid')
+        if (s.length > EMAIL_MAX_LENGTH) return t('registerEmailMax')
+        if (!isValidEmail(s)) return t('registerEmailInvalid')
         return null
       },
     },

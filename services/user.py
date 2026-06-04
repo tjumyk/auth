@@ -8,6 +8,7 @@ from sqlalchemy import or_, func
 import utils.two_factor as two_factor
 from error import BasicError
 from models import db, User
+from utils.email_validation import EMAIL_MAX_LENGTH, EMAIL_PATTERN, is_valid_email
 from utils.external_auth.provider import get_provider, ExternalAuthError
 
 
@@ -19,8 +20,8 @@ class UserService:
     name_pattern = re.compile('^[\w]{3,16}$')
     nickname_pattern = re.compile('^[ \w\-]{3,16}$')
     password_pattern = re.compile('^.{8,20}$')
-    email_pattern = re.compile('^.+@\w+(\.\w+)*$')
-    email_max_length = 64
+    email_pattern = EMAIL_PATTERN
+    email_max_length = EMAIL_MAX_LENGTH
     email_confirm_token_valid = timedelta(days=30)
     password_reset_token_valid = timedelta(minutes=15)
     email_reconfirm_request_wait = timedelta(minutes=1)
@@ -228,10 +229,8 @@ class UserService:
 
         if not UserService.name_pattern.match(name):
             raise UserServiceError('invalid name format')
-        if not UserService.email_pattern.match(email):
+        if not is_valid_email(email):
             raise UserServiceError('invalid email format')
-        if len(email) > UserService.email_max_length:
-            raise UserServiceError('email too long')
 
         if external_auth_provider_id:
             external_auth_enforced = True  # enforce external auth when external auth provider provided
@@ -276,10 +275,8 @@ class UserService:
 
         if not UserService.name_pattern.match(name):
             raise UserServiceError('invalid name format')
-        if not UserService.email_pattern.match(email):
+        if not is_valid_email(email):
             raise UserServiceError('invalid email format')
-        if len(email) > UserService.email_max_length:
-            raise UserServiceError('email too long')
         if not UserService.password_pattern.match(password):
             raise UserServiceError('invalid password format')
         if db.session.query(func.count()).filter(User.name == name).scalar():
