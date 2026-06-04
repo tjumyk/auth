@@ -14,8 +14,32 @@ from utils.qr_code import build_qr_code, img_to_base64
 from utils.session import get_session_user, requires_login, clear_current_user, set_current_user, get_current_user, \
     start_two_factor, get_two_factor_user
 from utils.upload import handle_upload, handle_post_upload, UploadError
+from utils.captcha import (
+    captcha_required_for_login,
+    peek_captcha,
+    resolve_user_by_name_or_email,
+    verify_captcha,
+)
 
 account = Blueprint('account', __name__)
+
+
+@account.route('/login-guard', methods=['GET'])
+def account_login_guard():
+    name_or_email = request.args.get('name_or_email')
+    ip = _get_client_ip()
+    user = resolve_user_by_name_or_email(name_or_email)
+    return jsonify(captcha_required=captcha_required_for_login(user, ip))
+
+
+@account.route('/captcha-check', methods=['POST'])
+def account_captcha_check():
+    _json = request.json or {}
+    challenge_id = _json.get('captcha_challenge_id')
+    answer = _json.get('captcha_answer')
+    ip = _get_client_ip()
+    valid = peek_captcha(challenge_id, answer, ip)
+    return jsonify(valid=valid)
 
 
 @account.route('/login', methods=['POST'])
@@ -25,8 +49,19 @@ def account_login():
         name_or_email = _json.get('name_or_email')
         password = _json.get('password')
         remember = _json.get('remember')
+        captcha_challenge_id = _json.get('captcha_challenge_id')
+        captcha_answer = _json.get('captcha_answer')
 
-        user = UserService.login(name_or_email, password, _get_client_ip(), request.user_agent)
+        ip = _get_client_ip()
+        user_lookup = resolve_user_by_name_or_email(name_or_email)
+        if captcha_required_for_login(user_lookup, ip):
+            if not verify_captcha(captcha_challenge_id, captcha_answer, ip):
+                return jsonify(
+                    msg='captcha invalid',
+                    detail='The security code is incorrect or expired. Please try again.',
+                ), 400
+
+        user = UserService.login(name_or_email, password, ip, request.user_agent)
         if user is None:
             return jsonify(msg='user not found'), 404
 

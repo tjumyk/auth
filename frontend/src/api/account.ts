@@ -59,12 +59,18 @@ export async function postLogin(
   name_or_email: string,
   password: string,
   remember: boolean,
+  captcha?: { challenge_id: string; answer: string },
 ): Promise<User> {
-  const res = await apiClient.post<unknown>('/api/account/login', {
+  const body: Record<string, unknown> = {
     name_or_email,
     password,
     remember,
-  })
+  }
+  if (captcha) {
+    body.captcha_challenge_id = captcha.challenge_id
+    body.captcha_answer = captcha.answer
+  }
+  const res = await apiClient.post<unknown>('/api/account/login', body)
   const parsed = UserSchema.safeParse(res.data)
   if (!parsed.success) {
     console.error('login parse error', parsed.error.flatten())

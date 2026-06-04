@@ -141,6 +141,9 @@ def _load_config_with_env_overrides(config_path: str) -> dict[str, Any]:
         (('MAIL', 'reply_to_name'), ('MAIL_REPLY_TO_NAME',), str),
         (('UPLOAD', 'root_folder'), ('UPLOAD_ROOT_FOLDER',), str),
         (('DEBUG',), ('FLASK_DEBUG',), _parse_bool),
+        (('CAPTCHA', 'enabled'), ('CAPTCHA_ENABLED',), _parse_bool),
+        (('CAPTCHA', 'service_url'), ('CAPTCHA_SERVICE_URL',), str),
+        (('CAPTCHA', 'secret'), ('CAPTCHA_SECRET',), str),
     ]
     for config_path_keys, env_names, parser in override_specs:
         env_value = _get_env_override(env_names)

@@ -3,6 +3,7 @@ set -eu
 
 BASE_PATH="${FRONTEND_BASE_PATH:-/}"
 BACKEND_UPSTREAM="${BACKEND_UPSTREAM:-backend:8077}"
+CAPTCHA_UPSTREAM="${CAPTCHA_UPSTREAM:-recaptcha:8090}"
 
 case "${BASE_PATH}" in
   /*) ;;
@@ -31,6 +32,7 @@ rm -f /etc/nginx/conf.d/default.root.conf /etc/nginx/conf.d/default.subpath.conf
 cp "${TEMPLATE_PATH}" /etc/nginx/conf.d/default.conf
 sed -i \
   -e "s/__BACKEND_UPSTREAM__/$(escape_sed "${BACKEND_UPSTREAM}")/g" \
+  -e "s/__CAPTCHA_UPSTREAM__/$(escape_sed "${CAPTCHA_UPSTREAM}")/g" \
   -e "s/__BASE_PATH__/$(escape_sed "${BASE_PATH}")/g" \
   -e "s/__BASE_PATH_NO_TRAILING__/$(escape_sed "${BASE_PATH_NO_TRAILING}")/g" \
   /etc/nginx/conf.d/default.conf

@@ -160,9 +160,18 @@ export function OAuthLoginPage(): React.ReactElement {
     connectM.mutate(parsed.params)
   }, [parsed, whoamiQ.data, connectM, redirecting])
 
+  const [loginGuardRefresh, setLoginGuardRefresh] = useState(0)
+
   const loginM = useMutation({
     mutationFn: (v: LoginFormValues) =>
-      postLogin(v.name_or_email.trim(), v.password, v.remember),
+      postLogin(
+        v.name_or_email.trim(),
+        v.password,
+        v.remember,
+        v.captcha_challenge_id && v.captcha_answer
+          ? { challenge_id: v.captcha_challenge_id, answer: v.captcha_answer }
+          : undefined,
+      ),
     onSuccess: (user: User, variables) => {
       setFormError(null)
       if (user.is_two_factor_enabled) {
@@ -175,6 +184,7 @@ export function OAuthLoginPage(): React.ReactElement {
     },
     onError: (err) => {
       setFormError(getBasicErrorFromUnknown(err))
+      setLoginGuardRefresh((n) => n + 1)
     },
   })
 
@@ -324,6 +334,7 @@ export function OAuthLoginPage(): React.ReactElement {
         <LoginForm
           key={locale}
           loading={loginM.isPending}
+          loginGuardRefresh={loginGuardRefresh}
           onSubmit={(v) => {
             loginM.mutate(v)
           }}

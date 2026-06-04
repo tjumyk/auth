@@ -53,11 +53,14 @@ function buildMailEnvDefines(env: Record<string, string>): Record<string, string
 
 function flaskDevProxy(
   target: string,
+  captchaTarget: string,
   appBase: string,
 ): Record<string, { target: string; changeOrigin: boolean }> {
   const opts = { target, changeOrigin: true as const }
+  const captchaOpts = { target: captchaTarget, changeOrigin: true as const }
   if (appBase === '/') {
     return {
+      '/api/captcha': captchaOpts,
       '/api': opts,
       '/oauth': opts,
       '/upload': opts,
@@ -65,6 +68,7 @@ function flaskDevProxy(
   }
   const prefix = appBase.replace(/\/+$/, '')
   return {
+    [`${prefix}/api/captcha`]: captchaOpts,
     [`${prefix}/api`]: opts,
     [`${prefix}/oauth`]: opts,
     [`${prefix}/upload`]: opts,
@@ -75,9 +79,10 @@ function flaskDevProxy(
 export default defineConfig(({ mode }) => {
   const env = loadMergedEnv(mode)
   const flaskOrigin = env.VITE_FLASK_ORIGIN ?? 'http://127.0.0.1:8077'
+  const captchaOrigin = env.VITE_CAPTCHA_ORIGIN ?? 'http://127.0.0.1:8090'
   const appBase = resolveAppBaseFromEnv(env)
   const base = resolveAssetBaseFromEnv(env, { production: mode === 'production' })
-  const proxy = flaskDevProxy(flaskOrigin, appBase)
+  const proxy = flaskDevProxy(flaskOrigin, captchaOrigin, appBase)
 
   return {
     plugins: [react()],

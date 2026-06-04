@@ -50,5 +50,11 @@
     "free_register": false,
     "email_domain_register": []
   },
-  "IP_CHECK": {}
+  "IP_CHECK": {},
+  "CAPTCHA": {
+    "enabled": true,
+    "service_url": "http://recaptcha:8090",
+    "secret": "change_me",
+    "ttl_seconds": 120
+  }
 }

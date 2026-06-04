@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Alert, Loader, Text, Title } from '@mantine/core'
 import { useDocumentTitle } from '@mantine/hooks'
 import { useState } from 'react'
+import { useNavigate } from 'react-router'
 
 import { fetchWhoami, postLogin, postTwoFactorLogin } from '@/api/account'
 import { getBasicErrorFromUnknown } from '@/api/client'
@@ -11,6 +12,7 @@ import { TwoFactorPanel } from '@/components/auth/TwoFactorPanel'
 import { SiteBrandBlock } from '@/components/branding/SiteBrandBlock'
 import { PublicAuthCard, PublicAuthCenter } from '@/components/layout/PublicAuthShell'
 import { useRedirectAfterLogin } from '@/hooks/useRedirectAfterLogin'
+import { useSafeRedirectPath } from '@/hooks/useSafeRedirectPath'
 import { useI18n } from '@/hooks/useI18n'
 import type { BasicError } from '@/models/apiError'
 import { siteConfig } from '@/models/siteConfig'
@@ -19,9 +21,12 @@ export function LoginPage(): React.ReactElement {
   const { t, locale } = useI18n()
   useDocumentTitle(`${siteConfig.name} · ${t('signInPageTitle')}`)
   const queryClient = useQueryClient()
+  const navigate = useNavigate()
+  const redirect = useSafeRedirectPath()
   const [step, setStep] = useState<'password' | '2fa'>('password')
   const [rememberFor2fa, setRememberFor2fa] = useState(false)
   const [formError, setFormError] = useState<BasicError | null>(null)
+  const [loginGuardRefresh, setLoginGuardRefresh] = useState(0)
 
   const whoamiQ = useQuery({
     queryKey: ['whoami'],
@@ -33,7 +38,14 @@ export function LoginPage(): React.ReactElement {
 
   const loginM = useMutation({
     mutationFn: (v: LoginFormValues) =>
-      postLogin(v.name_or_email.trim(), v.password, v.remember),
+      postLogin(
+        v.name_or_email.trim(),
+        v.password,
+        v.remember,
+        v.captcha_challenge_id && v.captcha_answer
+          ? { challenge_id: v.captcha_challenge_id, answer: v.captcha_answer }
+          : undefined,
+      ),
     onSuccess: (user, variables) => {
       setFormError(null)
       if (user.is_two_factor_enabled) {
@@ -43,9 +55,11 @@ export function LoginPage(): React.ReactElement {
       }
       queryClient.setQueryData(['whoami'], user)
       void queryClient.invalidateQueries({ queryKey: ['myOAuthClients'] })
+      navigate(redirect, { replace: true })
     },
     onError: (err) => {
       setFormError(getBasicErrorFromUnknown(err))
+      setLoginGuardRefresh((n) => n + 1)
     },
   })
 
@@ -55,6 +69,7 @@ export function LoginPage(): React.ReactElement {
       setFormError(null)
       queryClient.setQueryData(['whoami'], user)
       void queryClient.invalidateQueries({ queryKey: ['myOAuthClients'] })
+      navigate(redirect, { replace: true })
     },
     onError: (err) => {
       setFormError(getBasicErrorFromUnknown(err))
@@ -91,6 +106,7 @@ export function LoginPage(): React.ReactElement {
         <LoginForm
           key={locale}
           loading={loginM.isPending}
+          loginGuardRefresh={loginGuardRefresh}
           onSubmit={(v) => {
             loginM.mutate(v)
           }}

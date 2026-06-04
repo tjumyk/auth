@@ -1,4 +1,40 @@
 services:
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  recaptcha:
+    build:
+      context: ./recaptcha
+      dockerfile: Dockerfile
+      args:
+        APT_MIRROR: ${APT_MIRROR:-mirrors.tuna.tsinghua.edu.cn}
+        PIP_INDEX_URL: ${PIP_INDEX_URL:-https://pypi.tuna.tsinghua.edu.cn/simple}
+        PIP_TRUSTED_HOST: ${PIP_TRUSTED_HOST:-pypi.tuna.tsinghua.edu.cn}
+    restart: unless-stopped
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      REDIS_URL: redis://redis:6379/0
+      CAPTCHA_SECRET: ${CAPTCHA_SECRET:-change_me}
+      CAPTCHA_TTL_SECONDS: ${CAPTCHA_TTL_SECONDS:-120}
+      CAPTCHA_PORT: ${CAPTCHA_PORT:-8090}
+    depends_on:
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import os, urllib.request; urllib.request.urlopen('http://127.0.0.1:' + os.environ.get('CAPTCHA_PORT', '8090') + '/api/meta/health')\""]
+      interval: 30s
+      timeout: 10s
+      start_period: 5s
+      retries: 3
+
   db:
     image: postgres:15
     restart: unless-stopped
@@ -35,8 +71,13 @@ services:
     environment:
       BACKEND_PORT: ${BACKEND_PORT:-8077}
       SQLALCHEMY_DATABASE_URI: ${SQLALCHEMY_DATABASE_URI:-postgresql://auth:change_me@db:5432/auth}
+      CAPTCHA_ENABLED: ${CAPTCHA_ENABLED:-true}
+      CAPTCHA_SERVICE_URL: ${CAPTCHA_SERVICE_URL:-http://recaptcha:8090}
+      CAPTCHA_SECRET: ${CAPTCHA_SECRET:-change_me}
     depends_on:
       db:
+        condition: service_healthy
+      recaptcha:
         condition: service_healthy
     healthcheck:
       test: ["CMD-SHELL", "python -c \"import os, urllib.request; urllib.request.urlopen('http://127.0.0.1:' + os.environ.get('BACKEND_PORT', '8077') + '/api/meta/health')\""]
@@ -70,8 +111,11 @@ services:
     environment:
       FRONTEND_BASE_PATH: ${FRONTEND_BASE_PATH:-/}
       BACKEND_UPSTREAM: backend:${BACKEND_PORT:-8077}
+      CAPTCHA_UPSTREAM: recaptcha:${CAPTCHA_PORT:-8090}
     depends_on:
       backend:
+        condition: service_healthy
+      recaptcha:
         condition: service_healthy
     healthcheck:
       test: ["CMD-SHELL", "wget -q -O /dev/null \"http://127.0.0.1$${FRONTEND_BASE_PATH:-/}\" || exit 1"]
