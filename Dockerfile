@@ -67,7 +67,7 @@ COPY config.example.json config*.json ./
 COPY mmdb/ /tmp/mmdb-in/
 RUN mkdir -p mmdb && \
     cp -f /tmp/mmdb-in/source.txt /tmp/mmdb-in/.gitignore mmdb/ 2>/dev/null || true; \
-    if compgen -G "/tmp/mmdb-in/*.mmdb" > /dev/null; then \
+    if ls /tmp/mmdb-in/*.mmdb >/dev/null 2>&1; then \
       cp /tmp/mmdb-in/*.mmdb mmdb/; \
       echo "GeoLite MMDB: included $(ls -1 mmdb/*.mmdb | wc -l) file(s) in image"; \
     else \
