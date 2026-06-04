@@ -20,6 +20,7 @@ from utils.captcha import (
     resolve_user_by_name_or_email,
     verify_captcha,
 )
+from utils.request_client import get_client_ip
 
 account = Blueprint('account', __name__)
 
@@ -75,12 +76,8 @@ def account_login():
         return jsonify(msg=e.msg, detail=e.detail), 400
 
 
-def _get_client_ip():
-    if app.config['SITE'].get('behind_proxy'):
-        ip = request.environ.get('HTTP_X_REAL_IP') or request.remote_addr
-    else:
-        ip = request.remote_addr
-    return ip
+def _get_client_ip() -> str:
+    return get_client_ip(behind_proxy=bool(app.config['SITE'].get('behind_proxy')))
 
 
 @account.route('/register', methods=['POST'])

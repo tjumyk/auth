@@ -69,6 +69,7 @@ RUN if [ -n "${ALPINE_MIRROR}" ]; then \
 COPY --from=builder /app/static/browser /usr/share/nginx/html
 COPY frontend/docker-entrypoint.sh /docker-entrypoint.d/40-generate-nginx-conf.sh
 COPY frontend/nginx /etc/nginx/conf-templates
+COPY frontend/nginx/00-client-ip-map.conf /etc/nginx/conf.d/00-client-ip-map.conf
 RUN chmod +x /docker-entrypoint.d/40-generate-nginx-conf.sh
 
 ENV FRONTEND_BASE_PATH=/ \

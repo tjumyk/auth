@@ -113,7 +113,17 @@ Optional settings beyond the minimal trial. Some use `.env`; others require `con
 
 **Subpath (e.g. `/id/`).** In `.env` set `FRONTEND_BASE_PATH=/id/`, `SITE_BASE_URL=/id/`, and `SITE_ROOT_URL` accordingly. Set these before building the frontend image; after changes run `docker compose up -d --build frontend`.
 
-**Reverse proxy (`SITE.behind_proxy`).** Set `SITE_BEHIND_PROXY=true` in `.env` when the backend is reached through nginx or another reverse proxy (Docker Compose default). Identity then reads the client IP from the `X-Real-IP` header the proxy sets, instead of the proxy's own address — used for login records, geo region detection, and IP check. The frontend nginx config already forwards `X-Real-IP` to the backend. For host install with direct `flask run` and no proxy in front, set `SITE_BEHIND_PROXY=false`.
+**Reverse proxy (`SITE.behind_proxy`).** Set `SITE_BEHIND_PROXY=true` in `.env` when the backend is reached through nginx or another reverse proxy (Docker Compose default). Identity then reads the client IP from `X-Real-IP`, then the first hop in `X-Forwarded-For`, instead of the proxy's own address — used for login records, geo region detection, and IP check. The compose **frontend** nginx preserves an incoming `X-Real-IP` from an outer proxy and forwards it to the backend.
+
+If you also run an **external nginx** in front of the compose frontend (common in production), that outer proxy must pass the real client address, for example:
+
+```nginx
+proxy_set_header X-Real-IP $remote_addr;
+proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+proxy_set_header X-Forwarded-Proto $scheme;
+```
+
+Without those headers, login records will show the outer proxy or Docker network address. For host install with direct `flask run` and no proxy in front, set `SITE_BEHIND_PROXY=false`.
 
 **Outbound email.** Disabled by default in `config.example.json` (`MAIL.enabled: false`). For production, set `MAIL_ENABLED=true` in `.env` and configure SMTP. The backend image includes **msmtp**; when `MAIL_SMTP_HOST` is set, the container writes msmtp config at startup and sends mail through your relay:
 

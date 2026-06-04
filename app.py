@@ -20,6 +20,7 @@ from services.user import UserService
 from utils import upload
 from utils.external_auth import provider
 from utils.ip import get_geo_country
+from utils.request_client import get_client_ip
 
 
 class MyFlask(Flask):
@@ -74,10 +75,7 @@ class MyFlask(Flask):
     def get_request_region(self):
         detect_regions = self.config.get('DETECT_REQUEST_REGIONS')
         if detect_regions:
-            if self.config['SITE'].get('behind_proxy'):
-                ip = request.environ.get('HTTP_X_REAL_IP') or request.remote_addr
-            else:
-                ip = request.remote_addr
+            ip = get_client_ip(behind_proxy=bool(self.config['SITE'].get('behind_proxy')))
             country = get_geo_country(ip)
             if country:
                 country_code = country.country.iso_code.lower()
