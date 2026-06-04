@@ -15,6 +15,7 @@
 #
 # Pull: only when the image is not already present locally.
 # Save: skipped when the archive exists and the image ID matches the last export.
+# Config: docker-compose.yml and .env copied only when content changed (cmp).
 #
 # On the offline host (from that directory):
 #   docker load -i auth-backend.tar.gz
@@ -78,6 +79,7 @@ prepare_env() {
   fi
   rm -f .env
   ln -s ".env.${TARGET}" .env
+  echo "build-offline-package: linked .env -> .env.${TARGET} for docker compose build"
 }
 
 image_id() {
@@ -127,6 +129,18 @@ ensure_and_save_image() {
   save_image_if_changed "$1" "$2"
 }
 
+copy_file_if_changed() {
+  local src="$1"
+  local dest="$2"
+  local label="$3"
+  if [[ -f "$dest" ]] && cmp -s "$src" "$dest"; then
+    echo "build-offline-package: skip copy (unchanged): ${label}"
+    return 0
+  fi
+  echo "build-offline-package: copying ${label} -> ${dest}"
+  cp -p "$src" "$dest"
+}
+
 trap restore_env EXIT
 
 echo "build-offline-package: target=${TARGET}"
@@ -145,7 +159,13 @@ save_image_if_changed auth-recaptcha:latest "${OUT_DIR}/auth-recaptcha.tar.gz"
 ensure_and_save_image redis:7-alpine "${OUT_DIR}/redis-7-alpine.tar.gz"
 ensure_and_save_image postgres:15 "${OUT_DIR}/postgres-15.tar.gz"
 
-cp -p "${REPO_ROOT}/docker-compose.offline.yml" "${OUT_DIR}/docker-compose.yml"
-cp -p "$ENV_SOURCE" "${OUT_DIR}/.env"
+copy_file_if_changed \
+  "${REPO_ROOT}/docker-compose.offline.yml" \
+  "${OUT_DIR}/docker-compose.yml" \
+  "docker-compose.offline.yml"
+copy_file_if_changed \
+  "$ENV_SOURCE" \
+  "${OUT_DIR}/.env" \
+  ".env.${TARGET}"
 
 echo "build-offline-package: done -> ${OUT_DIR}"
