@@ -17,14 +17,15 @@ depends_on: Union[str, Sequence[str], None] = None
 
 
 def upgrade() -> None:
+    # SQLite supports ADD COLUMN; batch mode is only needed for the unique constraint.
+    op.add_column('user', sa.Column('real_name', sa.String(length=64), nullable=True))
+    op.add_column('user', sa.Column('mobile', sa.String(length=20), nullable=True))
     with op.batch_alter_table('user', schema=None) as batch_op:
-        batch_op.add_column(sa.Column('real_name', sa.String(length=64), nullable=True))
-        batch_op.add_column(sa.Column('mobile', sa.String(length=20), nullable=True))
         batch_op.create_unique_constraint('uq_user_mobile', ['mobile'])
 
 
 def downgrade() -> None:
     with op.batch_alter_table('user', schema=None) as batch_op:
         batch_op.drop_constraint('uq_user_mobile', type_='unique')
-        batch_op.drop_column('mobile')
-        batch_op.drop_column('real_name')
+    op.drop_column('user', 'mobile')
+    op.drop_column('user', 'real_name')
