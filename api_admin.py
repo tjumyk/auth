@@ -492,6 +492,7 @@ def oauth_client_generate_config_file(cid):
                 "admin_user_by_name_api": "/api/admin/user-by-name",
                 "admin_groups_api": "/api/admin/groups",
                 "profile_page": "/settings/profile",
+                "logout_page": "/account/logout",
                 "admin_user_page": "/admin/account/users/u/{uid}",
                 "admin_group_page": "/admin/account/groups/g/{gid}"
             },
