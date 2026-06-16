@@ -1,0 +1,10 @@
+[
+  {
+    "name": "testapp",
+    "secret": "integration-test-secret",
+    "redirect_url": "http://localhost:3000/oauth/callback",
+    "home_url": "http://localhost:3000",
+    "description": "Integration test OAuth client",
+    "is_public": true
+  }
+]

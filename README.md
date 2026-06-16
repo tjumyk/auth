@@ -98,6 +98,50 @@ docker compose exec backend flask create-db
 docker compose exec backend flask init-db
 ```
 
+#### OAuth client bootstrap (optional)
+
+For integration tests or local development, you can seed a single OAuth client automatically instead of creating it in the admin console. Set these variables in `.env` (see [.env.example](.env.example)):
+
+| Variable | Required | Purpose |
+| -------- | -------- | ------- |
+| `OAUTH_CLIENT_NAME` | yes | Client name (3–16 word characters) |
+| `OAUTH_CLIENT_REDIRECT_URL` | yes | OAuth callback URL |
+| `OAUTH_CLIENT_HOME_URL` | yes | App home URL (callback must start with this) |
+| `OAUTH_CLIENT_SECRET` | no | Fixed secret for tests; auto-generated if omitted |
+| `OAUTH_CLIENT_DESCRIPTION` | no | Description shown in the app list |
+| `OAUTH_CLIENT_IS_PUBLIC` | no | `true` / `false` (default `true`) |
+
+Example:
+
+```bash
+OAUTH_CLIENT_NAME=testapp
+OAUTH_CLIENT_SECRET=integration-test-secret
+OAUTH_CLIENT_REDIRECT_URL=http://localhost:3000/oauth/callback
+OAUTH_CLIENT_HOME_URL=http://localhost:3000
+OAUTH_CLIENT_DESCRIPTION=Integration test OAuth client
+OAUTH_CLIENT_IS_PUBLIC=true
+```
+
+The backend container runs import on each start when `OAUTH_CLIENT_NAME` is set. Import is **idempotent** — existing clients with the same name are skipped. If the database is not migrated yet, import is skipped silently; after `create-db` and `init-db`, restart the backend to import:
+
+```bash
+docker compose restart backend
+```
+
+You can also import manually:
+
+```bash
+docker compose exec backend flask import-oauth-client-from-env
+```
+
+**Multiple clients from a file.** For more than one client, use the CLI with a JSON array (see [oauth-clients.example.json](oauth-clients.example.json)):
+
+```bash
+docker compose exec backend flask import-oauth-clients /path/to/oauth-clients.json
+```
+
+Set `OAUTH_CLIENTS_FILE` in the container and place the file there (e.g. via a custom volume) to import from file on startup instead of env vars.
+
 #### 5. Open the app
 
 [http://localhost:8080/](http://localhost:8080/) (or the port in `FRONTEND_PORT` / `.env`).
@@ -439,5 +483,6 @@ See the [auth_connect README](https://github.com/tjumyk/auth_connect) for config
 | Mail debugging          | [Mail debugging](#mail-debugging) — `MAIL.mock_folder` or `MAIL.mail_catcher` in `config.json`       |
 | Mail disabled           | Default in `config.example.json`; set `MAIL_ENABLED=true` in `.env` + `MAIL_SMTP_*` to enable — see [Advanced config](#advanced-config) |
 | OAuth client apps       | [auth_connect](https://github.com/tjumyk/auth_connect) — Flask client SDK; see [Client SDK](#client-sdk) |
+| OAuth client bootstrap  | `OAUTH_CLIENT_*` in `.env` — auto-import one client on backend start; see [OAuth client bootstrap](#oauth-client-bootstrap-optional) |
 
 

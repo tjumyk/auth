@@ -62,15 +62,18 @@ class OAuthService:
             .all()
 
     @staticmethod
-    def add_client(name, redirect_url, home_url, description):
+    def _validate_new_client_fields(
+        name: str,
+        redirect_url: str,
+        home_url: str,
+        description: str | None,
+    ) -> None:
         if not name:
             raise OAuthServiceError('name is required')
         if not redirect_url:
             raise OAuthServiceError('redirect_url is required')
         if not home_url:
             raise OAuthServiceError('home_url is required')
-        secret = token_urlsafe()
-
         if not OAuthService.client_name_pattern.match(name):
             raise OAuthServiceError('invalid name format')
         if len(redirect_url) > OAuthService.client_url_max_length:
@@ -80,8 +83,37 @@ class OAuthService:
         if description and len(description) > OAuthService.client_description_max_length:
             raise OAuthServiceError('description too long')
 
+    @staticmethod
+    def add_client(name, redirect_url, home_url, description):
+        OAuthService._validate_new_client_fields(name, redirect_url, home_url, description)
+        secret = token_urlsafe()
+
         client = OAuthClient(name=name, secret=secret, redirect_url=redirect_url,
                              home_url=home_url, description=description)
+        db.session.add(client)
+        return client
+
+    @staticmethod
+    def import_client(
+        name: str,
+        redirect_url: str,
+        home_url: str,
+        description: str | None = None,
+        secret: str | None = None,
+        is_public: bool = True,
+    ) -> OAuthClient:
+        OAuthService._validate_new_client_fields(name, redirect_url, home_url, description)
+        if secret is not None and not secret:
+            raise OAuthServiceError('secret can not be empty')
+
+        client = OAuthClient(
+            name=name,
+            secret=secret or token_urlsafe(),
+            redirect_url=redirect_url,
+            home_url=home_url,
+            description=description,
+            is_public=is_public,
+        )
         db.session.add(client)
         return client
 

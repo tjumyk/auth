@@ -15,7 +15,12 @@ from api_oauth import oauth
 from models import db
 from page_oauth import oauth_pages
 from services.group import GroupService
-from services.oauth import OAuthService
+from services.oauth import OAuthService, OAuthServiceError
+from services.oauth_bootstrap import (
+    import_oauth_client_from_env,
+    import_oauth_clients_from_file,
+    parse_oauth_clients_file,
+)
 from services.user import UserService
 from utils import upload
 from utils.external_auth import provider
@@ -217,6 +222,48 @@ def init_db():
     admin_group = GroupService.add('admin', 'System Administrators')
     admin_user.groups.append(admin_group)
     db.session.commit()
+
+
+@app.cli.command('import-oauth-clients')
+@click.argument('path', type=click.Path(exists=True, dir_okay=False))
+def import_oauth_clients_cmd(path: str) -> None:
+    """Import OAuth clients from a JSON file (idempotent by client name)."""
+    _run_oauth_client_import(lambda: import_oauth_clients_from_file(path), path=path)
+
+
+@app.cli.command('import-oauth-client-from-env')
+def import_oauth_client_from_env_cmd() -> None:
+    """Import a single OAuth client from OAUTH_CLIENT_* environment variables."""
+    _run_oauth_client_import(import_oauth_client_from_env)
+
+
+def _run_oauth_client_import(
+    import_fn: Callable[[], list[tuple[Any, bool]]],
+    path: str | None = None,
+) -> None:
+    try:
+        if path is not None:
+            specs = parse_oauth_clients_file(path)
+            if not specs:
+                click.echo('No OAuth clients to import')
+                return
+
+        results = import_fn()
+        if not results:
+            click.echo('No OAuth client configured for import')
+            return
+
+        db.session.commit()
+        for client, created in results:
+            if created:
+                click.echo(f'Imported OAuth client {client.name!r} (id={client.id})')
+            else:
+                click.echo(f'Skipped existing OAuth client {client.name!r} (id={client.id})')
+    except OAuthServiceError as e:
+        if e.msg == 'oauth_client table not found':
+            click.echo('Skipping OAuth client import: database not initialized')
+            return
+        raise click.ClickException(f'{e.msg}: {e.detail}' if e.detail else e.msg) from e
 
 
 @app.cli.command()

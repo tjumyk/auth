@@ -8,4 +8,10 @@ chown -R appuser:appuser /app "${UPLOAD_DIR}"
 
 /usr/local/bin/configure-msmtp.sh
 
+if [ -n "${OAUTH_CLIENT_NAME:-}" ]; then
+  gosu appuser flask import-oauth-client-from-env || true
+elif [ -n "${OAUTH_CLIENTS_FILE:-}" ] && [ -f "${OAUTH_CLIENTS_FILE}" ]; then
+  gosu appuser flask import-oauth-clients "${OAUTH_CLIENTS_FILE}" || true
+fi
+
 exec gosu appuser "$@"
