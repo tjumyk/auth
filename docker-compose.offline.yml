@@ -75,6 +75,8 @@ services:
         required: false
     environment:
       BACKEND_PORT: ${BACKEND_PORT:-8077}
+      RUN_MIGRATIONS: ${RUN_MIGRATIONS:-true}
+      RUN_INIT_DB: ${RUN_INIT_DB:-true}
       SQLALCHEMY_DATABASE_URI: ${SQLALCHEMY_DATABASE_URI:-postgresql://auth:change_me@db:5432/auth}
       CAPTCHA_ENABLED: ${CAPTCHA_ENABLED:-true}
       CAPTCHA_SERVICE_URL: ${CAPTCHA_SERVICE_URL:-http://recaptcha:8090}

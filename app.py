@@ -21,7 +21,7 @@ from services.oauth_bootstrap import (
     import_oauth_clients_from_file,
     parse_oauth_clients_file,
 )
-from services.user import UserService
+from services.user import UserService, UserServiceError
 from utils import upload
 from utils.external_auth import provider
 from utils.ip import get_geo_country
@@ -217,11 +217,56 @@ def create_db():
 
 @app.cli.command()
 def init_db():
+    """Seed admin user and group (idempotent — safe to run on every start)."""
     admin_config = app.config['ADMIN']
-    admin_user = UserService.init_admin(**admin_config)
-    admin_group = GroupService.add('admin', 'System Administrators')
-    admin_user.groups.append(admin_group)
+    admin_user = UserService.get_by_name(admin_config['name'])
+    if admin_user is None:
+        admin_user = UserService.init_admin(**admin_config)
+
+    admin_group = GroupService.get_by_name('admin')
+    if admin_group is None:
+        admin_group = GroupService.add('admin', 'System Administrators')
+
+    if admin_group not in admin_user.groups:
+        admin_user.groups.append(admin_group)
+
     db.session.commit()
+
+
+@app.cli.command('reset-admin-password')
+@click.option('--from-config', is_flag=True, help='Use ADMIN.password / ADMIN_PASSWORD from config.')
+@click.option('--stdin', 'use_stdin', is_flag=True, help='Read password from stdin (one line; avoids shell history).')
+def reset_admin_password(from_config: bool, use_stdin: bool) -> None:
+    """Reset the bootstrap admin password (prompt, --stdin, or --from-config)."""
+    if from_config and use_stdin:
+        raise click.ClickException('use only one of --from-config or --stdin')
+
+    admin_config = app.config['ADMIN']
+    if from_config:
+        resolved_password = admin_config.get('password')
+        if not resolved_password:
+            raise click.ClickException('ADMIN.password / ADMIN_PASSWORD is not set')
+    elif use_stdin:
+        resolved_password = sys.stdin.read().rstrip('\r\n')
+        if not resolved_password:
+            raise click.ClickException('password is required on stdin')
+    else:
+        resolved_password = click.prompt(
+            'New admin password',
+            hide_input=True,
+            confirmation_prompt=True,
+        )
+
+    admin_name = admin_config['name']
+    try:
+        admin_user = UserService.get_by_name(admin_name)
+        if admin_user is None:
+            raise click.ClickException(f'admin user {admin_name!r} not found; run flask init-db first')
+        UserService.force_set_password(admin_user, resolved_password)
+        db.session.commit()
+        click.echo(f'Reset password for admin user {admin_name!r}')
+    except UserServiceError as e:
+        raise click.ClickException(f'{e.msg}: {e.detail}' if e.detail else e.msg) from e
 
 
 @app.cli.command('import-oauth-clients')

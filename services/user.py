@@ -495,6 +495,20 @@ class UserService:
         user.password = pbkdf2_sha256.hash(new_password)
 
     @staticmethod
+    def force_set_password(user, new_password):
+        if user is None:
+            raise UserServiceError('user is required')
+        if new_password is None:
+            raise UserServiceError('new password is required')
+        if not user.is_active:
+            raise UserServiceError('inactive user')
+        if not UserService.password_pattern.match(new_password):
+            raise UserServiceError('invalid password format')
+        user.password = pbkdf2_sha256.hash(new_password)
+        user.password_reset_token = None
+        user.password_reset_token_expire_at = None
+
+    @staticmethod
     def request_reset_password(name_or_email):
         if name_or_email is None:
             raise UserServiceError('name or email is required')

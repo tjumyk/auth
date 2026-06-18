@@ -22,13 +22,11 @@ Requires [Docker](https://docs.docker.com/get-docker/) and Docker Compose — no
 
 ```bash
 docker compose up -d --build
-docker compose exec backend flask create-db
-docker compose exec backend flask init-db
 ```
 
 Open [http://localhost:8080/](http://localhost:8080/) and sign in as `admin` / `PASSword` (from baked-in `config.example.json`). Outbound email is **off** in that default config — no msmtp setup required for the trial.
 
-`flask create-db` applies Alembic migrations (`alembic upgrade head`).
+The backend entrypoint runs migrations and admin seed on each start (`RUN_MIGRATIONS` and `RUN_INIT_DB` default to `true`; both are idempotent).
 
 **Logs:** `docker compose logs -f frontend backend recaptcha redis db` · **Stop:** `docker compose down`
 
@@ -91,12 +89,16 @@ Skip this for a minimal trial — the app runs without geo IP.
 docker compose up -d --build
 ```
 
-#### 4. Initialize the database (first time only)
+#### 4. Open the app
 
-```bash
-docker compose exec backend flask create-db
-docker compose exec backend flask init-db
-```
+[http://localhost:8080/](http://localhost:8080/) (or the port in `FRONTEND_PORT` / `.env`).
+
+Migrations and admin seed run automatically when the backend starts. To run them manually: `docker compose exec backend flask create-db` and `docker compose exec backend flask init-db`.
+
+The stack includes **redis** and **recaptcha** (image CAPTCHA microservice) in addition to `db`, `backend`, and `frontend`. The frontend nginx container proxies `/api/captcha/` to recaptcha; the backend verifies challenges over the internal Docker network only.
+
+**Logs:** `docker compose logs -f frontend backend recaptcha redis db`  
+**Stop:** `docker compose down`
 
 #### OAuth client bootstrap (optional)
 
@@ -122,11 +124,7 @@ OAUTH_CLIENT_DESCRIPTION=Integration test OAuth client
 OAUTH_CLIENT_IS_PUBLIC=true
 ```
 
-The backend container runs import on each start when `OAUTH_CLIENT_NAME` is set. Import is **idempotent** — existing clients with the same name are skipped. If the database is not migrated yet, import is skipped silently; after `create-db` and `init-db`, restart the backend to import:
-
-```bash
-docker compose restart backend
-```
+The backend container runs import on each start when `OAUTH_CLIENT_NAME` is set. Import is **idempotent** — existing clients with the same name are skipped.
 
 You can also import manually:
 
@@ -141,15 +139,6 @@ docker compose exec backend flask import-oauth-clients /path/to/oauth-clients.js
 ```
 
 Set `OAUTH_CLIENTS_FILE` in the container and place the file there (e.g. via a custom volume) to import from file on startup instead of env vars.
-
-#### 5. Open the app
-
-[http://localhost:8080/](http://localhost:8080/) (or the port in `FRONTEND_PORT` / `.env`).
-
-The stack includes **redis** and **recaptcha** (image CAPTCHA microservice) in addition to `db`, `backend`, and `frontend`. The frontend nginx container proxies `/api/captcha/` to recaptcha; the backend verifies challenges over the internal Docker network only.
-
-**Logs:** `docker compose logs -f frontend backend recaptcha redis db`  
-**Stop:** `docker compose down`
 
 #### Advanced config
 
@@ -365,7 +354,11 @@ cd frontend && npm run test && npm run lint
 
 ### Database migrations
 
-Schema is managed with [Alembic](https://alembic.sqlalchemy.org/) (`alembic/` at the repo root). From the project root:
+Schema is managed with [Alembic](https://alembic.sqlalchemy.org/) (`alembic/` at the repo root).
+
+**Docker:** the backend entrypoint runs `flask create-db` and `flask init-db` on each start when `RUN_MIGRATIONS` and `RUN_INIT_DB` are `true` (defaults). Both are idempotent. Set either to `false` in `.env` if you run that step separately (e.g. multiple backend replicas).
+
+**Host / local:** from the project root:
 
 ```bash
 alembic upgrade head    # new database
@@ -373,6 +366,22 @@ flask init-db           # seed admin user and group
 ```
 
 `flask create-db` is an alias for `alembic upgrade head`.
+
+**Reset bootstrap admin password** (when locked out; do not pass the password on the command line — it ends up in shell history):
+
+```bash
+flask reset-admin-password                    # interactive prompt (hidden input)
+flask reset-admin-password --from-config      # ADMIN.password / ADMIN_PASSWORD
+printf '%s' 'NEW_PASSWORD' | flask reset-admin-password --stdin
+```
+
+Docker:
+
+```bash
+docker compose exec -it backend flask reset-admin-password
+docker compose exec backend flask reset-admin-password --from-config
+printf '%s' 'NEW_PASSWORD' | docker compose exec -T backend flask reset-admin-password --stdin
+```
 
 **Existing database** created before Alembic (schema matches revision `0001_initial`, without `real_name` / `mobile`):
 
@@ -477,6 +486,7 @@ See the [auth_connect README](https://github.com/tjumyk/auth_connect) for config
 | Frontend app base       | `VITE_SITE_BASE_URL` / `FRONTEND_BASE_PATH` — router, `/api`, `/upload` (must match `SITE.base_url`) |
 | Frontend asset base     | `VITE_STATIC_PATH=static/` for Flask-direct only; **empty** for Docker/nginx (`/assets/…`)           |
 | Offline bundle          | `./scripts/build-offline-package.sh <target>` → `docker-images/<target>/`; [docker-compose.offline.yml](docker-compose.offline.yml) on the air-gapped host |
+| DB bootstrap (Docker)   | Auto on backend start: `RUN_MIGRATIONS` + `RUN_INIT_DB` (default `true`); `flask reset-admin-password` for recovery |
 | Login CAPTCHA           | [recaptcha/](recaptcha/) + `CAPTCHA` in `config.json` / `CAPTCHA_*` in `.env` — see [Advanced config](#advanced-config) |
 | GeoLite files           | [mmdb/source.txt](mmdb/source.txt), [scripts/download-mmdb.sh](scripts/download-mmdb.sh)             |
 | Outbound email (Docker) | Set `MAIL_SMTP_`* in `.env`; backend uses msmtp — see [Advanced config](#advanced-config)            |
