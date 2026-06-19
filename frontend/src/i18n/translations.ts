@@ -349,7 +349,7 @@ export const translations: Record<Locale, Record<string, string>> = {
     nicknameInvalid: 'Invalid characters.',
     saveNickname: 'Save nickname',
     realNameSection: 'Legal name',
-    realName: 'Name',
+    realName: 'Legal name',
     realNameHint: 'Optional. 2–64 characters.',
     realNameMinLength: 'At least 2 characters.',
     realNameMaxLength: 'At most 64 characters.',
