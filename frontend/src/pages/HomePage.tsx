@@ -178,7 +178,7 @@ export function HomePage(): React.ReactElement {
                 {t('clockSkewHeroTitle')}
               </Text>
               <Text size="sm" c="dimmed">
-                {t('clockSkewHeroBody', { seconds: clockSkewSeconds })}
+                {t('clockSkewHeroBody', { seconds: String(clockSkewSeconds) })}
               </Text>
             </Stack>
           </Paper>
