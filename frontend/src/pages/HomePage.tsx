@@ -16,6 +16,7 @@ import { useMemo } from 'react'
 import { Link, useNavigate } from 'react-router'
 
 import { fetchIpCheck, fetchMyOAuthClients, IP_CHECK_QUERY_KEY } from '@/api/account'
+import { fetchMetaTime, META_TIME_QUERY_KEY } from '@/api/meta'
 import { AppGrid } from '@/components/apps/AppGrid'
 import { useAuthUser } from '@/hooks/useAuthUser'
 import { useI18n } from '@/hooks/useI18n'
@@ -23,6 +24,7 @@ import {
   enrichOAuthClientsWithIpCheck,
   findGateClient,
 } from '@/utils/enrichOAuthClientsWithIpCheck'
+import { formatClockSkewSeconds, isClockSkewWarning } from '@/utils/clockSkew'
 import { isAdmin } from '@/utils/isAdmin'
 import { shouldWarnAdminInsecureHttp } from '@/utils/isHttpHostedPage'
 import { formatPasswordExpiryDate, shouldInterceptPasswordExpiry } from '@/utils/passwordExpiry'
@@ -42,6 +44,12 @@ export function HomePage(): React.ReactElement {
   const ipQ = useQuery({
     queryKey: IP_CHECK_QUERY_KEY,
     queryFn: fetchIpCheck,
+    staleTime: 60_000,
+  })
+
+  const timeQ = useQuery({
+    queryKey: META_TIME_QUERY_KEY,
+    queryFn: fetchMetaTime,
     staleTime: 60_000,
   })
 
@@ -68,6 +76,9 @@ export function HomePage(): React.ReactElement {
   const displayName = getUserDisplayName(user)
   const showAdmin2faWarning = isAdmin(user) && !user.is_two_factor_enabled
   const showAdminInsecureHttpWarning = isAdmin(user) && shouldWarnAdminInsecureHttp()
+  const showClockSkewWarning = timeQ.isSuccess && isClockSkewWarning(timeQ.data.skewSeconds)
+  const clockSkewSeconds =
+    timeQ.isSuccess ? formatClockSkewSeconds(timeQ.data.skewSeconds) : 0
   const passwordExpiryDate = formatPasswordExpiryDate(user.password_expires_at, locale)
   const showPasswordExpiry1Month = user.password_expiry_status === 'warning_1month'
   const showPasswordExpiry1Week = user.password_expiry_status === 'warning_1week'
@@ -147,6 +158,28 @@ export function HomePage(): React.ReactElement {
                   {t('admin2faHeroCta')}
                 </Button>
               </div>
+            </Stack>
+          </Paper>
+        ) : null}
+
+        {showClockSkewWarning ? (
+          <Paper
+            shadow="xs"
+            p="md"
+            radius="md"
+            withBorder
+            style={{
+              background: 'light-dark(var(--mantine-color-yellow-0), rgba(250, 176, 5, 0.12))',
+              borderColor: 'light-dark(var(--mantine-color-yellow-3), var(--mantine-color-dark-4))',
+            }}
+          >
+            <Stack gap="sm">
+              <Text fw={600} size="sm">
+                {t('clockSkewHeroTitle')}
+              </Text>
+              <Text size="sm" c="dimmed">
+                {t('clockSkewHeroBody', { seconds: clockSkewSeconds })}
+              </Text>
             </Stack>
           </Paper>
         ) : null}

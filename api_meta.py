@@ -1,4 +1,5 @@
 import subprocess
+import time
 
 from flask import Blueprint, jsonify
 
@@ -10,6 +11,11 @@ meta = Blueprint('meta_api', __name__)
 @meta.route('/health')
 def health():
     return jsonify(status='ok')
+
+
+@meta.route('/time')
+def get_time():
+    return jsonify(unix_time=time.time())
 
 
 @meta.route('/version')

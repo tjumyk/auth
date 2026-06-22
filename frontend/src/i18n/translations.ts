@@ -407,6 +407,9 @@ export const translations: Record<Locale, Record<string, string>> = {
     admin2faHeroBody:
       'Administrator accounts have elevated access. We strongly recommend turning on two-factor authentication to protect your account and the platform.',
     admin2faHeroCta: 'Set up two-factor',
+    clockSkewHeroTitle: 'Clock skew detected',
+    clockSkewHeroBody:
+      'Your browser and the server clocks differ by about {seconds} seconds. Two-factor authentication codes may fail until the clocks are aligned.',
     passwordExpiry1MonthHeroTitle: 'Password expiring soon',
     passwordExpiry1MonthHeroBody:
       'Your password expires on {date}. Update your password or enable two-factor authentication to keep access.',
@@ -887,6 +890,9 @@ export const translations: Record<Locale, Record<string, string>> = {
     admin2faHeroBody:
       '管理员账户权限较高，强烈建议启用两步验证（2FA），以保护您的账户和系统安全。',
     admin2faHeroCta: '前往设置',
+    clockSkewHeroTitle: '检测到时钟偏差',
+    clockSkewHeroBody:
+      '您的浏览器与服务器时钟相差约 {seconds} 秒。在时钟对齐之前，两步验证码可能无法通过。',
     passwordExpiry1MonthHeroTitle: '密码即将过期',
     passwordExpiry1MonthHeroBody:
       '您的密码将于 {date} 过期。请更新密码或启用两步验证以保持访问权限。',
