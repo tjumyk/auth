@@ -15,6 +15,8 @@ _token_length = 6
 _hash_method = SHA1
 _key_length = 20
 _time_step = 30
+# Accept codes from ±2 windows (±60s) so login works when host clock drifts without NTP.
+_valid_window = 2
 
 _setup_expire = timedelta(seconds=300)
 
@@ -87,12 +89,17 @@ def build_uri(user: User) -> str:
     return otp.get_provisioning_uri(user.name, issuer_name)
 
 
-def verify(user: User, token: str):
+def verify(user: User, token: str) -> None:
     if user is None:
         raise TwoFactorError('user is required')
 
     otp = _get_otp(user)
-    try:
-        otp.verify(token.encode(), time.time())
-    except InvalidToken:
-        raise TwoFactorError('invalid token')
+    token_bytes = token.encode()
+    now = time.time()
+    for offset in range(-_valid_window, _valid_window + 1):
+        try:
+            otp.verify(token_bytes, now + offset * _time_step)
+            return
+        except InvalidToken:
+            continue
+    raise TwoFactorError('invalid token')
