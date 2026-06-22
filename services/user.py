@@ -8,8 +8,16 @@ from sqlalchemy import or_, func
 import utils.two_factor as two_factor
 from error import BasicError
 from models import db, User
+from services.password_expiry import (
+    clear_password_expiry,
+    get_password_expiry_status,
+    refresh_password_expiry,
+    restore_password_expiry_on_2fa_disable,
+)
+from services.password_history import check_password_not_reused, record_password_change
 from utils.email_validation import EMAIL_MAX_LENGTH, EMAIL_PATTERN, is_valid_email
 from utils.external_auth.provider import get_provider, ExternalAuthError
+from utils.password import validate_password_strength, PasswordValidationError
 from utils.profile_validation import (
     ProfileValidationError,
     validate_mobile,
@@ -24,7 +32,7 @@ class UserServiceError(BasicError):
 
 class UserService:
     name_pattern = re.compile('^[\w]{3,16}$')
-    password_pattern = re.compile('^.{8,20}$')
+    password_pattern = re.compile('^.{8,64}$')
     email_pattern = EMAIL_PATTERN
     email_max_length = EMAIL_MAX_LENGTH
     email_confirm_token_valid = timedelta(days=30)
@@ -167,16 +175,21 @@ class UserService:
                                'confirmation. If you forgot your password, please click the "Reset ' \
                                'Password" link below.'
 
+        if error is not None:
+            from .login_record import LoginRecordService
+            LoginRecordService.add(user, ip, user_agent.string, False, error)
+            db.session.commit()
+            raise UserServiceError(error, detail=error_detail)
+
+        UserService._check_password_not_expired_for_login(user)
+
         # two-factor authentication
-        if error is None and user.is_two_factor_enabled:  # skip adding 'success' login record
+        if user.is_two_factor_enabled:  # skip adding 'success' login record
             return user
 
         from .login_record import LoginRecordService
-        LoginRecordService.add(user, ip, user_agent.string, error is None, error)
-        db.session.commit()  # force commit, a little bit ugly
-
-        if error is not None:
-            raise UserServiceError(error, detail=error_detail)
+        LoginRecordService.add(user, ip, user_agent.string, True, None)
+        db.session.commit()
         return user
 
     @staticmethod
@@ -214,6 +227,8 @@ class UserService:
             else:
                 raise UserServiceError(error)
 
+        UserService._check_password_not_expired_for_login(user)
+
     @staticmethod
     def check_login_recent_failures(user: User, ip: str):
         from .login_record import LoginRecordService
@@ -232,6 +247,29 @@ class UserService:
                                    'and then try again' % recent_failures_minutes)
 
     @staticmethod
+    def _validate_new_password(password: str) -> None:
+        try:
+            validate_password_strength(password)
+        except PasswordValidationError as e:
+            raise UserServiceError('invalid password format', e.msg)
+
+    @staticmethod
+    def _apply_new_password(user: User, new_password: str, *, check_reuse: bool = True) -> None:
+        UserService._validate_new_password(new_password)
+        if check_reuse:
+            check_password_not_reused(user, new_password)
+        record_password_change(user)
+        user.password = pbkdf2_sha256.hash(new_password)
+        refresh_password_expiry(user)
+
+    @staticmethod
+    def _check_password_not_expired_for_login(user: User) -> None:
+        if get_password_expiry_status(user) == 'expired':
+            raise UserServiceError(
+                'password expired',
+                detail='Your password has expired. Please use the reset password link to set a new password.',
+            )
+
     @staticmethod
     def _check_duplicate_mobile(mobile: str, exclude_user_id: int | None = None) -> None:
         query = db.session.query(func.count()).filter(User.mobile == mobile)
@@ -339,8 +377,7 @@ class UserService:
             raise UserServiceError('invalid name format')
         if not is_valid_email(email):
             raise UserServiceError('invalid email format')
-        if not UserService.password_pattern.match(password):
-            raise UserServiceError('invalid password format')
+        UserService._validate_new_password(password)
         if db.session.query(func.count()).filter(User.name == name).scalar():
             raise UserServiceError('duplicate name')
         if db.session.query(func.count()).filter(User.email == email).scalar():
@@ -350,6 +387,7 @@ class UserService:
         user = User(name=name, password=password_hash, email=email,
                     is_email_confirmed=True, email_confirmed_at=datetime.utcnow())
         db.session.add(user)
+        refresh_password_expiry(user)
         return user
 
     @staticmethod
@@ -449,9 +487,7 @@ class UserService:
 
         if not check_only:
             if not user.external_auth_provider_id:
-                if not UserService.password_pattern.match(new_password):
-                    raise UserServiceError('invalid password format')
-                user.password = pbkdf2_sha256.hash(new_password)
+                UserService._apply_new_password(user, new_password)
             user.email_confirm_token = None
             user.email_confirm_token_expire_at = None
             user.email_confirmed_at = datetime.utcnow()
@@ -486,25 +522,22 @@ class UserService:
 
         if not user.is_active:
             raise UserServiceError('inactive user')
-        if not UserService.password_pattern.match(new_password):
-            raise UserServiceError('invalid password format')
+        UserService._validate_new_password(new_password)
         if not old_password:
             raise UserServiceError('require old password')
         if not pbkdf2_sha256.verify(old_password, user.password):
             raise UserServiceError('wrong old password')
-        user.password = pbkdf2_sha256.hash(new_password)
+        UserService._apply_new_password(user, new_password)
 
     @staticmethod
-    def force_set_password(user, new_password):
+    def force_set_password(user, new_password, ignore_history: bool = False):
         if user is None:
             raise UserServiceError('user is required')
         if new_password is None:
             raise UserServiceError('new password is required')
         if not user.is_active:
             raise UserServiceError('inactive user')
-        if not UserService.password_pattern.match(new_password):
-            raise UserServiceError('invalid password format')
-        user.password = pbkdf2_sha256.hash(new_password)
+        UserService._apply_new_password(user, new_password, check_reuse=not ignore_history)
         user.password_reset_token = None
         user.password_reset_token_expire_at = None
 
@@ -562,9 +595,7 @@ class UserService:
             raise UserServiceError('token expired')
 
         if not check_only:
-            if not UserService.password_pattern.match(new_password):
-                raise UserServiceError('invalid password format')
-            user.password = pbkdf2_sha256.hash(new_password)
+            UserService._apply_new_password(user, new_password)
             user.password_reset_token = None
             user.password_reset_token_expire_at = None
 
@@ -614,3 +645,4 @@ class UserService:
         user.two_factor_disable_token = None
         user.two_factor_disable_token_expire_at = None
         user.is_two_factor_enabled = False
+        restore_password_expiry_on_2fa_disable(user)

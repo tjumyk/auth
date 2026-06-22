@@ -20,6 +20,7 @@ import { ConfirmEmailPage } from '@/pages/ConfirmEmailPage'
 import { DisableTwoFactorByEmailPage } from '@/pages/DisableTwoFactorByEmailPage'
 import { ForbiddenPage } from '@/pages/ForbiddenPage'
 import { HomePage } from '@/pages/HomePage'
+import { PasswordExpiryPage } from '@/pages/PasswordExpiryPage'
 import { ProfilePage } from '@/pages/ProfilePage'
 import { LoginPage } from '@/pages/LoginPage'
 import { LogoutPage } from '@/pages/LogoutPage'
@@ -52,6 +53,7 @@ export const router = createBrowserRouter(
         children: [
           { index: true, element: <HomePage /> },
           { path: 'account/profile', element: <ProfilePage /> },
+          { path: 'account/password-expiry', element: <PasswordExpiryPage /> },
           { path: 'account/two-factor', element: <TwoFactorSettingsPage /> },
           /* Legacy Angular paths → canonical routes (+ scroll state where needed) */
           {

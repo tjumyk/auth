@@ -12,6 +12,7 @@ import { useI18n } from '@/hooks/useI18n'
 import type { BasicError } from '@/models/apiError'
 import { siteConfig } from '@/models/siteConfig'
 import { validateNewPassword, validateRepeatNewPassword } from '@/utils/passwordValidation'
+import { formatPasswordServiceError } from '@/utils/passwordErrorMessage'
 
 export function ResetPasswordPage(): React.ReactElement {
   const { t, locale } = useI18n()
@@ -125,11 +126,11 @@ export function ResetPasswordPage(): React.ReactElement {
       {formError ? (
         <Alert
           color="red"
-          title={formError.msg}
+          title={formatPasswordServiceError(formError, t)?.title ?? formError.msg}
           onClose={() => setFormError(null)}
           withCloseButton
         >
-          {formError.detail}
+          {formatPasswordServiceError(formError, t)?.detail ?? formError.detail}
         </Alert>
       ) : null}
       <form

@@ -236,7 +236,8 @@ def init_db():
 @app.cli.command('reset-admin-password')
 @click.option('--from-config', is_flag=True, help='Use ADMIN.password / ADMIN_PASSWORD from config.')
 @click.option('--stdin', 'use_stdin', is_flag=True, help='Read password from stdin (one line; avoids shell history).')
-def reset_admin_password(from_config: bool, use_stdin: bool) -> None:
+@click.option('--ignore-history', is_flag=True, help='Skip password reuse check (emergency recovery only).')
+def reset_admin_password(from_config: bool, use_stdin: bool, ignore_history: bool) -> None:
     """Reset the bootstrap admin password (prompt, --stdin, or --from-config)."""
     if from_config and use_stdin:
         raise click.ClickException('use only one of --from-config or --stdin')
@@ -262,11 +263,45 @@ def reset_admin_password(from_config: bool, use_stdin: bool) -> None:
         admin_user = UserService.get_by_name(admin_name)
         if admin_user is None:
             raise click.ClickException(f'admin user {admin_name!r} not found; run flask init-db first')
-        UserService.force_set_password(admin_user, resolved_password)
+        UserService.force_set_password(admin_user, resolved_password, ignore_history=ignore_history)
         db.session.commit()
         click.echo(f'Reset password for admin user {admin_name!r}')
     except UserServiceError as e:
         raise click.ClickException(f'{e.msg}: {e.detail}' if e.detail else e.msg) from e
+
+
+@app.cli.command('migrate-password-expiry')
+@click.option('--dry-run', is_flag=True, help='Report changes without writing to the database.')
+@click.option('--force', is_flag=True, help='Re-apply expiry dates even when already set.')
+def migrate_password_expiry(dry_run: bool, force: bool) -> None:
+    """One-time migration: set password expiry for existing users without 2FA."""
+    from datetime import datetime
+    from services.password_expiry import PASSWORD_EXPIRY_MIGRATED, is_password_expiry_applicable
+
+    updated = 0
+    skipped = 0
+    for user in UserService.get_all():
+        if not is_password_expiry_applicable(user):
+            skipped += 1
+            continue
+        if user.password_expires_at is not None and not force:
+            skipped += 1
+            continue
+        expires_at = datetime.utcnow() + PASSWORD_EXPIRY_MIGRATED
+        if user.password_changed_at is None:
+            user.password_changed_at = user.modified_at or user.created_at
+        user.password_expires_at = expires_at
+        user.password_expiry_warning_email_sent_at = None
+        updated += 1
+        click.echo(f'User {user.name!r} (id={user.id}): password_expires_at={expires_at.isoformat()}')
+
+    if dry_run:
+        db.session.rollback()
+        click.echo(f'Dry run: would update {updated} user(s), skipped {skipped}')
+        return
+
+    db.session.commit()
+    click.echo(f'Updated {updated} user(s), skipped {skipped}')
 
 
 @app.cli.command('import-oauth-clients')

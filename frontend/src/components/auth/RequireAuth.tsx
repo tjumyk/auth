@@ -11,7 +11,7 @@ import {
 import { type ReactNode, useEffect } from 'react'
 import { Navigate, useLocation } from 'react-router'
 
-import { fetchWhoami } from '@/api/account'
+import { fetchWhoami, PasswordExpiredWhoamiError } from '@/api/account'
 import { AuthUserProvider } from '@/components/auth/AuthUserProvider'
 import { ThemeLocaleToolbar } from '@/components/layout/ThemeLocaleToolbar'
 import { useI18n } from '@/hooks/useI18n'
@@ -47,6 +47,9 @@ export function RequireAuth({ children }: { children: ReactNode }): React.ReactE
   }
 
   if (q.isError) {
+    if (q.error instanceof PasswordExpiredWhoamiError) {
+      return <Navigate to="/account/login?password_expired=1" replace />
+    }
     return (
       <Stack gap="md" p="md">
         {isThemeLocaleToolbarVisible ? (

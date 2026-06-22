@@ -101,7 +101,10 @@ def admin_impersonate_user(uid):
             return jsonify(msg='target user not found'), 404
 
         # logout current user
-        user = get_session_user()
+        try:
+            user = get_session_user()
+        except PasswordExpiryError:
+            user = None
         clear_current_user()  # clear session first
         if user:
             OAuthService.clear_user_tokens(user)

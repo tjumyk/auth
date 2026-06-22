@@ -13,7 +13,7 @@ import {
 } from '@mantine/core'
 import { IconSettings, IconUser } from '@tabler/icons-react'
 import { useMemo } from 'react'
-import { Link } from 'react-router'
+import { Link, useNavigate } from 'react-router'
 
 import { fetchIpCheck, fetchMyOAuthClients, IP_CHECK_QUERY_KEY } from '@/api/account'
 import { AppGrid } from '@/components/apps/AppGrid'
@@ -25,12 +25,14 @@ import {
 } from '@/utils/enrichOAuthClientsWithIpCheck'
 import { isAdmin } from '@/utils/isAdmin'
 import { shouldWarnAdminInsecureHttp } from '@/utils/isHttpHostedPage'
+import { formatPasswordExpiryDate, shouldInterceptPasswordExpiry } from '@/utils/passwordExpiry'
 import { siteAssetSrc } from '@/utils/siteAssetUrl'
 import { getUserDisplayName } from '@/utils/userDisplayName'
 
 export function HomePage(): React.ReactElement {
-  const { t } = useI18n()
+  const { t, locale } = useI18n()
   const user = useAuthUser()
+  const navigate = useNavigate()
 
   const clientsQ = useQuery({
     queryKey: ['myOAuthClients'],
@@ -66,6 +68,18 @@ export function HomePage(): React.ReactElement {
   const displayName = getUserDisplayName(user)
   const showAdmin2faWarning = isAdmin(user) && !user.is_two_factor_enabled
   const showAdminInsecureHttpWarning = isAdmin(user) && shouldWarnAdminInsecureHttp()
+  const passwordExpiryDate = formatPasswordExpiryDate(user.password_expires_at, locale)
+  const showPasswordExpiry1Month = user.password_expiry_status === 'warning_1month'
+  const showPasswordExpiry1Week = user.password_expiry_status === 'warning_1week'
+  const interceptApps = shouldInterceptPasswordExpiry(user)
+
+  const handleClientNavigate = (homeUrl: string, clientId: number): void => {
+    if (interceptApps) {
+      navigate(`/account/password-expiry?intent_client_id=${clientId}`)
+      return
+    }
+    window.location.href = homeUrl
+  }
 
   const refetchApps = (): void => {
     void clientsQ.refetch()
@@ -137,6 +151,66 @@ export function HomePage(): React.ReactElement {
           </Paper>
         ) : null}
 
+        {showPasswordExpiry1Month ? (
+          <Paper
+            shadow="xs"
+            p="md"
+            radius="md"
+            withBorder
+            style={{
+              background: 'light-dark(var(--mantine-color-yellow-0), rgba(250, 176, 5, 0.12))',
+              borderColor: 'light-dark(var(--mantine-color-yellow-3), var(--mantine-color-dark-4))',
+            }}
+          >
+            <Stack gap="sm">
+              <Text fw={600} size="sm">
+                {t('passwordExpiry1MonthHeroTitle')}
+              </Text>
+              <Text size="sm" c="dimmed">
+                {t('passwordExpiry1MonthHeroBody', { date: passwordExpiryDate })}
+              </Text>
+              <Group gap="xs">
+                <Button component={Link} to="/account/profile" size="xs" variant="filled">
+                  {t('passwordExpiryResetCta')}
+                </Button>
+                <Button component={Link} to="/account/two-factor" size="xs" variant="light">
+                  {t('passwordExpiry2faCta')}
+                </Button>
+              </Group>
+            </Stack>
+          </Paper>
+        ) : null}
+
+        {showPasswordExpiry1Week ? (
+          <Paper
+            shadow="xs"
+            p="md"
+            radius="md"
+            withBorder
+            style={{
+              background: 'light-dark(var(--mantine-color-yellow-0), rgba(250, 176, 5, 0.12))',
+              borderColor: 'light-dark(var(--mantine-color-yellow-3), var(--mantine-color-dark-4))',
+            }}
+          >
+            <Stack gap="sm">
+              <Text fw={600} size="sm">
+                {t('passwordExpiry1WeekHeroTitle')}
+              </Text>
+              <Text size="sm" c="dimmed">
+                {t('passwordExpiry1WeekHeroBody', { date: passwordExpiryDate })}
+              </Text>
+              <Group gap="xs">
+                <Button component={Link} to="/account/profile" size="xs" variant="filled">
+                  {t('passwordExpiryResetCta')}
+                </Button>
+                <Button component={Link} to="/account/two-factor" size="xs" variant="light">
+                  {t('passwordExpiry2faCta')}
+                </Button>
+              </Group>
+            </Stack>
+          </Paper>
+        ) : null}
+
         {showAdminInsecureHttpWarning ? (
           <Paper
             shadow="xs"
@@ -179,7 +253,13 @@ export function HomePage(): React.ReactElement {
               </Text>
               {gateClient ? (
                 <Group gap="xs" wrap="nowrap" align="center">
-                  <Anchor href={gateClient.home_url} underline="hover" style={{ textDecoration: 'none' }}>
+                  <Anchor
+                    component="button"
+                    type="button"
+                    underline="hover"
+                    style={{ textDecoration: 'none', background: 'none', border: 'none', padding: 0, cursor: 'pointer' }}
+                    onClick={() => handleClientNavigate(gateClient.home_url, gateClient.id)}
+                  >
                     <Group gap="xs" wrap="nowrap">
                       {gateClient.icon ? (
                         <Avatar
@@ -209,6 +289,7 @@ export function HomePage(): React.ReactElement {
             isLoading={clientsQ.isPending}
             error={clientsQ.error}
             onRetry={refetchApps}
+            onClientNavigate={handleClientNavigate}
           />
         </div>
       </Stack>

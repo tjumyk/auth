@@ -8,6 +8,7 @@ from sqlalchemy.orm import joinedload
 
 from error import BasicError
 from models import OAuthClient, db, OAuthAuthorization, User, client_allowed_groups, user_groups
+from services.password_expiry import PasswordExpiryError, check_password_expiry_for_oauth
 
 
 class OAuthServiceError(BasicError):
@@ -174,6 +175,10 @@ class OAuthService:
 
         OAuthService._pre_check_client(client, redirect_url)
         OAuthService._check_user_eligibility(client, user)
+        try:
+            check_password_expiry_for_oauth(user)
+        except PasswordExpiryError as e:
+            raise OAuthServiceError(e.msg, detail=e.detail, code=e.code)
 
         authorize_token = None
         for _ in range(OAuthService.token_generation_retry):  # repeat in case token collision
@@ -219,6 +224,10 @@ class OAuthService:
             raise OAuthServiceError('authorization token expired')
 
         OAuthService._check_user_eligibility(client, auth.user)
+        try:
+            check_password_expiry_for_oauth(auth.user)
+        except PasswordExpiryError as e:
+            raise OAuthServiceError(e.msg, detail=e.detail, code=e.code)
 
         access_token = None
         for _ in range(OAuthService.token_generation_retry):  # repeat in case token collision
@@ -246,6 +255,10 @@ class OAuthService:
             raise OAuthServiceError('invalid access_token')
 
         OAuthService._check_user_eligibility(auth.client, auth.user)
+        try:
+            check_password_expiry_for_oauth(auth.user)
+        except PasswordExpiryError as e:
+            raise OAuthServiceError(e.msg, detail=e.detail, code=e.code)
 
         return auth
 

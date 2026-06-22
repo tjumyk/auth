@@ -1,9 +1,10 @@
 import { z } from 'zod'
 
-/** Flask `jsonify(msg=..., detail=...)` includes `"detail": null` when detail is absent. */
+/** Flask `jsonify(msg=..., detail=..., code=...)` error payload. */
 export const BasicErrorSchema = z.object({
   msg: z.string(),
   detail: z.string().nullish(),
+  code: z.string().nullish(),
 })
 
 export type BasicError = z.infer<typeof BasicErrorSchema>

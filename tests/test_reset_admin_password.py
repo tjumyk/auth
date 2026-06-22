@@ -23,7 +23,7 @@ class ResetAdminPasswordTests(unittest.TestCase):
         self.admin_config = flask_app.config['ADMIN']
         self.admin_user = UserService.get_by_name(self.admin_config['name'])
         assert self.admin_user is not None
-        UserService.force_set_password(self.admin_user, 'OldPass123')
+        self.admin_user.password = pbkdf2_sha256.hash('OldPass123')
         db.session.commit()
 
     def tearDown(self) -> None:

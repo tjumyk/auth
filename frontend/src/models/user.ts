@@ -1,5 +1,12 @@
 import { z } from 'zod'
 
+export const PasswordExpiryStatusSchema = z.enum([
+  'none',
+  'warning_1month',
+  'warning_1week',
+  'expired',
+])
+
 export const GroupSchema = z.object({
   id: z.number(),
   name: z.string(),
@@ -19,6 +26,9 @@ export const UserSchema = z.object({
   is_two_factor_enabled: z.boolean(),
   external_auth_provider_id: z.string().nullable().optional(),
   external_auth_enforced: z.boolean(),
+  password_expires_at: z.string().nullable().optional(),
+  password_expiry_status: PasswordExpiryStatusSchema.optional(),
+  password_expiry_intercept_active: z.boolean().optional(),
   groups: z.array(GroupSchema).optional(),
 })
 

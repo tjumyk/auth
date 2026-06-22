@@ -54,6 +54,7 @@ import {
   validateRealName,
 } from '@/utils/profileValidation'
 import { userAvatarSrc } from '@/utils/siteAssetUrl'
+import { formatPasswordExpiryDate } from '@/utils/passwordExpiry'
 
 const AVATAR_MAX_BYTES = 262_144
 
@@ -346,6 +347,53 @@ export function AdminUserEditPage(): React.ReactElement {
           disabled={activeM.isPending}
           onChange={(e) => activeM.mutate(e.currentTarget.checked)}
         />
+      </Paper>
+
+      <Paper p="md" withBorder shadow="xs">
+        <Title order={4} mb="sm">
+          {t('adminSecuritySection')}
+        </Title>
+        <Stack gap="xs">
+          <Group gap="xs">
+            <Text size="sm" fw={500}>
+              {t('twoFactorSettingsTitle')}:
+            </Text>
+            <Badge color={user.is_two_factor_enabled ? 'teal' : 'gray'} variant="light">
+              {user.is_two_factor_enabled ? t('adminTwoFactorOn') : t('adminTwoFactorOff')}
+            </Badge>
+          </Group>
+          <Text size="sm">
+            {t('adminPasswordChangedAt')}:{' '}
+            {user.password_changed_at
+              ? formatPasswordExpiryDate(user.password_changed_at, locale)
+              : '—'}
+          </Text>
+          <Text size="sm">
+            {t('adminUsersColPasswordExpiry')}:{' '}
+            {user.password_expires_at
+              ? formatPasswordExpiryDate(user.password_expires_at, locale)
+              : t('adminPasswordExpiryNone')}
+          </Text>
+          <Group gap="xs">
+            <Text size="sm" fw={500}>
+              {t('adminPasswordExpiryStatus')}:
+            </Text>
+            <Badge
+              color={
+                user.password_expiry_status === 'expired'
+                  ? 'red'
+                  : user.password_expiry_status === 'warning_1week'
+                    ? 'orange'
+                    : user.password_expiry_status === 'warning_1month'
+                      ? 'yellow'
+                      : 'gray'
+              }
+              variant="light"
+            >
+              {user.password_expiry_status ?? 'none'}
+            </Badge>
+          </Group>
+        </Stack>
       </Paper>
 
       <Paper p="md" withBorder shadow="xs">

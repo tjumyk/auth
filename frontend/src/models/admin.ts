@@ -65,6 +65,9 @@ export const AdminUserSchema = z.object({
   modified_at: z.string(),
   email_confirmed_at: z.union([z.string(), z.null()]).optional(),
   is_email_confirmed: z.boolean(),
+  password_changed_at: z.string().nullable().optional(),
+  password_expires_at: z.string().nullable().optional(),
+  password_expiry_status: z.enum(['none', 'warning_1month', 'warning_1week', 'expired']).optional(),
   authorizations: z.array(OAuthAuthorizationSchema).optional(),
 })
 

@@ -1,10 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { Alert, Loader, Text, Title } from '@mantine/core'
+import { Alert, Anchor, Loader, Stack, Text, Title } from '@mantine/core'
 import { useDocumentTitle } from '@mantine/hooks'
 import { useState } from 'react'
-import { useNavigate } from 'react-router'
+import { Link, useNavigate, useSearchParams } from 'react-router'
 
-import { fetchWhoami, postLogin, postTwoFactorLogin } from '@/api/account'
+import { fetchWhoami, PasswordExpiredWhoamiError, postLogin, postTwoFactorLogin } from '@/api/account'
 import { getBasicErrorFromUnknown } from '@/api/client'
 import { LoginFooterLinks } from '@/components/auth/LoginFooterLinks'
 import { LoginForm, type LoginFormValues } from '@/components/auth/LoginForm'
@@ -16,12 +16,14 @@ import { useSafeRedirectPath } from '@/hooks/useSafeRedirectPath'
 import { useI18n } from '@/hooks/useI18n'
 import type { BasicError } from '@/models/apiError'
 import { siteConfig } from '@/models/siteConfig'
+import { isPasswordExpiredError } from '@/utils/passwordErrorMessage'
 
 export function LoginPage(): React.ReactElement {
   const { t, locale } = useI18n()
   useDocumentTitle(`${siteConfig.name} · ${t('signInPageTitle')}`)
   const queryClient = useQueryClient()
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
   const redirect = useSafeRedirectPath()
   const [step, setStep] = useState<'password' | '2fa'>('password')
   const [rememberFor2fa, setRememberFor2fa] = useState(false)
@@ -33,6 +35,10 @@ export function LoginPage(): React.ReactElement {
     queryFn: fetchWhoami,
     staleTime: 0,
   })
+
+  const showSessionExpired =
+    searchParams.get('password_expired') === '1' ||
+    (whoamiQ.isError && whoamiQ.error instanceof PasswordExpiredWhoamiError)
 
   useRedirectAfterLogin(whoamiQ.data ?? undefined)
 
@@ -58,7 +64,8 @@ export function LoginPage(): React.ReactElement {
       navigate(redirect, { replace: true })
     },
     onError: (err) => {
-      setFormError(getBasicErrorFromUnknown(err))
+      const basic = getBasicErrorFromUnknown(err)
+      setFormError(basic)
       setLoginGuardRefresh((n) => n + 1)
     },
   })
@@ -92,14 +99,37 @@ export function LoginPage(): React.ReactElement {
     <PublicAuthCard scrollable>
       <SiteBrandBlock />
       <Title order={2}>{t('signInHeading')}</Title>
+      {showSessionExpired ? (
+        <Alert color="red" title={t('passwordExpiryLoginExpiredTitle')}>
+          <Stack gap="xs">
+            <Text size="sm">{t('passwordExpiryLoginExpiredBody')}</Text>
+            <Anchor component={Link} to="/account/request-reset-password" size="sm">
+              {t('loginFooterResetPassword')}
+            </Anchor>
+          </Stack>
+        </Alert>
+      ) : null}
       {formError ? (
         <Alert
           color="red"
-          title={formError.msg}
+          title={
+            isPasswordExpiredError(formError)
+              ? t('passwordExpiryLoginExpiredTitle')
+              : formError.msg
+          }
           onClose={() => setFormError(null)}
           withCloseButton
         >
-          {formError.detail}
+          {isPasswordExpiredError(formError) ? (
+            <Stack gap="xs">
+              <Text size="sm">{t('passwordExpiryLoginExpiredBody')}</Text>
+              <Anchor component={Link} to="/account/request-reset-password" size="sm">
+                {t('loginFooterResetPassword')}
+              </Anchor>
+            </Stack>
+          ) : (
+            formError.detail
+          )}
         </Alert>
       ) : null}
       {step === 'password' ? (

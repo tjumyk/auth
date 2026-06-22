@@ -59,6 +59,8 @@ def confirm_setup(user: User, token: str):
     verify(user, token)
     user.is_two_factor_enabled = True
     user.two_factor_setup_expire_at = None
+    from services.password_expiry import clear_password_expiry
+    clear_password_expiry(user)
 
 
 def disable(user: User, token: str):
@@ -72,6 +74,8 @@ def disable(user: User, token: str):
 
     user.is_two_factor_enabled = False
     user.two_factor_key = None
+    from services.password_expiry import restore_password_expiry_on_2fa_disable
+    restore_password_expiry_on_2fa_disable(user)
 
 
 def build_uri(user: User) -> str:

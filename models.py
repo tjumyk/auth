@@ -45,16 +45,29 @@ class User(db.Model):
     external_auth_provider_id = db.Column(db.String(32))
     external_auth_enforced = db.Column(db.Boolean, nullable=False, default=False)
 
+    password_changed_at = db.Column(db.DateTime)
+    password_expires_at = db.Column(db.DateTime)
+    password_expiry_warning_email_sent_at = db.Column(db.DateTime)
+
     login_records = db.relationship('LoginRecord', backref=db.backref('user'), cascade="all, delete-orphan")
     authorizations = db.relationship('OAuthAuthorization', backref=db.backref('user', lazy=False),
                                      cascade="all, delete-orphan")
+    password_history = db.relationship(
+        'UserPasswordHistory',
+        backref=db.backref('user'),
+        cascade='all, delete-orphan',
+        order_by='UserPasswordHistory.created_at.desc()',
+    )
 
-    def to_dict(self, with_groups=True, with_group_ids=False, with_authorizations=False, with_advanced_fields=False):
+    def to_dict(self, with_groups=True, with_group_ids=False, with_authorizations=False,
+                with_advanced_fields=False, password_expiry_fields: dict | None = None):
         _dict = dict(id=self.id, name=self.name, email=self.email, nickname=self.nickname,
                      real_name=self.real_name, mobile=self.mobile, avatar=self.avatar,
                      is_active=self.is_active, is_two_factor_enabled=self.is_two_factor_enabled,
                      external_auth_provider_id=self.external_auth_provider_id,
                      external_auth_enforced=self.external_auth_enforced)
+        if password_expiry_fields is not None:
+            _dict.update(password_expiry_fields)
         if with_groups:
             _dict['groups'] = [group.to_dict() for group in self.groups]
         if with_group_ids:
@@ -67,11 +80,24 @@ class User(db.Model):
             _dict['modified_at'] = self.modified_at
             _dict['email_confirmed_at'] = self.email_confirmed_at
             _dict['is_email_confirmed'] = self.is_email_confirmed
+            if password_expiry_fields is None:
+                from services.password_expiry import build_password_expiry_admin_fields
+                _dict.update(build_password_expiry_admin_fields(self))
 
         return _dict
 
     def __repr__(self):
         return '<User %r>' % self.name
+
+
+class UserPasswordHistory(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete='CASCADE'), nullable=False)
+    password_hash = db.Column(db.String(128), nullable=False)
+    created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+
+    def __repr__(self):
+        return '<UserPasswordHistory %r>' % self.id
 
 
 class Group(db.Model):

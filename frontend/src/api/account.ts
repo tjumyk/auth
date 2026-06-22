@@ -1,6 +1,8 @@
 import { z } from 'zod'
 
 import { apiClient, getBasicErrorFromUnknown } from '@/api/client'
+import type { BasicError } from '@/models/apiError'
+import { parseBasicErrorFromUnknown } from '@/models/apiError'
 import type { IpCheckResult } from '@/utils/enrichOAuthClientsWithIpCheck'
 import { OAuthClientSchema, type OAuthClient } from '@/models/oauthClient'
 import {
@@ -30,10 +32,27 @@ export async function fetchIpCheck(): Promise<IpCheckResult | null> {
   }
 }
 
+export class PasswordExpiredWhoamiError extends Error {
+  readonly basicError: BasicError
+
+  constructor(basicError: BasicError) {
+    super(basicError.msg)
+    this.name = 'PasswordExpiredWhoamiError'
+    this.basicError = basicError
+  }
+}
+
 export async function fetchWhoami(): Promise<User | null> {
   const res = await apiClient.get<unknown>('/api/account/whoami', {
-    validateStatus: (s) => s === 200 || s === 204,
+    validateStatus: (s) => s === 200 || s === 204 || s === 401,
   })
+  if (res.status === 401) {
+    const basic = parseBasicErrorFromUnknown(res.data)
+    if (basic?.code === 'password_expired') {
+      throw new PasswordExpiredWhoamiError(basic)
+    }
+    throw new Error(basic?.msg ?? 'Session verification failed')
+  }
   if (res.status === 204) {
     return null
   }
@@ -74,6 +93,16 @@ export async function postLogin(
   const parsed = UserSchema.safeParse(res.data)
   if (!parsed.success) {
     console.error('login parse error', parsed.error.flatten())
+    throw new Error('Invalid user payload from server')
+  }
+  return parsed.data
+}
+
+export async function postPasswordExpirySkip(): Promise<User> {
+  const res = await apiClient.post<unknown>('/api/account/password-expiry/skip')
+  const parsed = UserSchema.safeParse(res.data)
+  if (!parsed.success) {
+    console.error('password expiry skip parse error', parsed.error.flatten())
     throw new Error('Invalid user payload from server')
   }
   return parsed.data

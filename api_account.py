@@ -11,8 +11,18 @@ from services.user import UserService, UserServiceError
 from utils.external_auth.provider import get_provider, get_providers
 from utils.mail import send_email, is_mail_enabled
 from utils.qr_code import build_qr_code, img_to_base64
-from utils.session import get_session_user, requires_login, clear_current_user, set_current_user, get_current_user, \
-    start_two_factor, get_two_factor_user
+from utils.session import (
+    get_session_user,
+    user_to_dict_with_password_expiry,
+    _password_expiry_error_response,
+    requires_login,
+    clear_current_user,
+    set_current_user,
+    get_current_user,
+    start_two_factor,
+    get_two_factor_user,
+)
+from services.password_expiry import PasswordExpiryError, set_password_expiry_oauth_dismissed
 from utils.upload import handle_upload, handle_post_upload, UploadError
 from utils.captcha import (
     captcha_required_for_login,
@@ -71,7 +81,8 @@ def account_login():
             start_two_factor(user)
         else:
             set_current_user(user, remember)
-        return jsonify(user.to_dict())
+        db.session.commit()
+        return jsonify(user_to_dict_with_password_expiry(user, include_intercept=True))
     except UserServiceError as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
 
@@ -146,6 +157,9 @@ def account_logout():
         if user:
             OAuthService.clear_user_tokens(user)
             db.session.commit()
+        return "", 204
+    except PasswordExpiryError:
+        clear_current_user()
         return "", 204
     except (UserServiceError, OAuthServiceError) as e:
         return jsonify(msg=e.msg, detail=e.detail), 500
@@ -257,14 +271,19 @@ def account_who_am_i():
         user = get_current_user()
     except UserServiceError as e:
         return jsonify(msg=e.msg, detail=e.detail), 500
+    except PasswordExpiryError as e:
+        return _password_expiry_error_response(e)
     except OAuthServiceError as e:
-        return jsonify(msg=e.msg, detail=e.detail), 403
+        if getattr(e, 'code', None) in ('password_expiring', 'password_expired'):
+            return _password_expiry_error_response(e)
+        return jsonify(msg=e.msg, detail=e.detail, code=getattr(e, 'code', None)), 403
 
     if user is None:
         return "", 204
     if not user.is_active:  # do not acknowledge inactive user as '@requires_login' do
         return "", 204
-    return jsonify(user.to_dict())
+    db.session.commit()
+    return jsonify(user_to_dict_with_password_expiry(user, include_intercept=True))
 
 
 @account.route('/me', methods=['GET', 'PUT'])
@@ -319,9 +338,9 @@ def account_update_password():
         old_password = _json.get('old_password')
         new_password = _json.get('new_password')
 
-        user = get_session_user()
+        user = get_current_user()
         if user is None:
-            return jsonify('login required'), 401
+            return jsonify(msg='login required'), 401
         UserService.update_password(user, new_password, old_password)
         db.session.commit()
         return "", 204
@@ -408,8 +427,23 @@ def account_two_factor_login():
         UserService.two_factor_login(user, token, _get_client_ip(), request.user_agent)
 
         set_current_user(user, remember)
-        return jsonify(user.to_dict())
+        db.session.commit()
+        return jsonify(user_to_dict_with_password_expiry(user, include_intercept=True))
     except UserServiceError as e:
+        return jsonify(msg=e.msg, detail=e.detail), 400
+
+
+@account.route('/password-expiry/skip', methods=['POST'])
+@requires_login
+def account_password_expiry_skip():
+    try:
+        user = get_session_user()
+        if user is None:
+            return jsonify(msg='login required'), 401
+        set_password_expiry_oauth_dismissed(user)
+        db.session.commit()
+        return jsonify(user_to_dict_with_password_expiry(user, include_intercept=True))
+    except PasswordExpiryError as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
 
 

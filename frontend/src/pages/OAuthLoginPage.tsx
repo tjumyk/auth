@@ -17,9 +17,9 @@ import {
 import { useDocumentTitle } from '@mantine/hooks'
 import { IconApps } from '@tabler/icons-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { Link, useSearchParams } from 'react-router'
+import { Link, useNavigate, useSearchParams } from 'react-router'
 import { SiteBrandBlock } from '@/components/branding/SiteBrandBlock'
-import { fetchWhoami, postLogin, postTwoFactorLogin } from '@/api/account'
+import { fetchWhoami, PasswordExpiredWhoamiError, postLogin, postTwoFactorLogin } from '@/api/account'
 import { getBasicErrorFromUnknown } from '@/api/client'
 import { fetchOAuthClient, getOAuthConnect } from '@/api/oauth'
 import { LoginFooterLinks } from '@/components/auth/LoginFooterLinks'
@@ -32,6 +32,9 @@ import type { BasicError } from '@/models/apiError'
 import { siteConfig } from '@/models/siteConfig'
 import type { User } from '@/models/user'
 import { siteAssetSrc } from '@/utils/siteAssetUrl'
+import { buildPasswordExpiryPath } from '@/pages/PasswordExpiryPage'
+import { isPasswordExpiredError } from '@/utils/passwordErrorMessage'
+import { shouldInterceptPasswordExpiry } from '@/utils/passwordExpiry'
 
 /** Compact cue that this flow is handled by the central identity service (not the OAuth client). */
 function OAuthIdentityPill(): React.ReactElement {
@@ -95,6 +98,7 @@ export function OAuthLoginPage(): React.ReactElement {
   const { t, locale } = useI18n()
   const [searchParams] = useSearchParams()
   const queryClient = useQueryClient()
+  const navigate = useNavigate()
   const parsed = useMemo(() => oauthParams(searchParams), [searchParams])
   const [step, setStep] = useState<'password' | '2fa'>('password')
   const [rememberFor2fa, setRememberFor2fa] = useState(false)
@@ -140,8 +144,20 @@ export function OAuthLoginPage(): React.ReactElement {
       })
     },
     onError: (err) => {
+      const basic = getBasicErrorFromUnknown(err)
+      if (basic?.code === 'password_expiring') {
+        navigate(buildPasswordExpiryPath(searchParams))
+        return
+      }
+      if (isPasswordExpiredError(basic)) {
+        setConnectError({
+          msg: t('passwordExpiryLoginExpiredTitle'),
+          detail: t('passwordExpiryLoginExpiredBody'),
+        })
+        return
+      }
       setConnectError(
-        getBasicErrorFromUnknown(err) ?? {
+        basic ?? {
           msg: t('oauthConnectFailedTitle'),
           detail: t('oauthConnectFailedDetail'),
         },
@@ -153,12 +169,16 @@ export function OAuthLoginPage(): React.ReactElement {
     if (!parsed.ok || !whoamiQ.data) {
       return
     }
+    if (shouldInterceptPasswordExpiry(whoamiQ.data)) {
+      navigate(buildPasswordExpiryPath(searchParams))
+      return
+    }
     if (connectAttemptedRef.current || connectM.isPending || redirecting) {
       return
     }
     connectAttemptedRef.current = true
     connectM.mutate(parsed.params)
-  }, [parsed, whoamiQ.data, connectM, redirecting])
+  }, [parsed, whoamiQ.data, connectM, redirecting, navigate, searchParams])
 
   const [loginGuardRefresh, setLoginGuardRefresh] = useState(0)
 
@@ -183,7 +203,8 @@ export function OAuthLoginPage(): React.ReactElement {
       void queryClient.invalidateQueries({ queryKey: ['myOAuthClients'] })
     },
     onError: (err) => {
-      setFormError(getBasicErrorFromUnknown(err))
+      const basic = getBasicErrorFromUnknown(err)
+      setFormError(basic)
       setLoginGuardRefresh((n) => n + 1)
     },
   })
@@ -228,6 +249,23 @@ export function OAuthLoginPage(): React.ReactElement {
     )
   }
 
+  if (whoamiQ.isError && whoamiQ.error instanceof PasswordExpiredWhoamiError) {
+    return (
+      <PublicAuthCard stackGap="md">
+        <SiteBrandBlock />
+        <Title order={2}>{t('oauthSignInPageTitle')}</Title>
+        <Alert color="red" title={t('passwordExpiryLoginExpiredTitle')}>
+          <Stack gap="xs">
+            <Text size="sm">{t('passwordExpiryLoginExpiredBody')}</Text>
+            <Anchor component={Link} to="/account/request-reset-password" size="sm">
+              {t('loginFooterResetPassword')}
+            </Anchor>
+          </Stack>
+        </Alert>
+      </PublicAuthCard>
+    )
+  }
+
   const user = whoamiQ.data
   if (user) {
     const authorizing =
@@ -253,24 +291,36 @@ export function OAuthLoginPage(): React.ReactElement {
     }
 
     if (connectError) {
+      const expired = connectError.msg === t('passwordExpiryLoginExpiredTitle')
       return (
         <PublicAuthCard stackGap="md">
           <SiteBrandBlock />
           <Title order={2}>{t('oauthSignInPageTitle')}</Title>
           <Alert color="red" title={connectError.msg}>
-            {connectError.detail}
+            {expired ? (
+              <Stack gap="xs">
+                <Text size="sm">{connectError.detail}</Text>
+                <Anchor component={Link} to="/account/request-reset-password" size="sm">
+                  {t('loginFooterResetPassword')}
+                </Anchor>
+              </Stack>
+            ) : (
+              connectError.detail
+            )}
           </Alert>
-          <Button
-            onClick={() => {
-              setConnectError(null)
-              connectM.reset()
-              connectAttemptedRef.current = true
-              connectM.mutate(params)
-            }}
-            loading={connectM.isPending}
-          >
-            {t('retry')}
-          </Button>
+          {!expired ? (
+            <Button
+              onClick={() => {
+                setConnectError(null)
+                connectM.reset()
+                connectAttemptedRef.current = true
+                connectM.mutate(params)
+              }}
+              loading={connectM.isPending}
+            >
+              {t('retry')}
+            </Button>
+          ) : null}
           <Anchor component={Link} to="/account/login" size="sm">
             {t('signInAgain')}
           </Anchor>
@@ -323,11 +373,24 @@ export function OAuthLoginPage(): React.ReactElement {
       {formError ? (
         <Alert
           color="red"
-          title={formError.msg}
+          title={
+            isPasswordExpiredError(formError)
+              ? t('passwordExpiryLoginExpiredTitle')
+              : formError.msg
+          }
           onClose={() => setFormError(null)}
           withCloseButton
         >
-          {formError.detail}
+          {isPasswordExpiredError(formError) ? (
+            <Stack gap="xs">
+              <Text size="sm">{t('passwordExpiryLoginExpiredBody')}</Text>
+              <Anchor component={Link} to="/account/request-reset-password" size="sm">
+                {t('loginFooterResetPassword')}
+              </Anchor>
+            </Stack>
+          ) : (
+            formError.detail
+          )}
         </Alert>
       ) : null}
       {step === 'password' ? (

@@ -40,6 +40,7 @@ import type { AccountMeUser } from '@/models/user'
 import { siteConfig } from '@/models/siteConfig'
 import { groupNameToBadgeColor } from '@/utils/groupBadgeColor'
 import { validateNewPassword, validateRepeatNewPassword } from '@/utils/passwordValidation'
+import { formatPasswordServiceError } from '@/utils/passwordErrorMessage'
 import { PROFILE_SECTION_DOM_IDS, type AppLocationScrollState } from '@/models/locationScrollState'
 import {
   normalizeMobile,
@@ -261,6 +262,7 @@ export function ProfilePage(): React.ReactElement {
       setPasswordError(null)
       setPasswordOk(true)
       pwdForm.reset()
+      void queryClient.invalidateQueries({ queryKey: ['whoami'] })
     },
     onError: (err) => {
       setPasswordOk(false)
@@ -550,11 +552,11 @@ export function ProfilePage(): React.ReactElement {
                 {passwordError ? (
                   <Alert
                     color="red"
-                    title={passwordError.msg}
+                    title={formatPasswordServiceError(passwordError, t)?.title ?? passwordError.msg}
                     onClose={() => setPasswordError(null)}
                     withCloseButton
                   >
-                    {passwordError.detail}
+                    {formatPasswordServiceError(passwordError, t)?.detail ?? passwordError.detail}
                   </Alert>
                 ) : null}
                 {showLocalPasswordForm ? (

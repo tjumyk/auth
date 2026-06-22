@@ -13,6 +13,7 @@ import type { AdminUser } from '@/models/admin'
 
 import { AdminUserInviteModal } from '@/pages/admin/AdminUserInviteModal'
 import { groupNameToBadgeColor } from '@/utils/groupBadgeColor'
+import { formatPasswordExpiryDate } from '@/utils/passwordExpiry'
 
 type AdminUsersLocationState = { adminOpenInvite?: boolean }
 
@@ -42,7 +43,7 @@ function UserGroupPills({ user }: { user: AdminUser }): React.ReactElement {
 }
 
 export function AdminUsersPage(): React.ReactElement {
-  const { t } = useI18n()
+  const { t, locale } = useI18n()
   const location = useLocation()
   const navigate = useNavigate()
   const [filter, setFilter] = useState('')
@@ -143,6 +144,8 @@ export function AdminUsersPage(): React.ReactElement {
                 <Table.Th>{t('adminUsersColEmail')}</Table.Th>
                 <Table.Th>{t('adminUsersColActive')}</Table.Th>
                 <Table.Th>{t('adminUsersColEmailConfirmed')}</Table.Th>
+                <Table.Th>{t('adminUsersCol2fa')}</Table.Th>
+                <Table.Th>{t('adminUsersColPasswordExpiry')}</Table.Th>
                 <Table.Th>{t('adminUsersColGroups')}</Table.Th>
                 <Table.Th>{t('adminUsersColActions')}</Table.Th>
               </Table.Tr>
@@ -200,6 +203,26 @@ export function AdminUsersPage(): React.ReactElement {
                       <Badge color="orange" variant="light">
                         {t('adminUsersNo')}
                       </Badge>
+                    )}
+                  </Table.Td>
+                  <Table.Td>
+                    {u.is_two_factor_enabled ? (
+                      <Badge color="teal" variant="light">
+                        {t('adminTwoFactorOn')}
+                      </Badge>
+                    ) : (
+                      <Badge color="gray" variant="light">
+                        {t('adminTwoFactorOff')}
+                      </Badge>
+                    )}
+                  </Table.Td>
+                  <Table.Td>
+                    {u.password_expires_at ? (
+                      <Text size="sm">{formatPasswordExpiryDate(u.password_expires_at, locale)}</Text>
+                    ) : (
+                      <Text size="sm" c="dimmed">
+                        {t('adminPasswordExpiryNone')}
+                      </Text>
                     )}
                   </Table.Td>
                   <Table.Td style={{ maxWidth: 280 }}>

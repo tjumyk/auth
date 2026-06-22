@@ -289,6 +289,18 @@ docker compose up -d
 
 Same auto DB bootstrap as online compose (`RUN_MIGRATIONS`, `RUN_INIT_DB`).
 
+### Password expiry migration (one-time)
+
+After deploying the password expiry feature, run once against the production database:
+
+```bash
+docker compose exec backend flask migrate-password-expiry
+# or dry-run first:
+docker compose exec backend flask migrate-password-expiry --dry-run
+```
+
+This sets a 30-day expiry for existing users without 2FA (users with 2FA or `external_auth_enforced` are skipped). Idempotent: users who already have `password_expires_at` are skipped unless `--force` is passed.
+
 ---
 
 ## Reference
