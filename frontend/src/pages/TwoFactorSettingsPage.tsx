@@ -38,7 +38,7 @@ import type { AccountMeUser } from '@/models/user'
 import type { BasicError } from '@/models/apiError'
 import { siteConfig } from '@/models/siteConfig'
 
-const QR_EXPIRE_MS = 55 * 1000
+const QR_EXPIRE_MS = 300 * 1000
 const TOTP_LENGTH = 6
 
 const GOOGLE_PLAY_AUTHENTICATOR =

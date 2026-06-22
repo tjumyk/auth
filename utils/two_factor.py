@@ -16,7 +16,7 @@ _hash_method = SHA1
 _key_length = 20
 _time_step = 30
 
-_setup_expire = timedelta(seconds=60)
+_setup_expire = timedelta(seconds=300)
 
 
 class TwoFactorError(BasicError):
