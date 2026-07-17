@@ -1,6 +1,7 @@
 .card {
   display: block;
   position: relative;
+  cursor: pointer;
   transition:
     transform 180ms ease,
     box-shadow 200ms ease,
