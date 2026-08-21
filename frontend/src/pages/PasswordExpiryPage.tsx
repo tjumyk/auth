@@ -4,7 +4,7 @@ import { useDocumentTitle } from '@mantine/hooks'
 import { useMemo, useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router'
 
-import { fetchMyOAuthClients, postPasswordExpirySkip } from '@/api/account'
+import { fetchIpCheck, fetchMyOAuthClients, IP_CHECK_QUERY_KEY, postPasswordExpirySkip } from '@/api/account'
 import { getOAuthConnect } from '@/api/oauth'
 import { getBasicErrorFromUnknown } from '@/api/client'
 import { PublicAuthCard } from '@/components/layout/PublicAuthShell'
@@ -13,6 +13,7 @@ import { useI18n } from '@/hooks/useI18n'
 import type { BasicError } from '@/models/apiError'
 import { siteConfig } from '@/models/siteConfig'
 import { formatPasswordExpiryDate } from '@/utils/passwordExpiry'
+import { resolvePasswordExpiryIntentResume } from '@/utils/resolvePasswordExpiryResume'
 
 function buildOAuthSearchParams(searchParams: URLSearchParams): string {
   const parts: string[] = []
@@ -49,12 +50,17 @@ async function resumeAfterSkip(
     return result.redirect_url ?? null
   }
   if (intentClientId != null) {
-    const clients = await queryClient.fetchQuery({
-      queryKey: ['myOAuthClients'],
-      queryFn: fetchMyOAuthClients,
-    })
-    const client = clients.find((c) => c.id === intentClientId)
-    return client?.home_url ?? null
+    const [clients, ipCheck] = await Promise.all([
+      queryClient.fetchQuery({
+        queryKey: ['myOAuthClients'],
+        queryFn: fetchMyOAuthClients,
+      }),
+      queryClient.fetchQuery({
+        queryKey: IP_CHECK_QUERY_KEY,
+        queryFn: fetchIpCheck,
+      }),
+    ])
+    return resolvePasswordExpiryIntentResume(clients, ipCheck, intentClientId)
   }
   return null
 }
@@ -95,7 +101,7 @@ export function PasswordExpiryPage(): React.ReactElement {
       return null
     }
     const id = Number.parseInt(raw, 10)
-    return Number.isFinite(id) ? id : null
+    return Number.isFinite(id) && id > 0 ? id : null
   }, [searchParams])
 
   const skipM = useMutation({

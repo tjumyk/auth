@@ -119,8 +119,10 @@ def account_register():
         db.session.commit()
         send_email(name, email, 'confirm_email', user=user, site=app.config['SITE'])
         return jsonify(user.to_dict(with_advanced_fields=True)), 201
-    except (UserServiceError, GroupServiceError, ValueError) as e:
+    except (UserServiceError, GroupServiceError) as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
+    except ValueError as e:
+        return jsonify(msg=str(e)), 400
 
 
 def _check_register(email) -> Tuple[bool, list, str]:

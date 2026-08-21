@@ -12,7 +12,7 @@ import {
   Title,
 } from '@mantine/core'
 import { IconSettings, IconUser } from '@tabler/icons-react'
-import { useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
 import { Link, useNavigate } from 'react-router'
 
 import { fetchIpCheck, fetchMyOAuthClients, IP_CHECK_QUERY_KEY } from '@/api/account'
@@ -24,10 +24,12 @@ import {
   enrichOAuthClientsWithIpCheck,
   findGateClient,
 } from '@/utils/enrichOAuthClientsWithIpCheck'
+import { applyDevIpCheckOverride } from '@/utils/devScenarioOverrides'
 import { formatClockSkewSeconds, isClockSkewWarning } from '@/utils/clockSkew'
 import { isAdmin } from '@/utils/isAdmin'
 import { shouldWarnAdminInsecureHttp } from '@/utils/isHttpHostedPage'
 import { formatPasswordExpiryDate, shouldInterceptPasswordExpiry } from '@/utils/passwordExpiry'
+import { resolveClientNavigation } from '@/utils/resolveClientNavigation'
 import { siteAssetSrc } from '@/utils/siteAssetUrl'
 import { getUserDisplayName } from '@/utils/userDisplayName'
 
@@ -59,7 +61,7 @@ export function HomePage(): React.ReactElement {
     }
     return enrichOAuthClientsWithIpCheck(
       clientsQ.data,
-      ipQ.isSuccess ? (ipQ.data ?? null) : null,
+      applyDevIpCheckOverride(ipQ.isSuccess ? (ipQ.data ?? null) : null),
     )
   }, [clientsQ.data, ipQ.isSuccess, ipQ.data])
 
@@ -85,12 +87,38 @@ export function HomePage(): React.ReactElement {
   const interceptApps = shouldInterceptPasswordExpiry(user)
 
   const handleClientNavigate = (homeUrl: string, clientId: number): void => {
-    if (interceptApps) {
-      navigate(`/account/password-expiry?intent_client_id=${clientId}`)
+    const client = enrichedClients?.find((c) => c.id === clientId)
+    if (!client) {
+      window.location.href = homeUrl
       return
     }
-    window.location.href = homeUrl
+
+    const action = resolveClientNavigation({
+      client,
+      gateClient,
+      interceptPasswordExpiry: interceptApps,
+    })
+
+    switch (action.kind) {
+      case 'password_expiry':
+        navigate(`/account/password-expiry?intent_client_id=${action.clientId}`)
+        return
+      case 'gate_grant_access':
+      case 'external':
+        window.location.href = action.url
+        return
+    }
   }
+
+  useEffect(() => {
+    const onVisibilityChange = (): void => {
+      if (document.visibilityState === 'visible') {
+        void ipQ.refetch()
+      }
+    }
+    document.addEventListener('visibilitychange', onVisibilityChange)
+    return () => document.removeEventListener('visibilitychange', onVisibilityChange)
+  }, [ipQ])
 
   const refetchApps = (): void => {
     void clientsQ.refetch()
