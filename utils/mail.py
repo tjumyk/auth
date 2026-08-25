@@ -46,6 +46,11 @@ def send_emails(to_list, cc_list, bcc_list, template, **kwargs):
         _logger.debug('Outbound email skipped (MAIL.enabled is false)')
         return
 
+    user = kwargs.get('user')
+    if user is not None and not user.is_active:
+        _logger.debug('Outbound email skipped (recipient user is inactive)')
+        return
+
     mail_config = app.config['MAIL']
 
     msg = EmailMessage()
@@ -56,7 +61,6 @@ def send_emails(to_list, cc_list, bcc_list, template, **kwargs):
     if sender:  # if sender is specified, it's a personal email. Otherwise, it's a system email.
         from_name = '%s via %s' % (display_name(sender), from_name)
 
-    user = kwargs.get('user')
     if user is not None:
         kwargs = {**kwargs, 'user_display_name': display_name(user)}
     msg['From'] = Address(from_name, from_user, from_domain)

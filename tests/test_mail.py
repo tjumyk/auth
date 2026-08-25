@@ -34,6 +34,16 @@ class MailConfigTests(unittest.TestCase):
             send_emails([('User', 'u@example.com')], [], [], 'confirm_email', user=MagicMock())
             popen.assert_not_called()
 
+    def test_send_emails_noop_when_recipient_inactive(self) -> None:
+        from utils.mail import send_emails
+
+        flask_app.config['MAIL'] = {'from': 'a@b.com', 'display_name': 'Test'}
+        inactive_user = MagicMock()
+        inactive_user.is_active = False
+        with patch('utils.mail.Popen') as popen:
+            send_emails([('User', 'u@example.com')], [], [], 'confirm_email', user=inactive_user)
+            popen.assert_not_called()
+
 
 if __name__ == '__main__':
     unittest.main()

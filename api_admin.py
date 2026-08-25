@@ -625,16 +625,20 @@ def send_email_api():
         if not to_users:
             return jsonify(msg='empty receiver list'), 400
 
-        if len(to_users) == 1:
-            _user = list(to_users.values())[0]
+        active_users = [u for u in to_users.values() if u.is_active]
+        if not active_users:
+            return jsonify(msg='no active recipients'), 400
+
+        if len(active_users) == 1:
+            _user = active_users[0]
             send_email(_user.name, _user.email,
-                       template=None, subject=subject, body=body, sender=user,
+                       template=None, subject=subject, body=body, sender=user, user=_user,
                        site=app.config['SITE'])
         else:  # use bcc list if there are multiple recipients
-            send_emails([], [], [(u.name, u.email) for u in to_users.values()],
+            send_emails([], [], [(u.name, u.email) for u in active_users],
                         template=None, subject=subject, body=body, sender=user,
                         site=app.config['SITE'])
-        return jsonify(num_recipients=len(to_users))
+        return jsonify(num_recipients=len(active_users))
     except (UserServiceError, GroupServiceError, OAuthServiceError) as e:
         return jsonify(msg=e.msg, detail=e.detail), 500
     except Exception as e:
