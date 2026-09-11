@@ -13,7 +13,7 @@ import {
 } from '@mantine/core'
 import { IconSettings, IconUser } from '@tabler/icons-react'
 import { useEffect, useMemo } from 'react'
-import { Link, useNavigate } from 'react-router'
+import { Link } from 'react-router'
 
 import { fetchIpCheck, fetchMyOAuthClients, IP_CHECK_QUERY_KEY } from '@/api/account'
 import { fetchMetaTime, META_TIME_QUERY_KEY } from '@/api/meta'
@@ -28,15 +28,13 @@ import { applyDevIpCheckOverride } from '@/utils/devScenarioOverrides'
 import { formatClockSkewSeconds, isClockSkewWarning } from '@/utils/clockSkew'
 import { isAdmin } from '@/utils/isAdmin'
 import { shouldWarnAdminInsecureHttp } from '@/utils/isHttpHostedPage'
-import { formatPasswordExpiryDate, shouldInterceptPasswordExpiry } from '@/utils/passwordExpiry'
-import { resolveClientNavigation } from '@/utils/resolveClientNavigation'
+import { formatPasswordExpiryDate } from '@/utils/passwordExpiry'
 import { siteAssetSrc } from '@/utils/siteAssetUrl'
 import { getUserDisplayName } from '@/utils/userDisplayName'
 
 export function HomePage(): React.ReactElement {
   const { t, locale } = useI18n()
   const user = useAuthUser()
-  const navigate = useNavigate()
 
   const clientsQ = useQuery({
     queryKey: ['myOAuthClients'],
@@ -84,25 +82,9 @@ export function HomePage(): React.ReactElement {
   const passwordExpiryDate = formatPasswordExpiryDate(user.password_expires_at, locale)
   const showPasswordExpiry1Month = user.password_expiry_status === 'warning_1month'
   const showPasswordExpiry1Week = user.password_expiry_status === 'warning_1week'
-  const interceptApps = shouldInterceptPasswordExpiry(user)
 
-  const handleClientNavigate = (homeUrl: string, clientId: number): void => {
-    const client = enrichedClients?.find((c) => c.id === clientId)
-    if (!client) {
-      window.location.href = homeUrl
-      return
-    }
-
-    const action = resolveClientNavigation({
-      client,
-      interceptPasswordExpiry: interceptApps,
-    })
-
-    if (action.kind === 'password_expiry') {
-      navigate(`/account/password-expiry?intent_client_id=${action.clientId}`)
-      return
-    }
-    window.location.href = action.url
+  const handleClientNavigate = (homeUrl: string): void => {
+    window.location.href = homeUrl
   }
 
   useEffect(() => {
@@ -244,8 +226,8 @@ export function HomePage(): React.ReactElement {
             radius="md"
             withBorder
             style={{
-              background: 'light-dark(var(--mantine-color-yellow-0), rgba(250, 176, 5, 0.12))',
-              borderColor: 'light-dark(var(--mantine-color-yellow-3), var(--mantine-color-dark-4))',
+              background: 'light-dark(var(--mantine-color-orange-0), rgba(253, 126, 20, 0.12))',
+              borderColor: 'light-dark(var(--mantine-color-orange-3), var(--mantine-color-dark-4))',
             }}
           >
             <Stack gap="sm">
@@ -314,7 +296,7 @@ export function HomePage(): React.ReactElement {
                     type="button"
                     underline="hover"
                     style={{ textDecoration: 'none', background: 'none', border: 'none', padding: 0, cursor: 'pointer' }}
-                    onClick={() => handleClientNavigate(gateClient.home_url, gateClient.id)}
+                    onClick={() => handleClientNavigate(gateClient.home_url)}
                   >
                     <Group gap="xs" wrap="nowrap">
                       {gateClient.icon ? (

@@ -17,7 +17,7 @@ import {
 import { useDocumentTitle } from '@mantine/hooks'
 import { IconApps } from '@tabler/icons-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { Link, useNavigate, useSearchParams } from 'react-router'
+import { Link, useSearchParams } from 'react-router'
 import { SiteBrandBlock } from '@/components/branding/SiteBrandBlock'
 import { fetchWhoami, PasswordExpiredWhoamiError, postLogin, postTwoFactorLogin } from '@/api/account'
 import { getBasicErrorFromUnknown } from '@/api/client'
@@ -32,9 +32,7 @@ import type { BasicError } from '@/models/apiError'
 import { siteConfig } from '@/models/siteConfig'
 import type { User } from '@/models/user'
 import { siteAssetSrc } from '@/utils/siteAssetUrl'
-import { buildPasswordExpiryPath } from '@/pages/PasswordExpiryPage'
 import { isPasswordExpiredError } from '@/utils/passwordErrorMessage'
-import { shouldInterceptPasswordExpiry } from '@/utils/passwordExpiry'
 
 /** Compact cue that this flow is handled by the central identity service (not the OAuth client). */
 function OAuthIdentityPill(): React.ReactElement {
@@ -98,7 +96,6 @@ export function OAuthLoginPage(): React.ReactElement {
   const { t, locale } = useI18n()
   const [searchParams] = useSearchParams()
   const queryClient = useQueryClient()
-  const navigate = useNavigate()
   const parsed = useMemo(() => oauthParams(searchParams), [searchParams])
   const [step, setStep] = useState<'password' | '2fa'>('password')
   const [rememberFor2fa, setRememberFor2fa] = useState(false)
@@ -145,10 +142,6 @@ export function OAuthLoginPage(): React.ReactElement {
     },
     onError: (err) => {
       const basic = getBasicErrorFromUnknown(err)
-      if (basic?.code === 'password_expiring') {
-        navigate(buildPasswordExpiryPath(searchParams))
-        return
-      }
       if (isPasswordExpiredError(basic)) {
         setConnectError({
           msg: t('passwordExpiryLoginExpiredTitle'),
@@ -169,16 +162,12 @@ export function OAuthLoginPage(): React.ReactElement {
     if (!parsed.ok || !whoamiQ.data) {
       return
     }
-    if (shouldInterceptPasswordExpiry(whoamiQ.data)) {
-      navigate(buildPasswordExpiryPath(searchParams))
-      return
-    }
     if (connectAttemptedRef.current || connectM.isPending || redirecting) {
       return
     }
     connectAttemptedRef.current = true
     connectM.mutate(parsed.params)
-  }, [parsed, whoamiQ.data, connectM, redirecting, navigate, searchParams])
+  }, [parsed, whoamiQ.data, connectM, redirecting])
 
   const [loginGuardRefresh, setLoginGuardRefresh] = useState(0)
 

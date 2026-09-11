@@ -35,7 +35,6 @@ describe('UserSchema', () => {
       external_auth_enforced: false,
       password_expires_at: '2026-09-01T00:00:00',
       password_expiry_status: 'warning_1month',
-      password_expiry_intercept_active: false,
     })
     expect(parsed.success).toBe(true)
   })

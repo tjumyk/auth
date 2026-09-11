@@ -51,14 +51,6 @@ def _password_expiry_login_url() -> str:
     return site_url + 'account/login'
 
 
-def _password_expiry_intercept_url() -> str:
-    site = app.config['SITE']
-    site_url = site['root_url'] + site['base_url']
-    if not site_url.endswith('/'):
-        site_url += '/'
-    return site_url + 'account/password-expiry'
-
-
 def _handle_expired_session_user(user) -> None:
     revoke_expired_session(user)
     clear_current_user()
@@ -141,8 +133,8 @@ def get_current_user():
         return get_session_user(raise_on_expired=True)
 
 
-def user_to_dict_with_password_expiry(user, *, include_intercept: bool = False) -> dict:
-    expiry_fields = build_password_expiry_fields(user, include_intercept=include_intercept)
+def user_to_dict_with_password_expiry(user) -> dict:
+    expiry_fields = build_password_expiry_fields(user)
     return user.to_dict(password_expiry_fields=expiry_fields)
 
 
@@ -183,13 +175,13 @@ def get_two_factor_user():
 
 
 def _password_expiry_error_response(error: PasswordExpiryError):
-    body = {'msg': error.msg, 'detail': error.detail, 'code': error.code}
-    if error.code == 'password_expiring':
-        body['path'] = '/account/password-expiry'
-        body['redirect_url'] = _password_expiry_intercept_url()
-    elif error.code == 'password_expired':
-        body['path'] = '/account/login'
-        body['redirect_url'] = _password_expiry_login_url()
+    body = {
+        'msg': error.msg,
+        'detail': error.detail,
+        'code': error.code,
+        'path': '/account/login',
+        'redirect_url': _password_expiry_login_url(),
+    }
     return jsonify(body), 401
 
 
@@ -203,7 +195,7 @@ def requires_login(f):
         except PasswordExpiryError as e:
             return _password_expiry_error_response(e)
         except OAuthServiceError as e:
-            if getattr(e, 'code', None) in ('password_expiring', 'password_expired'):
+            if getattr(e, 'code', None) == 'password_expired':
                 return _password_expiry_error_response(e)
             return jsonify(msg=e.msg, detail=e.detail, code=getattr(e, 'code', None)), 403
 
@@ -226,7 +218,7 @@ def requires_admin(f):
         except PasswordExpiryError as e:
             return _password_expiry_error_response(e)
         except OAuthServiceError as e:
-            if getattr(e, 'code', None) in ('password_expiring', 'password_expired'):
+            if getattr(e, 'code', None) == 'password_expired':
                 return _password_expiry_error_response(e)
             return jsonify(msg=e.msg, detail=e.detail, code=getattr(e, 'code', None)), 403
 

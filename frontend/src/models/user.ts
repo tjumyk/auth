@@ -28,7 +28,6 @@ export const UserSchema = z.object({
   external_auth_enforced: z.boolean(),
   password_expires_at: z.string().nullable().optional(),
   password_expiry_status: PasswordExpiryStatusSchema.optional(),
-  password_expiry_intercept_active: z.boolean().optional(),
   groups: z.array(GroupSchema).optional(),
 })
 

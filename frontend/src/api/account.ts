@@ -98,16 +98,6 @@ export async function postLogin(
   return parsed.data
 }
 
-export async function postPasswordExpirySkip(): Promise<User> {
-  const res = await apiClient.post<unknown>('/api/account/password-expiry/skip')
-  const parsed = UserSchema.safeParse(res.data)
-  if (!parsed.success) {
-    console.error('password expiry skip parse error', parsed.error.flatten())
-    throw new Error('Invalid user payload from server')
-  }
-  return parsed.data
-}
-
 export async function postTwoFactorLogin(token: string, remember: boolean): Promise<User> {
   const res = await apiClient.post<unknown>('/api/account/two-factor/login', {
     token,

@@ -415,13 +415,9 @@ export const translations: Record<Locale, Record<string, string>> = {
       'Your password expires on {date}. Update your password or enable two-factor authentication to keep access.',
     passwordExpiry1WeekHeroTitle: 'Password expiring very soon',
     passwordExpiry1WeekHeroBody:
-      'Your password expires on {date}. Connected applications may block access until you update your password or enable two-factor authentication.',
+      'Your password expires on {date}. Update your password or enable two-factor authentication soon to avoid losing access.',
     passwordExpiryResetCta: 'Update password',
     passwordExpiry2faCta: 'Enable two-factor',
-    passwordExpiryPageTitle: 'Password expiring soon',
-    passwordExpiryPageBody:
-      'Your password expires on {date}. Update your password or enable two-factor authentication to continue using connected applications.',
-    passwordExpirySkipCta: 'Skip for now',
     passwordExpiryLoginExpiredTitle: 'Password expired',
     passwordExpiryLoginExpiredBody:
       'Your password has expired. Use the reset password link to set a new password before signing in.',
@@ -898,13 +894,9 @@ export const translations: Record<Locale, Record<string, string>> = {
       '您的密码将于 {date} 过期。请更新密码或启用两步验证以保持访问权限。',
     passwordExpiry1WeekHeroTitle: '密码即将在一周内过期',
     passwordExpiry1WeekHeroBody:
-      '您的密码将于 {date} 过期。在更新密码或启用两步验证之前，关联应用可能会限制访问。',
+      '您的密码将于 {date} 过期。请尽快更新密码或启用两步验证，以免失去访问权限。',
     passwordExpiryResetCta: '更新密码',
     passwordExpiry2faCta: '启用两步验证',
-    passwordExpiryPageTitle: '密码即将过期',
-    passwordExpiryPageBody:
-      '您的密码将于 {date} 过期。请更新密码或启用两步验证，以继续使用关联应用。',
-    passwordExpirySkipCta: '暂时跳过',
     passwordExpiryLoginExpiredTitle: '密码已过期',
     passwordExpiryLoginExpiredBody: '您的密码已过期。请先通过重置密码设置新密码后再登录。',
     adminPasswordExpiryNone: '无过期',

@@ -1,4 +1,3 @@
-import { Route, Routes } from 'react-router'
 import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { http, HttpResponse } from 'msw'
@@ -35,38 +34,6 @@ describe('HomePage navigation', () => {
 
     await userEvent.click(screen.getByRole('button', { name: /Open gate to manage IP access/i }))
     expect(location.href).toBe('https://gate.example/')
-  })
-
-  it('navigates to password expiry when intercept is active', async () => {
-    renderWithApp(
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/account/password-expiry" element={<div>expiry-intercept</div>} />
-      </Routes>,
-      {
-        router: { initialEntries: ['/'] },
-        user: {
-          id: 1,
-          name: 'tester',
-          email: 'tester@example.com',
-          nickname: null,
-          avatar: null,
-          is_active: true,
-          is_two_factor_enabled: false,
-          external_auth_enforced: false,
-          password_expiry_intercept_active: true,
-        },
-      },
-    )
-
-    await waitFor(() => {
-      expect(screen.getByText('target')).toBeInTheDocument()
-    })
-
-    await userEvent.click(screen.getByRole('button', { name: /target/i }))
-    await waitFor(() => {
-      expect(screen.getByText('expiry-intercept')).toBeInTheDocument()
-    })
   })
 
   it('opens target home_url when ip check passes', async () => {

@@ -22,7 +22,7 @@ from utils.session import (
     start_two_factor,
     get_two_factor_user,
 )
-from services.password_expiry import PasswordExpiryError, set_password_expiry_oauth_dismissed
+from services.password_expiry import PasswordExpiryError
 from utils.upload import handle_upload, handle_post_upload, UploadError
 from utils.captcha import (
     captcha_required_for_login,
@@ -82,7 +82,7 @@ def account_login():
         else:
             set_current_user(user, remember)
         db.session.commit()
-        return jsonify(user_to_dict_with_password_expiry(user, include_intercept=True))
+        return jsonify(user_to_dict_with_password_expiry(user))
     except UserServiceError as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
 
@@ -276,7 +276,7 @@ def account_who_am_i():
     except PasswordExpiryError as e:
         return _password_expiry_error_response(e)
     except OAuthServiceError as e:
-        if getattr(e, 'code', None) in ('password_expiring', 'password_expired'):
+        if getattr(e, 'code', None) == 'password_expired':
             return _password_expiry_error_response(e)
         return jsonify(msg=e.msg, detail=e.detail, code=getattr(e, 'code', None)), 403
 
@@ -285,7 +285,7 @@ def account_who_am_i():
     if not user.is_active:  # do not acknowledge inactive user as '@requires_login' do
         return "", 204
     db.session.commit()
-    return jsonify(user_to_dict_with_password_expiry(user, include_intercept=True))
+    return jsonify(user_to_dict_with_password_expiry(user))
 
 
 @account.route('/me', methods=['GET', 'PUT'])
@@ -430,22 +430,8 @@ def account_two_factor_login():
 
         set_current_user(user, remember)
         db.session.commit()
-        return jsonify(user_to_dict_with_password_expiry(user, include_intercept=True))
+        return jsonify(user_to_dict_with_password_expiry(user))
     except UserServiceError as e:
-        return jsonify(msg=e.msg, detail=e.detail), 400
-
-
-@account.route('/password-expiry/skip', methods=['POST'])
-@requires_login
-def account_password_expiry_skip():
-    try:
-        user = get_session_user()
-        if user is None:
-            return jsonify(msg='login required'), 401
-        set_password_expiry_oauth_dismissed(user)
-        db.session.commit()
-        return jsonify(user_to_dict_with_password_expiry(user, include_intercept=True))
-    except PasswordExpiryError as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
 
 

@@ -85,18 +85,6 @@ def oauth_connect():
         full_url = url_append_param(redirect_url, params)
         return redirect(full_url)
     except OAuthServiceError as e:
-        if getattr(e, 'code', None) == 'password_expiring':
-            site = app.config['SITE']
-            site_url = site['root_url'] + site['base_url']
-            if not site_url.endswith('/'):
-                site_url += '/'
-            params = {'client_id': client_id, 'redirect_url': redirect_url}
-            if original_path:
-                params['original_path'] = original_path
-            if state:
-                params['state'] = state
-            full_url = url_append_param(site_url + 'account/password-expiry', params)
-            return redirect(full_url)
         if getattr(e, 'code', None) == 'password_expired':
             login_url = url_append_param(_password_expiry_login_url(), {'password_expired': '1'})
             return redirect(login_url)

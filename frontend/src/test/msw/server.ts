@@ -28,19 +28,6 @@ export const handlers = [
   http.get('/api/meta/time', () =>
     HttpResponse.json({ unix_time: Math.floor(Date.now() / 1000) }),
   ),
-  http.post('/api/account/password-expiry/skip', () =>
-    HttpResponse.json({
-      id: 1,
-      name: 'tester',
-      email: 'tester@example.com',
-      nickname: null,
-      avatar: null,
-      is_active: true,
-      is_two_factor_enabled: false,
-      external_auth_enforced: false,
-      password_expiry_intercept_active: false,
-    }),
-  ),
 ]
 
 export const server = setupServer(...handlers)

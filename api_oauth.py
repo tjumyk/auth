@@ -90,25 +90,7 @@ def connect():
             state=state,
             redirect_url=full_url)
     except OAuthServiceError as e:
-        if getattr(e, 'code', None) in ('password_expiring', 'password_expired'):
-            if e.code == 'password_expiring':
-                site = app.config['SITE']
-                site_url = site['root_url'] + site['base_url']
-                if not site_url.endswith('/'):
-                    site_url += '/'
-                params = {'client_id': client_id, 'redirect_url': redirect_url}
-                if original_path:
-                    params['original_path'] = original_path
-                if state:
-                    params['state'] = state
-                full_url = url_append_param(site_url + 'account/password-expiry', params)
-                return jsonify(
-                    msg=e.msg,
-                    detail=e.detail,
-                    code=e.code,
-                    path='/account/password-expiry',
-                    redirect_url=full_url,
-                ), 401
+        if getattr(e, 'code', None) == 'password_expired':
             return jsonify(
                 msg=e.msg,
                 detail=e.detail,
@@ -156,6 +138,6 @@ def oauth_get_access_token():
 
         return jsonify(access_token=access_token)
     except OAuthServiceError as e:
-        if getattr(e, 'code', None) in ('password_expiring', 'password_expired'):
+        if getattr(e, 'code', None) == 'password_expired':
             return jsonify(msg=e.msg, detail=e.detail, code=e.code), 401
         return jsonify(msg=e.msg, detail=e.detail), 400

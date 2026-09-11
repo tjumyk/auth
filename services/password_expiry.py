@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 from typing import Literal
 
-from flask import current_app as app, session, has_request_context
+from flask import current_app as app
 
 from error import BasicError
 from models import User, db
@@ -13,9 +13,6 @@ PASSWORD_EXPIRY_NO_2FA = timedelta(days=90)
 PASSWORD_EXPIRY_MIGRATED = timedelta(days=30)
 PASSWORD_WARNING_1MONTH = timedelta(days=30)
 PASSWORD_WARNING_1WEEK = timedelta(days=7)
-
-_SESSION_KEY_OAUTH_DISMISSED_FOR = 'password_expiry_oauth_dismissed_for'
-
 
 class PasswordExpiryError(BasicError):
     pass
@@ -45,38 +42,8 @@ def get_password_expiry_status(user: User) -> PasswordExpiryStatus:
     return 'none'
 
 
-def is_password_expiry_intercept_active(user: User) -> bool:
-    if get_password_expiry_status(user) != 'warning_1week':
-        return False
-    if not has_request_context():
-        return True
-    dismissed_for = session.get(_SESSION_KEY_OAUTH_DISMISSED_FOR)
-    if dismissed_for is None:
-        return True
-    if user.password_expires_at is None:
-        return True
-    return dismissed_for != user.password_expires_at.isoformat()
-
-
-def set_password_expiry_oauth_dismissed(user: User) -> None:
-    if user.password_expires_at is None:
-        raise PasswordExpiryError('password expiry is not configured')
-    if get_password_expiry_status(user) != 'warning_1week':
-        raise PasswordExpiryError('password expiry warning is not active')
-    if not has_request_context():
-        raise PasswordExpiryError('session is required')
-    session[_SESSION_KEY_OAUTH_DISMISSED_FOR] = user.password_expires_at.isoformat()
-
-
-def clear_password_expiry_oauth_dismissed() -> None:
-    if not has_request_context():
-        return
-    session.pop(_SESSION_KEY_OAUTH_DISMISSED_FOR, None)
-
-
 def refresh_password_expiry(user: User) -> None:
     user.password_changed_at = datetime.utcnow()
-    clear_password_expiry_oauth_dismissed()
     user.password_expiry_warning_email_sent_at = None
     if is_password_expiry_applicable(user):
         user.password_expires_at = datetime.utcnow() + PASSWORD_EXPIRY_NO_2FA
@@ -86,7 +53,6 @@ def refresh_password_expiry(user: User) -> None:
 
 def clear_password_expiry(user: User) -> None:
     user.password_expires_at = None
-    clear_password_expiry_oauth_dismissed()
     user.password_expiry_warning_email_sent_at = None
 
 
@@ -96,19 +62,15 @@ def restore_password_expiry_on_2fa_disable(user: User) -> None:
         user.password_expiry_warning_email_sent_at = None
     else:
         user.password_expires_at = None
-    clear_password_expiry_oauth_dismissed()
 
 
-def build_password_expiry_fields(user: User, *, include_intercept: bool = False) -> dict:
+def build_password_expiry_fields(user: User) -> dict:
     status = get_password_expiry_status(user)
     expires_at = user.password_expires_at.isoformat() if user.password_expires_at else None
-    fields = {
+    return {
         'password_expires_at': expires_at,
         'password_expiry_status': status,
     }
-    if include_intercept:
-        fields['password_expiry_intercept_active'] = is_password_expiry_intercept_active(user)
-    return fields
 
 
 def build_password_expiry_admin_fields(user: User) -> dict:
@@ -122,14 +84,9 @@ def build_password_expiry_admin_fields(user: User) -> dict:
 
 
 def check_password_expiry_for_oauth(user: User) -> None:
-    status = get_password_expiry_status(user)
-    if status == 'expired':
+    if get_password_expiry_status(user) == 'expired':
         raise PasswordExpiryError('password expired', code='password_expired',
                                   detail='Your password has expired. Please reset your password to continue.')
-    if status == 'warning_1week' and is_password_expiry_intercept_active(user):
-        raise PasswordExpiryError('password expiring', code='password_expiring',
-                                  detail='Your password will expire soon. Please update it or enable two-factor '
-                                         'authentication.')
 
 
 def revoke_expired_session(user: User) -> None:

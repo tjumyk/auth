@@ -1,9 +1,3 @@
-import type { User } from '@/models/user'
-
-export function shouldInterceptPasswordExpiry(user: User | null | undefined): boolean {
-  return user?.password_expiry_intercept_active === true
-}
-
 export type PasswordExpiryStatus = 'none' | 'warning_1month' | 'warning_1week' | 'expired'
 
 export function formatPasswordExpiryDate(
