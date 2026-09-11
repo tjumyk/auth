@@ -436,7 +436,7 @@ export const translations: Record<Locale, Record<string, string>> = {
       'This site is being served over HTTP. Credentials and session data can be intercepted on the network. Enable HTTPS for production and set SITE_ROOT_URL to https://.',
     ipUntrustedHeroTitle: 'Your IP is not trusted for some apps',
     ipUntrustedHeroBody:
-      'Some applications below are shown as limited because your current IP is not allowed to reach their services (IP allowlist). Click a limited app to open Gate and grant access, then continue to that app.',
+      'Some applications below are shown as limited because your current IP is not allowed to reach their services (IP allowlist). Open Gate below to add your IP, then return here and try the app again.',
     ipUntrustedGateCta: 'Open {name} to manage IP access',
     appAccessLimited: 'Limited from this network',
     twoFactorSettingsTitle: 'Two-factor authentication',
@@ -918,7 +918,7 @@ export const translations: Record<Locale, Record<string, string>> = {
       '本系统正通过 HTTP 提供服务，凭据和会话数据可能在传输过程中被窃听。生产环境请启用 HTTPS，并将 SITE_ROOT_URL 配置为 https://。',
     ipUntrustedHeroTitle: '当前网络下部分应用受限',
     ipUntrustedHeroBody:
-      '以下部分应用因 IP 访问限制显示为受限状态；您的 IP 可能不在对应服务的白名单中。点击受限应用可打开 Gate 申请访问权限，完成后将自动进入该应用。',
+      '以下部分应用因 IP 访问限制显示为受限状态；您的 IP 可能不在对应服务的白名单中。请通过下方按钮打开 Gate 添加 IP 白名单，然后返回此处再试。',
     ipUntrustedGateCta: '打开 {name} 管理 IP 白名单',
     appAccessLimited: '当前网络受限',
     twoFactorSettingsTitle: '两步验证',

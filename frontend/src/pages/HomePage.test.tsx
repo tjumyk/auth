@@ -13,7 +13,7 @@ afterEach(() => server.resetHandlers())
 afterAll(() => server.close())
 
 describe('HomePage navigation', () => {
-  it('redirects blocked app clicks to gate grant-access', async () => {
+  it('opens target home_url when ip is blocked', async () => {
     const location = mockWindowLocation()
     renderWithApp(<HomePage />)
 
@@ -22,10 +22,10 @@ describe('HomePage navigation', () => {
     })
 
     await userEvent.click(screen.getByRole('button', { name: /target/i }))
-    expect(location.href).toBe('https://gate.example/grant-access?intent_client_id=10')
+    expect(location.href).toBe('https://target.example/')
   })
 
-  it('opens gate home from banner without grant-access intercept', async () => {
+  it('opens gate home from banner', async () => {
     const location = mockWindowLocation()
     renderWithApp(<HomePage />)
 

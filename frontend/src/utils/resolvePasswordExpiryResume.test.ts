@@ -14,39 +14,32 @@ function client(overrides: Partial<OAuthClient> & Pick<OAuthClient, 'id' | 'home
   }
 }
 
-const gateClient = client({
-  id: 1,
-  name: 'gate',
-  home_url: 'https://gate.example/',
-})
-
 describe('resolvePasswordExpiryIntentResume', () => {
-  it('returns home_url when ip check passes', () => {
+  it('returns home_url when intent client exists', () => {
     const url = resolvePasswordExpiryIntentResume(
-      [
-        gateClient,
-        client({ id: 10, name: 'target', home_url: 'https://target.example/' }),
-      ],
-      { check_pass: true, guarded_ports: [443] },
+      [client({ id: 10, name: 'target', home_url: 'https://target.example/' })],
       10,
     )
     expect(url).toBe('https://target.example/')
   })
 
-  it('returns grant-access URL when ip is blocked', () => {
+  it('returns home_url when intent app is ip blocked', () => {
     const url = resolvePasswordExpiryIntentResume(
       [
-        gateClient,
-        client({ id: 10, name: 'target', home_url: 'https://target.example/' }),
+        client({
+          id: 10,
+          name: 'target',
+          home_url: 'https://target.example/',
+          _is_ip_blocked: true,
+        }),
       ],
-      { check_pass: false, guarded_ports: [443] },
       10,
     )
-    expect(url).toBe('https://gate.example/grant-access?intent_client_id=10')
+    expect(url).toBe('https://target.example/')
   })
 
   it('returns null when intent client is missing', () => {
-    const url = resolvePasswordExpiryIntentResume([gateClient], null, 99)
+    const url = resolvePasswordExpiryIntentResume([], 99)
     expect(url).toBeNull()
   })
 })

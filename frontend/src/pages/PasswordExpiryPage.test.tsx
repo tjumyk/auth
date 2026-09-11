@@ -28,7 +28,7 @@ describe('PasswordExpiryPage skip resume', () => {
     })
   })
 
-  it('redirects to grant-access when intent app is ip blocked', async () => {
+  it('redirects to target home_url when intent app is ip blocked', async () => {
     const location = mockWindowLocation()
     renderWithApp(<PasswordExpiryPage />, {
       router: { initialEntries: ['/account/password-expiry?intent_client_id=10'] },
@@ -36,7 +36,7 @@ describe('PasswordExpiryPage skip resume', () => {
 
     await userEvent.click(screen.getByRole('button', { name: /Skip for now/i }))
     await waitFor(() => {
-      expect(location.href).toBe('https://gate.example/grant-access?intent_client_id=10')
+      expect(location.href).toBe('https://target.example/')
     })
   })
 

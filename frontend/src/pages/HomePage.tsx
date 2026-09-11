@@ -95,19 +95,14 @@ export function HomePage(): React.ReactElement {
 
     const action = resolveClientNavigation({
       client,
-      gateClient,
       interceptPasswordExpiry: interceptApps,
     })
 
-    switch (action.kind) {
-      case 'password_expiry':
-        navigate(`/account/password-expiry?intent_client_id=${action.clientId}`)
-        return
-      case 'gate_grant_access':
-      case 'external':
-        window.location.href = action.url
-        return
+    if (action.kind === 'password_expiry') {
+      navigate(`/account/password-expiry?intent_client_id=${action.clientId}`)
+      return
     }
+    window.location.href = action.url
   }
 
   useEffect(() => {

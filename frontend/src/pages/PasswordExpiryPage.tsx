@@ -4,7 +4,7 @@ import { useDocumentTitle } from '@mantine/hooks'
 import { useMemo, useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router'
 
-import { fetchIpCheck, fetchMyOAuthClients, IP_CHECK_QUERY_KEY, postPasswordExpirySkip } from '@/api/account'
+import { fetchMyOAuthClients, postPasswordExpirySkip } from '@/api/account'
 import { getOAuthConnect } from '@/api/oauth'
 import { getBasicErrorFromUnknown } from '@/api/client'
 import { PublicAuthCard } from '@/components/layout/PublicAuthShell'
@@ -50,17 +50,11 @@ async function resumeAfterSkip(
     return result.redirect_url ?? null
   }
   if (intentClientId != null) {
-    const [clients, ipCheck] = await Promise.all([
-      queryClient.fetchQuery({
-        queryKey: ['myOAuthClients'],
-        queryFn: fetchMyOAuthClients,
-      }),
-      queryClient.fetchQuery({
-        queryKey: IP_CHECK_QUERY_KEY,
-        queryFn: fetchIpCheck,
-      }),
-    ])
-    return resolvePasswordExpiryIntentResume(clients, ipCheck, intentClientId)
+    const clients = await queryClient.fetchQuery({
+      queryKey: ['myOAuthClients'],
+      queryFn: fetchMyOAuthClients,
+    })
+    return resolvePasswordExpiryIntentResume(clients, intentClientId)
   }
   return null
 }

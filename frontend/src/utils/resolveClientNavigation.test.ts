@@ -14,56 +14,26 @@ function client(overrides: Partial<OAuthClient> & Pick<OAuthClient, 'id' | 'home
   }
 }
 
-const gateClient = client({
-  id: 1,
-  name: 'gate',
-  home_url: 'https://gate.example/',
-})
-
 describe('resolveClientNavigation', () => {
   it('routes to password expiry when intercept is active', () => {
     const action = resolveClientNavigation({
       client: client({ id: 10, home_url: 'https://app.example/', _is_ip_blocked: true }),
-      gateClient,
       interceptPasswordExpiry: true,
     })
     expect(action).toEqual({ kind: 'password_expiry', clientId: 10 })
   })
 
-  it('routes blocked non-gate app to grant-access', () => {
+  it('opens target home when ip is blocked', () => {
     const action = resolveClientNavigation({
       client: client({ id: 10, home_url: 'https://app.example/', _is_ip_blocked: true }),
-      gateClient,
-      interceptPasswordExpiry: false,
-    })
-    expect(action).toEqual({
-      kind: 'gate_grant_access',
-      clientId: 10,
-      url: 'https://gate.example/grant-access?intent_client_id=10',
-    })
-  })
-
-  it('opens gate home directly when clicking gate client', () => {
-    const action = resolveClientNavigation({
-      client: gateClient,
-      gateClient,
-      interceptPasswordExpiry: false,
-    })
-    expect(action).toEqual({ kind: 'external', url: 'https://gate.example/' })
-  })
-
-  it('opens target home when not blocked', () => {
-    const action = resolveClientNavigation({
-      client: client({ id: 10, home_url: 'https://app.example/' }),
-      gateClient,
       interceptPasswordExpiry: false,
     })
     expect(action).toEqual({ kind: 'external', url: 'https://app.example/' })
   })
 
-  it('falls back to external when blocked but gate client missing', () => {
+  it('opens target home when not blocked', () => {
     const action = resolveClientNavigation({
-      client: client({ id: 10, home_url: 'https://app.example/', _is_ip_blocked: true }),
+      client: client({ id: 10, home_url: 'https://app.example/' }),
       interceptPasswordExpiry: false,
     })
     expect(action).toEqual({ kind: 'external', url: 'https://app.example/' })
