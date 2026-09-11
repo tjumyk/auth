@@ -14,32 +14,20 @@ function ClientCard({
   icon,
   homeUrl,
   restricted,
-  onNavigate,
 }: {
   name: string
   description: string | null
   icon: string | null
   homeUrl: string
   restricted?: boolean
-  onNavigate?: (homeUrl: string) => void
 }): React.ReactElement {
   const { t } = useI18n()
   const hasIcon = Boolean(icon && icon.trim())
 
-  const handleClick = (event: React.MouseEvent): void => {
-    if (!onNavigate) {
-      return
-    }
-    event.preventDefault()
-    onNavigate(homeUrl)
-  }
-
   return (
     <Card
-      component={onNavigate ? 'button' : 'a'}
-      href={onNavigate ? undefined : homeUrl}
-      type={onNavigate ? 'button' : undefined}
-      onClick={onNavigate ? handleClick : undefined}
+      component="a"
+      href={homeUrl}
       withBorder
       padding="md"
       radius="md"
@@ -109,13 +97,11 @@ export function AppGrid({
   isLoading,
   error,
   onRetry,
-  onClientNavigate,
 }: {
   clients?: OAuthClient[]
   isLoading: boolean
   error: unknown | null
   onRetry: () => void
-  onClientNavigate?: (homeUrl: string, clientId: number) => void
 }): React.ReactElement {
   const { t } = useI18n()
 
@@ -159,11 +145,6 @@ export function AppGrid({
           icon={c.icon}
           homeUrl={c.home_url}
           restricted={Boolean(c._is_ip_blocked)}
-          onNavigate={
-            onClientNavigate
-              ? (homeUrl) => onClientNavigate(homeUrl, c.id)
-              : undefined
-          }
         />
       ))}
     </SimpleGrid>

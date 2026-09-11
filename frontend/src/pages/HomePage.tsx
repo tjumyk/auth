@@ -83,10 +83,6 @@ export function HomePage(): React.ReactElement {
   const showPasswordExpiry1Month = user.password_expiry_status === 'warning_1month'
   const showPasswordExpiry1Week = user.password_expiry_status === 'warning_1week'
 
-  const handleClientNavigate = (homeUrl: string): void => {
-    window.location.href = homeUrl
-  }
-
   useEffect(() => {
     const onVisibilityChange = (): void => {
       if (document.visibilityState === 'visible') {
@@ -292,11 +288,9 @@ export function HomePage(): React.ReactElement {
               {gateClient ? (
                 <Group gap="xs" wrap="nowrap" align="center">
                   <Anchor
-                    component="button"
-                    type="button"
+                    href={gateClient.home_url}
                     underline="hover"
-                    style={{ textDecoration: 'none', background: 'none', border: 'none', padding: 0, cursor: 'pointer' }}
-                    onClick={() => handleClientNavigate(gateClient.home_url)}
+                    style={{ textDecoration: 'none' }}
                   >
                     <Group gap="xs" wrap="nowrap">
                       {gateClient.icon ? (
@@ -327,7 +321,6 @@ export function HomePage(): React.ReactElement {
             isLoading={clientsQ.isPending}
             error={clientsQ.error}
             onRetry={refetchApps}
-            onClientNavigate={handleClientNavigate}
           />
         </div>
       </Stack>
