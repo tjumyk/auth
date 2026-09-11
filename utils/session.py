@@ -28,6 +28,7 @@ _two_factor_window_span = 300  # seconds
 
 def set_current_user(user, remember):
     session[_session_key_user_id] = user.id
+    session.pop('password_expiry_oauth_dismissed_for', None)
     if remember:
         session.permanent = True
 
@@ -48,7 +49,7 @@ def _password_expiry_login_url() -> str:
     site_url = site['root_url'] + site['base_url']
     if not site_url.endswith('/'):
         site_url += '/'
-    return site_url + 'account/login'
+    return url_append_param(site_url + 'account/login', {'password_expired': '1'})
 
 
 def _handle_expired_session_user(user) -> None:

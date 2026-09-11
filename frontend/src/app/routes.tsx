@@ -52,6 +52,10 @@ export const router = createBrowserRouter(
         children: [
           { index: true, element: <HomePage /> },
           { path: 'account/profile', element: <ProfilePage /> },
+          {
+            path: 'account/password-expiry',
+            element: <Navigate to="/" replace />,
+          },
           { path: 'account/two-factor', element: <TwoFactorSettingsPage /> },
           /* Legacy Angular paths → canonical routes (+ scroll state where needed) */
           {

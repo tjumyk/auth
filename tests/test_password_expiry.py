@@ -113,6 +113,7 @@ class PasswordExpiryTests(unittest.TestCase):
         self.assertEqual(resp.status_code, 401)
         body = resp.get_json()
         self.assertEqual(body['code'], 'password_expired')
+        self.assertIn('password_expired=1', body['redirect_url'])
 
         follow_up = client.get('/api/account/whoami')
         self.assertEqual(follow_up.status_code, 204)
@@ -139,6 +140,7 @@ class PasswordExpiryTests(unittest.TestCase):
         self.assertEqual(resp.status_code, 401)
         body = resp.get_json()
         self.assertEqual(body['code'], 'password_expired')
+        self.assertIn('password_expired=1', body['redirect_url'])
 
     def test_expired_session_html_oauth_connect_redirects_to_login(self) -> None:
         user = self._make_user(password_expires_at=datetime.utcnow() - timedelta(days=1))
@@ -162,6 +164,30 @@ class PasswordExpiryTests(unittest.TestCase):
         )
         self.assertEqual(resp.status_code, 302)
         self.assertIn('password_expired=1', resp.location)
+
+    def test_warning_week_oauth_connect_succeeds(self) -> None:
+        user = self._make_user(password_expires_at=datetime.utcnow() + timedelta(days=3))
+        client_row = OAuthClient(
+            name='testapp',
+            secret='secret',
+            redirect_url='https://app.example/callback',
+            home_url='https://app.example/',
+            is_public=True,
+        )
+        db.session.add(client_row)
+        db.session.commit()
+
+        client = flask_app.test_client()
+        with client.session_transaction() as sess:
+            sess['user_id'] = user.id
+
+        resp = client.get(
+            f'/api/oauth/connect?client_id={client_row.id}&redirect_url={client_row.redirect_url}',
+        )
+        self.assertEqual(resp.status_code, 200)
+        body = resp.get_json()
+        self.assertIn('redirect_url', body)
+        self.assertIn('token=', body['redirect_url'])
 
 
 if __name__ == '__main__':

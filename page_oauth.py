@@ -44,8 +44,7 @@ def oauth_connect():
     except UserServiceError as e:
         return _error_html(msg=e.msg, detail=e.detail), 500
     except PasswordExpiryError:
-        login_url = url_append_param(_password_expiry_login_url(), {'password_expired': '1'})
-        return redirect(login_url)
+        return redirect(_password_expiry_login_url())
 
     # if not logged in
     if user is None:
@@ -86,6 +85,5 @@ def oauth_connect():
         return redirect(full_url)
     except OAuthServiceError as e:
         if getattr(e, 'code', None) == 'password_expired':
-            login_url = url_append_param(_password_expiry_login_url(), {'password_expired': '1'})
-            return redirect(login_url)
+            return redirect(_password_expiry_login_url())
         return _error_html(msg=e.msg, detail=e.detail), 400
