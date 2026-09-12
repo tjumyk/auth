@@ -14,6 +14,9 @@ export const translations: Record<Locale, Record<string, string>> = {
   en: {
     langEn: 'En',
     langZh: '中文',
+    themeLight: 'Light theme',
+    themeAuto: 'Use device theme',
+    themeDark: 'Dark theme',
     signInPageTitle: 'Sign in',
     signOutPageTitle: 'Sign out',
     notFoundPageTitle: 'Not found',
@@ -507,6 +510,9 @@ export const translations: Record<Locale, Record<string, string>> = {
   'zh-Hans': {
     langEn: 'En',
     langZh: '中文',
+    themeLight: '浅色主题',
+    themeAuto: '跟随系统',
+    themeDark: '深色主题',
     signInPageTitle: '登录',
     signOutPageTitle: '退出登录',
     notFoundPageTitle: '未找到',

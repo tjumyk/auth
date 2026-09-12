@@ -1,15 +1,29 @@
-import {
-  Box,
-  Group,
-  SegmentedControl,
-  Stack,
-  useComputedColorScheme,
-  useMantineColorScheme,
-} from '@mantine/core'
-import { IconMoon, IconSun } from '@tabler/icons-react'
+import { Box, Group, SegmentedControl, Stack, useMantineColorScheme } from '@mantine/core'
+import { IconDeviceDesktop, IconMoon, IconSun } from '@tabler/icons-react'
+import type { ReactNode } from 'react'
 
 import { useI18n } from '@/hooks/useI18n'
 import { isLocaleForced, isThemeForced } from '@/models/uiConfig'
+
+function ThemeOptionLabel({
+  label,
+  children,
+}: {
+  label: string
+  children: ReactNode
+}): React.ReactElement {
+  return (
+    <Box
+      component="span"
+      display="flex"
+      title={label}
+      aria-label={label}
+      style={{ alignItems: 'center', justifyContent: 'center' }}
+    >
+      {children}
+    </Box>
+  )
+}
 
 export function ThemeLocaleToolbar({
   variant = 'inline',
@@ -18,37 +32,36 @@ export function ThemeLocaleToolbar({
   variant?: 'inline' | 'menu'
 }): React.ReactElement | null {
   const { t, locale, setLocale } = useI18n()
-  const { setColorScheme } = useMantineColorScheme()
-  const computedColorScheme = useComputedColorScheme('light')
+  const { colorScheme, setColorScheme } = useMantineColorScheme()
 
   const themeControl = (
     <SegmentedControl
       size="xs"
       fullWidth={variant === 'menu'}
-      value={computedColorScheme}
-      onChange={(v) => setColorScheme(v as 'light' | 'dark')}
+      value={colorScheme}
+      onChange={(v) => setColorScheme(v as 'light' | 'dark' | 'auto')}
       data={[
         {
           label: (
-            <Box
-              component="span"
-              display="flex"
-              style={{ alignItems: 'center', justifyContent: 'center' }}
-            >
+            <ThemeOptionLabel label={t('themeLight')}>
               <IconSun size={16} />
-            </Box>
+            </ThemeOptionLabel>
           ),
           value: 'light',
         },
         {
           label: (
-            <Box
-              component="span"
-              display="flex"
-              style={{ alignItems: 'center', justifyContent: 'center' }}
-            >
+            <ThemeOptionLabel label={t('themeAuto')}>
+              <IconDeviceDesktop size={16} />
+            </ThemeOptionLabel>
+          ),
+          value: 'auto',
+        },
+        {
+          label: (
+            <ThemeOptionLabel label={t('themeDark')}>
               <IconMoon size={16} />
-            </Box>
+            </ThemeOptionLabel>
           ),
           value: 'dark',
         },
