@@ -6,14 +6,6 @@ import { describe, expect, it } from 'vitest'
 import { ThemeLocaleToolbar } from '@/components/layout/ThemeLocaleToolbar'
 import { I18nProvider } from '@/i18n'
 
-class ResizeObserverMock {
-  observe(): void {}
-  unobserve(): void {}
-  disconnect(): void {}
-}
-
-global.ResizeObserver = ResizeObserverMock
-
 function renderToolbar(): ReturnType<typeof render> {
   return render(
     <MantineProvider defaultColorScheme="auto">
